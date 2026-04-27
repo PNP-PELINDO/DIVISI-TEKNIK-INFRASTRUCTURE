@@ -14,6 +14,7 @@ class InfrastructureController extends Controller
     {
         $user = auth()->user();
 
+        // Tampilkan semua untuk superadmin, filter berdasarkan cabang untuk operator
         if ($user->role === 'superadmin') {
             $infrastructures = Infrastructure::with('entity')->latest()->get();
         } else {
@@ -36,6 +37,7 @@ class InfrastructureController extends Controller
             $entities = Entity::where('id', $user->entity_id)->get();
         }
         
+        // Mengambil daftar tipe alat unik berdasarkan kategori untuk dropdown
         $typeCategoryMap = Infrastructure::select('type', 'category')
                             ->distinct()
                             ->pluck('category', 'type')
@@ -48,14 +50,15 @@ class InfrastructureController extends Controller
     {
         $user = auth()->user();
 
-        // Validasi dasar
-        $request->validate([
+        // 1. Validasi dasar
+        $validated = $request->validate([
             'category'  => 'required|in:equipment,facility,utility',
             'code_name' => 'required|unique:infrastructures',
             'status'    => 'required|in:available,breakdown',
             'image'     => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048'
         ]);
 
+        // 2. Proteksi Entity ID
         // Jika superadmin, entity_id wajib dari form. Jika operator, entity_id dipaksa dari sistem (keamanan).
         $targetEntityId = $user->role === 'superadmin' ? $request->entity_id : $user->entity_id;
 
@@ -63,23 +66,26 @@ class InfrastructureController extends Controller
             return back()->withErrors(['entity_id' => 'Entitas/Cabang wajib dipilih!'])->withInput();
         }
 
+        // 3. Logika Tipe Alat (Dropdown vs Input Baru)
         $finalType = $request->type_select === 'new' ? $request->type_new : $request->type_select;
         
         if (empty($finalType)) {
             return back()->withErrors(['type_new' => 'Jenis alat wajib diisi!'])->withInput();
         }
 
+        // 4. Proses Upload Gambar
         $imagePath = null;
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('assets/infrastructures', 'public');
         }
 
+        // 5. Simpan ke Database
         Infrastructure::create([
-            'entity_id' => $targetEntityId, // Menggunakan ID yang sudah diamankan
-            'category'  => $request->category,
+            'entity_id' => $targetEntityId, 
+            'category'  => $validated['category'],
             'type'      => $finalType,
-            'code_name' => $request->code_name,
-            'status'    => $request->status,
+            'code_name' => $validated['code_name'],
+            'status'    => $validated['status'],
             'quantity'  => 1,
             'image'     => $imagePath,
         ]);
@@ -92,7 +98,7 @@ class InfrastructureController extends Controller
     {
         $user = auth()->user();
 
-        // Proteksi: Operator tidak boleh edit alat cabang lain
+        // Proteksi: Operator tidak boleh edit alat dari cabang lain
         if ($user->role !== 'superadmin' && $infrastructure->entity_id !== $user->entity_id) {
             return redirect()->route('admin.infrastructures.index')->with('error', 'Akses ditolak! Ini bukan aset di wilayah Anda.');
         }
@@ -115,38 +121,57 @@ class InfrastructureController extends Controller
     {
         $user = auth()->user();
 
+        // Proteksi keamanan di backend
         if ($user->role !== 'superadmin' && $infrastructure->entity_id !== $user->entity_id) {
             abort(403, 'Unauthorized action.');
         }
 
-        $request->validate([
+        // 1. Validasi input
+        $validated = $request->validate([
             'category'  => 'required|in:equipment,facility,utility',
             'code_name' => 'required|unique:infrastructures,code_name,' . $infrastructure->id,
             'status'    => 'required|in:available,breakdown',
             'image'     => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048'
         ]);
 
+        // 2. Tentukan Entity ID
+        // Operator tidak akan bisa mengubah entity_id meskipun form diakali (inspect element)
         $targetEntityId = $user->role === 'superadmin' ? $request->entity_id : $infrastructure->entity_id;
 
+        // 3. Logika Tipe Alat
         $finalType = $request->type_select === 'new' ? $request->type_new : $request->type_select;
         
+        // Jika type menggunakan form lama yang tidak punya select, pakai request->type langsung
+        if (empty($finalType) && $request->filled('type')) {
+            $finalType = $request->type;
+        }
+
         if (empty($finalType)) {
             return back()->withErrors(['type_new' => 'Jenis alat wajib diisi!'])->withInput();
         }
 
-        $data = $request->all();
-        $data['entity_id'] = $targetEntityId;
-        $data['type'] = $finalType;
-        $data['quantity'] = 1;
+        // 4. Siapkan array data untuk diupdate (Lebih aman dari Mass Assignment)
+        $dataToUpdate = [
+            'entity_id' => $targetEntityId,
+            'category'  => $validated['category'],
+            'type'      => $finalType,
+            'code_name' => $validated['code_name'],
+            'status'    => $validated['status'],
+            'quantity'  => 1,
+        ];
 
+        // 5. Proses Ganti Foto
         if ($request->hasFile('image')) {
-            if ($infrastructure->image) {
+            // Cek dan hapus foto lama dari brankas storage agar tidak penuh
+            if ($infrastructure->image && Storage::disk('public')->exists($infrastructure->image)) {
                 Storage::disk('public')->delete($infrastructure->image);
             }
-            $data['image'] = $request->file('image')->store('assets/infrastructures', 'public');
+            // Simpan foto baru dan catat path-nya
+            $dataToUpdate['image'] = $request->file('image')->store('assets/infrastructures', 'public');
         }
 
-        $infrastructure->update($data);
+        // 6. Eksekusi Update
+        $infrastructure->update($dataToUpdate);
 
         return redirect()->route('admin.infrastructures.index')
             ->with('success', 'Data inventaris berhasil diperbarui.');
@@ -156,37 +181,44 @@ class InfrastructureController extends Controller
     {
         $user = auth()->user();
         
+        // Proteksi Hapus
         if ($user->role !== 'superadmin' && $infrastructure->entity_id !== $user->entity_id) {
             return redirect()->route('admin.infrastructures.index')->with('error', 'Akses ditolak!');
         }
 
-        if ($infrastructure->image) {
+        // Hapus file fisik gambar jika ada
+        if ($infrastructure->image && Storage::disk('public')->exists($infrastructure->image)) {
             Storage::disk('public')->delete($infrastructure->image);
         }
 
         $infrastructure->delete();
 
         return redirect()->route('admin.infrastructures.index')
-            ->with('success', 'Aset telah dihapus dari database.');
+            ->with('success', 'Aset telah dihapus dari database beserta fotonya.');
     }
 
     public function deleteAll()
     {
+        // Hanya superadmin yang boleh melakukan reset total
         if (auth()->user()->role !== 'superadmin') {
             return back()->with('error', 'Akses ditolak!');
         }
 
+        // Hapus semua file gambar fisik dari direktori
         $infrastructuresWithImages = Infrastructure::whereNotNull('image')->get();
         foreach ($infrastructuresWithImages as $item) {
-            Storage::disk('public')->delete($item->image);
+            if (Storage::disk('public')->exists($item->image)) {
+                Storage::disk('public')->delete($item->image);
+            }
         }
 
+        // Bersihkan tabel dengan menonaktifkan constraint foreign key sementara
         Schema::disableForeignKeyConstraints();
         \App\Models\BreakdownLog::truncate();
         Infrastructure::truncate();
         Schema::enableForeignKeyConstraints();
 
         return redirect()->route('admin.infrastructures.index')
-            ->with('success', 'Seluruh database infrastruktur telah dibersihkan total.');
+            ->with('success', 'Seluruh database infrastruktur beserta file fotonya telah dibersihkan total.');
     }
 }
