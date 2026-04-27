@@ -9,12 +9,34 @@ class Infrastructure extends Model
 {
     use HasFactory;
 
+    // Atribut yang diizinkan untuk diisi ke dalam database (Mass Assignment)
     // PASTIKAN ADA KATA 'image' DI DALAM ARRAY INI
-    protected $fillable = ['entity_id', 'category', 'code_name', 'type', 'quantity', 'status', 'image'];
+    protected $fillable = [
+        'entity_id', 
+        'category', 
+        'code_name', 
+        'type', 
+        'quantity', 
+        'status', 
+        'image'
+    ];
 
-    // Relasi ke tabel entities
+    /**
+     * Relasi ke tabel entities
+     * (Setiap alat/infrastruktur dimiliki oleh satu entitas/cabang)
+     */
     public function entity()
     {
         return $this->belongsTo(Entity::class);
+    }
+
+    /**
+     * Relasi ke tabel breakdown_logs
+     * (Satu alat/infrastruktur bisa memiliki banyak riwayat kerusakan)
+     */
+    public function breakdownLogs()
+    {
+        // Pastikan nama model BreakdownLog sudah sesuai dengan yang ada di folder Models kamu
+        return $this->hasMany(BreakdownLog::class, 'infrastructure_id');
     }
 }
