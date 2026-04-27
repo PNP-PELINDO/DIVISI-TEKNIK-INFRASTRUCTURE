@@ -6,6 +6,7 @@ use App\Http\Controllers\EntityController;
 use App\Http\Controllers\InfrastructureController;
 use App\Http\Controllers\BreakdownLogController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AnalyticsController; // <-- Tambahan Controller Analytics
 use App\Models\Entity;
 use App\Models\Infrastructure;
 use App\Models\BreakdownLog;
@@ -59,6 +60,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('admin')->name('admin.')->group(function () {
 
         /* --- AKSES SEMUA LEVEL (Superadmin & Operator Cabang) --- */
+        
+        // Fitur Analytics / Statistik Detail
+        Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
         
         // Fitur Hapus Semua Data (Wajib di atas resource)
         Route::delete('infrastructures/delete-all', [InfrastructureController::class, 'deleteAll'])->name('infrastructures.deleteAll');

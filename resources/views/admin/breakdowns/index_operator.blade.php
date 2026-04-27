@@ -128,6 +128,10 @@
                         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Panel Kendali Tindak Lanjut Operator</p>
                     </div>
                 </div>
+
+                <button onclick="exportTableToCSV('Laporan_Kesiapan_Area_{{ date('d_M_Y') }}.csv')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-emerald-900/20 transition-all flex items-center gap-2 z-10 relative">
+                    <i class="fas fa-file-excel"></i> Export Excel
+                </button>
             </div>
 
             @if(session('success'))
@@ -138,7 +142,7 @@
 
             <div class="bg-white rounded-[2rem] border border-slate-200 overflow-hidden shadow-sm">
                 <div class="overflow-x-auto hide-scrollbar">
-                    <table class="w-full text-left border-collapse whitespace-nowrap min-w-[1500px]">
+                    <table id="operatorTable" class="w-full text-left border-collapse whitespace-nowrap min-w-[1500px]">
                         <thead>
                             <tr class="bg-slate-50 text-slate-500 text-[9px] font-black uppercase tracking-[0.1em] border-b border-slate-200">
                                 <th class="px-4 py-5 w-12 text-center sticky left-0 bg-slate-50 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">NO</th>
@@ -156,7 +160,7 @@
                                 <th class="px-4 py-5 text-center">Com Test</th>
                                 <th class="px-4 py-5 text-center">Selesai</th>
                                 <th class="px-4 py-5">PIC</th>
-                                <th class="px-4 py-5 text-center">Aksi / Bukti</th>
+                                <th class="px-4 py-5 text-center export-ignore">Aksi / Bukti</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
@@ -209,7 +213,7 @@
                                         {{ $activeLog ? $activeLog->vendor_pic : '-' }}
                                     </td>
 
-                                    <td class="px-4 py-4 text-center">
+                                    <td class="px-4 py-4 text-center export-ignore">
                                         @if(!$isBroken)
                                             <button @click="selectedAsset = {id: '{{ $item->id }}', code: '{{ $item->code_name }}'}; showReportModal = true;" 
                                                     class="bg-white border border-red-200 text-red-500 hover:bg-red-50 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest shadow-sm">
@@ -256,4 +260,45 @@
             
         </div>
     </div>
+
+    <script>
+        function exportTableToCSV(filename) {
+            var csv = [];
+            // Targetkan tabel dengan ID operatorTable
+            var rows = document.querySelectorAll("#operatorTable tr");
+            
+            for (var i = 0; i < rows.length; i++) {
+                var row = [];
+                var cols = rows[i].querySelectorAll("td, th");
+                
+                for (var j = 0; j < cols.length; j++) {
+                    // Abaikan kolom dengan class export-ignore
+                    if (cols[j].classList.contains('export-ignore')) {
+                        continue;
+                    }
+                    
+                    let text = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, " ").trim();
+                    text = text.replace(/"/g, '""');
+                    row.push('"' + text + '"');
+                }
+                csv.push(row.join(","));
+            }
+
+            downloadCSV(csv.join("\n"), filename);
+        }
+
+        function downloadCSV(csv, filename) {
+            var csvFile;
+            var downloadLink;
+
+            csvFile = new Blob([csv], {type: "text/csv;charset=utf-8;"});
+            downloadLink = document.createElement("a");
+            downloadLink.download = filename;
+            downloadLink.href = window.URL.createObjectURL(csvFile);
+            downloadLink.style.display = "none";
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+    </script>
 </x-app-layout>
