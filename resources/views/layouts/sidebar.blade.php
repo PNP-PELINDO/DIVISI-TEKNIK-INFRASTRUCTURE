@@ -45,10 +45,19 @@
     <div class="flex-1 overflow-y-auto hide-sidebar-scroll py-6 flex flex-col gap-6">
 
         <nav class="space-y-1.5 px-4">
+            <!-- Menu Dashboard -->
             <a href="{{ route('dashboard') }}"
                class="nav-item group flex items-center gap-4 px-4 py-3 rounded-xl {{ request()->routeIs('dashboard') ? 'sidebar-link-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
                 <i class="fas fa-desktop text-sm w-6 text-center {{ request()->routeIs('dashboard') ? '' : 'text-slate-500 group-hover:text-slate-300' }}"></i>
                 <span class="text-xs font-semibold tracking-wide uppercase">Dashboard Utama</span>
+            </a>
+
+            <!-- Menu Portal Publik (Katalog) -->
+            <a href="{{ route('home') }}" target="_blank"
+               class="nav-item group flex items-center gap-4 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white"
+               title="Buka halaman depan di tab baru">
+                <i class="fas fa-external-link-alt text-sm w-6 text-center text-slate-500 group-hover:text-slate-300"></i>
+                <span class="text-xs font-semibold tracking-wide uppercase">Portal Publik</span>
             </a>
         </nav>
 
@@ -88,7 +97,7 @@
 
     </div>
 
-    <!-- User Profile & Action Area (Dirombak Total) -->
+    <!-- User Profile & Action Area -->
     <div class="mt-auto bg-[#010e1c] border-t border-white/5 shrink-0 pb-2">
         @auth
             <div class="p-4 flex items-center justify-between gap-3">
