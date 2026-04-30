@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="max-w-[1600px] mx-auto w-full space-y-8 pb-16 animate-fade-up">
+    <div class="max-w-[1600px] mx-auto w-full space-y-6 animate-fade-up">
         
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
             <div class="flex items-center gap-5">

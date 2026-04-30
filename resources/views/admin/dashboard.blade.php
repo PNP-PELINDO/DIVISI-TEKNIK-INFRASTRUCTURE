@@ -12,7 +12,7 @@
 
         [x-cloak] { display: none !important; }
 
-        .animate-fade {
+        .{
             animation: fadeIn 0.6s ease-out forwards;
         }
 
@@ -25,7 +25,7 @@
             background-color: #ffffff;
             border: 1px solid #e2e8f0;
             border-radius: 12px;
-            padding: 16px;
+            padding: 10px;
             transition: all 0.3s ease;
             display: flex;
             flex-direction: column;
@@ -40,30 +40,30 @@
 
         .asset-img-box {
             width: 100%;
-            aspect-ratio: 4/3;
+            aspect-ratio: 16/9;
             background-color: #f8fafc;
             border: 1px solid #f1f5f9;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             overflow: hidden;
         }
 
         .asset-title-wrapper {
-            min-height: 2.5rem;
+            min-height: 2rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .stat-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 10px;
+            padding: 6px 8px;
             border-radius: 6px;
             margin-top: 6px;
             font-size: 10px;
@@ -95,18 +95,18 @@
         $countUtil = $utility->count();
     @endphp
 
-    <div id="main-ui" class="max-w-[1600px] mx-auto w-full space-y-8 pb-16">
+    <div id="main-ui" class="max-w-[1600px] mx-auto w-full space-y-6 animate-fade-up" x-data="{ showDetailModal: false, infraData: null, openDetailModal(data) { this.infraData = data; this.showDetailModal = true; } }">
 
-        <div class="bg-white rounded-2xl border border-slate-200 p-8 shadow-sm flex flex-col xl:flex-row items-center justify-between gap-8 animate-fade relative z-[60]">
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-8 shadow-sm flex flex-col xl:flex-row items-center justify-between gap-6 relative z-[60]">
             <div class="flex flex-col sm:flex-row items-center text-center sm:text-left gap-6 w-full xl:w-auto">
-                <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                    <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-10 md:h-12 object-contain">
-                    <div class="w-px h-10 bg-slate-300"></div>
-                    <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-10 md:h-12 object-contain">
+                <div class="flex items-center justify-center gap-3 sm:gap-4 bg-slate-50 p-3 sm:p-4 rounded-2xl border border-slate-100 w-full sm:w-auto">
+                    <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-7 sm:h-10 md:h-12 object-contain">
+                    <div class="w-px h-8 sm:h-10 bg-slate-300"></div>
+                    <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-7 sm:h-10 md:h-12 object-contain">
                 </div>
             </div>
 
-            <div class="flex flex-col sm:flex-row flex-wrap justify-center gap-3 w-full xl:w-auto">
+            <div class="grid grid-cols-1 min-[450px]:grid-cols-2 sm:flex sm:flex-row sm:flex-wrap justify-center gap-3 w-full xl:w-auto">
                 <div class="relative group z-50 w-full sm:w-auto">
                     <button class="w-full sm:w-auto justify-center bg-[#003366] hover:bg-[#002244] text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-900/20 transition-all flex items-center gap-2">
                         <i class="fas fa-file-export"></i> Export Laporan <i class="fas fa-chevron-down ml-1"></i>
@@ -121,6 +121,9 @@
                     </div>
                 </div>
 
+                <a href="{{ url('/') }}" class="w-full sm:w-auto justify-center bg-slate-100 hover:bg-slate-200 text-[#003366] px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm transition-all flex items-center gap-2 border border-slate-200">
+                    <i class="fas fa-globe"></i> Portal Publik
+                </a>
                 <a href="{{ route('admin.infrastructures.create') }}" class="w-full sm:w-auto justify-center bg-[#003366] hover:bg-[#001e3c] text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-900/20 transition-all flex items-center gap-2">
                     <i class="fas fa-plus"></i> Aset Baru
                 </a>
@@ -130,35 +133,142 @@
             </div>
         </div>
 
+        <!-- FILTER PANEL -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm relative z-[50]" >
+            <form action="{{ route('dashboard') }}" method="GET" class="flex flex-col md:flex-row items-end gap-4">
+                @if(auth()->user()->role === 'superadmin')
+                <div class="w-full md:w-1/3">
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Pilih Terminal / Bagian</label>
+                    <div class="relative">
+                        <select name="entity_id" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 focus:ring-2 focus:ring-[#003366] focus:border-[#003366] transition-all appearance-none cursor-pointer" onchange="this.form.submit()">
+                            <option value="">-- Semua Area (Pusat) --</option>
+                            @foreach($allEntities ?? [] as $entity)
+                                <option value="{{ $entity->id }}" {{ ($filterEntity ?? '') == $entity->id ? 'selected' : '' }}>{{ $entity->name }}</option>
+                            @endforeach
+                        </select>
+                        <i class="fas fa-map-marker-alt absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                    </div>
+                </div>
+                @endif
+                
+                <div class="w-full md:w-1/3">
+                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Kategori Aset</label>
+                    <div class="relative">
+                        <select name="category" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 focus:ring-2 focus:ring-[#003366] focus:border-[#003366] transition-all appearance-none cursor-pointer" onchange="this.form.submit()">
+                            <option value="">-- Semua Kategori --</option>
+                            <option value="equipment" {{ ($filterCategory ?? '') == 'equipment' ? 'selected' : '' }}>Peralatan (Equipment)</option>
+                            <option value="facility" {{ ($filterCategory ?? '') == 'facility' ? 'selected' : '' }}>Fasilitas (Facility)</option>
+                            <option value="utility" {{ ($filterCategory ?? '') == 'utility' ? 'selected' : '' }}>Utilitas (Utility)</option>
+                        </select>
+                        <i class="fas fa-layer-group absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-auto flex items-center gap-3 h-[46px]">
+                    <button type="submit" class="h-full px-6 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 rounded-xl text-[10px] font-black uppercase tracking-widest border border-blue-200 transition-colors flex items-center justify-center">
+                        <i class="fas fa-filter mr-2"></i> Terapkan
+                    </button>
+                    @if(($filterEntity ?? false) || ($filterCategory ?? false))
+                        <a href="{{ route('dashboard') }}" class="h-full px-6 bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-800 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-200 transition-colors flex items-center justify-center">
+                            Reset
+                        </a>
+                    @endif
+                </div>
+            </form>
+        </div>
+
         <!-- KPI STATS -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade" style="animation-delay: 100ms;">
-            <div class="bg-white border border-slate-200 p-6 rounded-2xl flex items-center justify-between shadow-sm">
-                <div>
-                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Inventaris</p>
-                    <p class="text-3xl font-black text-[#003366] mt-1">{{ $stats['total'] ?? 0 }} <span class="text-sm text-slate-500 font-bold">Unit</span></p>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 " >
+            <div class="bg-white border border-slate-200 p-6 rounded-2xl flex flex-col justify-between shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+                <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-50 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
+                <div class="flex items-start justify-between relative z-10">
+                    <div>
+                        <p class="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">Total Aset & Kesiapan</p>
+                        <div class="flex items-end gap-2">
+                            <p class="text-3xl font-black text-slate-800">{{ $stats['total'] ?? 0 }}</p>
+                            <p class="text-sm font-bold text-slate-500 mb-1">Unit</p>
+                        </div>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 text-xl shadow-inner border border-blue-100">
+                        <i class="fas fa-boxes"></i>
+                    </div>
                 </div>
-                <div class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 text-xl border border-slate-100"><i class="fas fa-boxes-stacked"></i></div>
+                <div class="mt-4 relative z-10">
+                    <div class="flex items-center justify-between text-xs font-bold mb-1">
+                        <span class="text-slate-500">Readiness Rate</span>
+                        <span class="text-blue-600">{{ $stats['readiness_rate'] }}%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-1.5">
+                        <div class="bg-blue-500 h-1.5 rounded-full" style="width: {{ $stats['readiness_rate'] }}%"></div>
+                    </div>
+                </div>
             </div>
-            
-            <div class="bg-white border border-slate-200 p-6 rounded-2xl flex items-center justify-between shadow-sm border-l-4 border-l-emerald-500">
-                <div>
-                    <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Aset Beroperasi</p>
-                    <p class="text-3xl font-black text-slate-800 mt-1">{{ $stats['available'] ?? 0 }} <span class="text-sm text-slate-500 font-bold">Unit</span></p>
+
+            <div class="bg-white border border-slate-200 p-6 rounded-2xl flex flex-col justify-between shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+                <div class="absolute -right-4 -top-4 w-24 h-24 bg-red-50 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
+                <div class="flex items-start justify-between relative z-10">
+                    <div>
+                        <p class="text-[10px] font-black text-red-600 uppercase tracking-widest mb-1">Laporan Masuk (Baru)</p>
+                        <div class="flex items-end gap-2">
+                            <p class="text-3xl font-black text-slate-800">{{ $stats['reported'] ?? 0 }}</p>
+                            <p class="text-sm font-bold text-slate-500 mb-1">Tiket</p>
+                        </div>
+                    </div>
+                    <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center text-red-500 text-xl shadow-inner border border-red-100">
+                        <i class="fas fa-bell"></i>
+                    </div>
                 </div>
-                <div class="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-500 text-xl"><i class="fas fa-check-circle"></i></div>
+                <div class="mt-4 relative z-10 flex items-center gap-2">
+                    <span class="text-[10px] font-bold text-red-600 bg-red-50 px-2 py-1 rounded border border-red-100">URGENT ACTION</span>
+                    <span class="text-[10px] font-bold text-slate-400">Belum direspons</span>
+                </div>
             </div>
-            
-            <div class="bg-white border border-slate-200 p-6 rounded-2xl flex items-center justify-between shadow-sm border-l-4 border-l-red-500">
-                <div>
-                    <p class="text-[10px] font-black text-red-600 uppercase tracking-widest">Aset Rusak</p>
-                    <p class="text-3xl font-black text-slate-800 mt-1">{{ $stats['breakdown'] ?? 0 }} <span class="text-sm text-slate-500 font-bold">Unit</span></p>
+
+            <div class="bg-white border border-slate-200 p-6 rounded-2xl flex flex-col justify-between shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+                <div class="absolute -right-4 -top-4 w-24 h-24 bg-amber-50 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
+                <div class="flex items-start justify-between relative z-10">
+                    <div>
+                        <p class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1">Sedang Dikerjakan</p>
+                        <div class="flex items-end gap-2">
+                            <p class="text-3xl font-black text-slate-800">{{ $stats['on_progress'] ?? 0 }}</p>
+                            <p class="text-sm font-bold text-slate-500 mb-1">Tiket</p>
+                        </div>
+                    </div>
+                    <div class="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center text-amber-500 text-xl shadow-inner border border-amber-100">
+                        <i class="fas fa-tools"></i>
+                    </div>
                 </div>
-                <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center text-red-500 text-xl"><i class="fas fa-engine-warning"></i></div>
+                <div class="mt-4 relative z-10 flex items-center gap-2">
+                    <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded border border-amber-100">ON PROGRESS</span>
+                    <span class="text-[10px] font-bold text-slate-400">Ditangani teknisi</span>
+                </div>
+            </div>
+
+            <div class="bg-white border border-slate-200 p-6 rounded-2xl flex flex-col justify-between shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+                <div class="absolute -right-4 -top-4 w-24 h-24 bg-purple-50 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
+                <div class="flex items-start justify-between relative z-10">
+                    <div>
+                        <p class="text-[10px] font-black text-purple-600 uppercase tracking-widest mb-1">Menunggu Suku Cadang</p>
+                        <div class="flex items-end gap-2">
+                            <p class="text-3xl font-black text-slate-800">{{ $stats['order_part'] ?? 0 }}</p>
+                            <p class="text-sm font-bold text-slate-500 mb-1">Tiket</p>
+                        </div>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-50 rounded-full flex items-center justify-center text-purple-500 text-xl shadow-inner border border-purple-100">
+                        <i class="fas fa-box-open"></i>
+                    </div>
+                </div>
+                <div class="mt-4 relative z-10 flex items-center gap-2">
+                    <span class="text-[10px] font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded border border-purple-100">ORDER PART</span>
+                    <span class="text-[10px] font-bold text-slate-400">Menunggu vendor/logistik</span>
+                </div>
             </div>
         </div>
 
         <!-- ANALYTICS CHARTS -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade" style="animation-delay: 150ms;">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 " >
             
             <!-- Tren Chart (Lebar 2 Kolom) -->
             <div class="lg:col-span-2 bg-white border border-slate-200 p-6 rounded-2xl shadow-sm flex flex-col">
@@ -170,153 +280,109 @@
                 </div>
             </div>
 
-            <!-- Rasio Kesehatan (1 Kolom) -->
+            <!-- Distribusi Kerusakan (1 Kolom) -->
             <div class="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm flex flex-col justify-between">
                 <h3 class="text-xs font-black text-slate-700 uppercase tracking-widest text-center mb-4 flex items-center justify-center gap-2">
-                    <i class="fas fa-chart-pie text-emerald-500"></i> Rasio Kesiapan Aset
+                    <i class="fas fa-chart-pie text-amber-500"></i> Kerusakan per Kategori
                 </h3>
                 <div class="relative h-48 w-full flex items-center justify-center mt-auto">
-                    <canvas id="healthChart"></canvas>
+                    <canvas id="categoryChart"></canvas>
                 </div>
             </div>
             
         </div>
 
-        <div x-data="{ tab: 'equipment' }" class="space-y-6 animate-fade" style="animation-delay: 200ms;">
+        <!-- ACTIONABLE LISTS -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 " >
             
-            <div class="flex items-center gap-2 border-b border-slate-300 pb-px overflow-x-auto hide-scroll">
-                <button @click="tab = 'equipment'" :class="tab === 'equipment' ? 'border-[#003366] text-[#003366] bg-white shadow-[0_-4px_6px_-4px_rgba(0,0,0,0.1)]' : 'border-transparent text-slate-500 hover:text-slate-700 bg-slate-50'" class="px-6 py-3.5 text-xs font-black uppercase tracking-widest border-t-2 border-x-2 rounded-t-xl transition-all whitespace-nowrap">
-                    <i class="fas fa-truck-loading mr-2"></i> Peralatan ({{ $countEq }})
-                </button>
-                <button @click="tab = 'facility'" :class="tab === 'facility' ? 'border-[#003366] text-[#003366] bg-white shadow-[0_-4px_6px_-4px_rgba(0,0,0,0.1)]' : 'border-transparent text-slate-500 hover:text-slate-700 bg-slate-50'" class="px-6 py-3.5 text-xs font-black uppercase tracking-widest border-t-2 border-x-2 rounded-t-xl transition-all whitespace-nowrap">
-                    <i class="fas fa-building mr-2"></i> Fasilitas ({{ $countFac }})
-                </button>
-                <button @click="tab = 'utility'" :class="tab === 'utility' ? 'border-[#003366] text-[#003366] bg-white shadow-[0_-4px_6px_-4px_rgba(0,0,0,0.1)]' : 'border-transparent text-slate-500 hover:text-slate-700 bg-slate-50'" class="px-6 py-3.5 text-xs font-black uppercase tracking-widest border-t-2 border-x-2 rounded-t-xl transition-all whitespace-nowrap">
-                    <i class="fas fa-bolt mr-2"></i> Utilitas ({{ $countUtil }})
-                </button>
-            </div>
-
-            <div x-show="tab === 'equipment'" x-cloak class="space-y-8">
-                @forelse($groupedEquipment as $entityName => $items)
-                    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-                        <div class="bg-[#003366] px-6 py-4 text-white flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                            <h3 class="font-black text-sm uppercase tracking-widest">{{ $entityName }}</h3>
-                        </div>
-                        <div class="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                            @foreach($items->groupBy('type') as $type => $typeItems)
-                                @php
-                                    $available = $typeItems->where('status', 'available')->count();
-                                    $breakdown = $typeItems->where('status', 'breakdown')->count();
-                                    $repImage = $typeItems->whereNotNull('image')->first();
-                                    $imgPath = $repImage ? ltrim($repImage->image, '/') : '';
-                                @endphp
-                                <div class="asset-card">
-                                    <div class="asset-img-box">
-                                        @if($imgPath)
-                                            <img src="{{ asset('storage/' . $imgPath) }}" 
-                                                 onerror="this.onerror=null; this.src='{{ asset($imgPath) }}';" 
-                                                 class="w-full h-full object-cover" 
-                                                 alt="{{ $type }}">
-                                        @else
-                                            <i class="fas fa-truck text-4xl text-slate-300"></i>
-                                        @endif
-                                    </div>
-                                    <div class="asset-title-wrapper">
-                                        <h4 class="text-[10px] font-black text-slate-800 uppercase text-center line-clamp-2 leading-snug">{{ $type }}</h4>
-                                    </div>
-                                    <div class="mt-auto border-t border-slate-100 pt-3">
-                                        <div class="stat-row stat-available"><span>Tersedia</span><span class="badge">{{ $available }}</span></div>
-                                        <div class="stat-row stat-breakdown"><span>Rusak</span><span class="badge">{{ $breakdown }}</span></div>
-                                    </div>
-                                </div>
-                            @endforeach
+            <!-- Top Infrastruktur Rusak -->
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm flex flex-col">
+                <div class="px-6 py-5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <i class="fas fa-tools text-slate-600 text-xl"></i>
+                        <div>
+                            <h3 class="text-slate-800 font-black uppercase tracking-widest text-sm leading-none">Top 5 Infrastruktur Sering Rusak</h3>
+                            <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-1">Evaluasi Aset Kritis</p>
                         </div>
                     </div>
-                @empty
-                    <div class="p-16 text-center bg-white border border-slate-200 rounded-2xl"><p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Tidak ada data peralatan</p></div>
-                @endforelse
+                </div>
+                <div class="p-6 flex-1">
+                    <div class="space-y-4">
+                        @forelse($frequentInfrastructures as $index => $infra)
+                        <div @click="openDetailModal({{ json_encode($infra) }})" class="cursor-pointer group flex items-center justify-between p-4 rounded-xl border border-slate-100 bg-slate-50 hover:bg-white hover:border-blue-300 hover:shadow-md transition-all relative">
+                            <div class="absolute right-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fas fa-chevron-right text-blue-500"></i>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-lg bg-red-100 text-red-600 flex items-center justify-center font-black text-sm group-hover:bg-red-500 group-hover:text-white transition-colors">
+                                    #{{ $index + 1 }}
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-black text-slate-800 uppercase group-hover:text-blue-700 transition-colors">{{ $infra->code_name }}</h4>
+                                    <p class="text-[10px] text-slate-500 uppercase font-bold mt-1">{{ $infra->entity->name ?? '-' }} &bull; {{ ucfirst($infra->category) }}</p>
+                                </div>
+                            </div>
+                            <div class="text-right mr-6">
+                                <span class="text-lg font-black text-[#003366]">{{ $infra->breakdown_logs_count }}</span>
+                                <p class="text-[9px] text-slate-400 uppercase font-bold">Kali Rusak</p>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="text-center py-8">
+                            <p class="text-xs text-slate-400 uppercase font-bold tracking-widest">Belum ada data kerusakan historis.</p>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
             </div>
 
-            <div x-show="tab === 'facility'" x-cloak class="space-y-8">
-                @forelse($groupedFacility as $entityName => $items)
-                    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-                        <div class="bg-[#003366] px-6 py-4 text-white flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                            <h3 class="font-black text-sm uppercase tracking-widest">{{ $entityName }}</h3>
-                        </div>
-                        <div class="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                            @foreach($items->groupBy('type') as $type => $typeItems)
-                                @php
-                                    $available = $typeItems->where('status', 'available')->count();
-                                    $breakdown = $typeItems->where('status', 'breakdown')->count();
-                                    $repImage = $typeItems->whereNotNull('image')->first();
-                                    $imgPath = $repImage ? ltrim($repImage->image, '/') : '';
-                                @endphp
-                                <div class="asset-card">
-                                    <div class="asset-img-box">
-                                        @if($imgPath)
-                                            <img src="{{ asset('storage/' . $imgPath) }}" 
-                                                 onerror="this.onerror=null; this.src='{{ asset($imgPath) }}';" 
-                                                 class="w-full h-full object-cover" 
-                                                 alt="{{ $type }}">
-                                        @else
-                                            <i class="fas fa-warehouse text-4xl text-slate-300"></i>
-                                        @endif
-                                    </div>
-                                    <div class="asset-title-wrapper"><h4 class="text-[10px] font-black text-slate-800 uppercase text-center line-clamp-2 leading-snug">{{ $type }}</h4></div>
-                                    <div class="mt-auto border-t border-slate-100 pt-3">
-                                        <div class="stat-row stat-available"><span>Ready</span><span class="badge">{{ $available }}</span></div>
-                                        <div class="stat-row stat-breakdown"><span>Issue</span><span class="badge">{{ $breakdown }}</span></div>
-                                    </div>
-                                </div>
-                            @endforeach
+            <!-- Top Terminal / Urgent / Info Tambahan -->
+            <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm flex flex-col">
+                <div class="px-6 py-5 bg-red-50 border-b border-red-100 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <i class="fas fa-siren-on text-red-600 text-xl"></i>
+                        <div>
+                            <h3 class="text-red-800 font-black uppercase tracking-widest text-sm leading-none">Laporan Mendesak (Urgent)</h3>
+                            <p class="text-[9px] text-red-500 font-bold uppercase tracking-widest mt-1">Laporan Belum Ditindaklanjuti</p>
                         </div>
                     </div>
-                @empty
-                    <div class="p-16 text-center bg-white border border-slate-200 rounded-2xl"><p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Tidak ada data fasilitas</p></div>
-                @endforelse
+                </div>
+                <div class="p-6 flex-1">
+                    <div class="space-y-4">
+                        @forelse($urgentBreakdowns as $log)
+                        <div @click="openDetailModal({{ json_encode($log->infrastructure) }})" class="cursor-pointer group flex items-start gap-4 p-4 border border-red-100 rounded-xl bg-white shadow-sm hover:border-red-400 hover:shadow-md transition-all relative">
+                            <div class="absolute right-4 top-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <i class="fas fa-chevron-right text-red-500"></i>
+                            </div>
+                            <div class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0 mt-1 group-hover:bg-red-500 group-hover:text-white transition-colors">
+                                <i class="fas fa-exclamation"></i>
+                            </div>
+                            <div class="flex-1 pr-6">
+                                <div class="flex justify-between items-start mb-1">
+                                    <h4 class="text-[11px] font-black text-slate-800 uppercase group-hover:text-red-700 transition-colors">{{ $log->infrastructure->code_name ?? 'Unknown Asset' }}</h4>
+                                    <span class="text-[9px] font-bold text-red-500 bg-red-50 px-2 py-0.5 rounded" title="{{ $log->created_at->format('d M Y H:i') }}">{{ $log->created_at->diffForHumans() }}</span>
+                                </div>
+                                <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed">{{ $log->issue_detail }}</p>
+                                <div class="mt-3 flex items-center justify-between text-[9px] uppercase font-bold text-slate-400 border-t border-slate-50 pt-2">
+                                    <span>Lokasi: {{ $log->infrastructure->entity->name ?? '-' }}</span>
+                                    <span>Pelapor: {{ $log->createdBy->name ?? 'Sistem' }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="text-center py-12 flex flex-col items-center justify-center h-full">
+                            <div class="w-16 h-16 bg-emerald-50 text-emerald-500 border border-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-sm"><i class="fas fa-shield-check"></i></div>
+                            <p class="text-xs text-slate-500 uppercase font-black tracking-widest">Semua Aman!</p>
+                            <p class="text-[10px] text-slate-400 uppercase font-bold mt-1">Tidak ada laporan mendesak saat ini.</p>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
             </div>
 
-            <div x-show="tab === 'utility'" x-cloak class="space-y-8">
-                @forelse($groupedUtility as $entityName => $items)
-                    <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
-                        <div class="bg-[#003366] px-6 py-4 text-white flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                            <h3 class="font-black text-sm uppercase tracking-widest">{{ $entityName }}</h3>
-                        </div>
-                        <div class="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                            @foreach($items->groupBy('type') as $type => $typeItems)
-                                @php
-                                    $available = $typeItems->where('status', 'available')->count();
-                                    $breakdown = $typeItems->where('status', 'breakdown')->count();
-                                    $repImage = $typeItems->whereNotNull('image')->first();
-                                    $imgPath = $repImage ? ltrim($repImage->image, '/') : '';
-                                @endphp
-                                <div class="asset-card">
-                                    <div class="asset-img-box">
-                                        @if($imgPath)
-                                            <img src="{{ asset('storage/' . $imgPath) }}" 
-                                                 onerror="this.onerror=null; this.src='{{ asset($imgPath) }}';" 
-                                                 class="w-full h-full object-cover" 
-                                                 alt="{{ $type }}">
-                                        @else
-                                            <i class="fas fa-bolt text-4xl text-slate-300"></i>
-                                        @endif
-                                    </div>
-                                    <div class="asset-title-wrapper"><h4 class="text-[10px] font-black text-slate-800 uppercase text-center line-clamp-2 leading-snug">{{ $type }}</h4></div>
-                                    <div class="mt-auto border-t border-slate-100 pt-3">
-                                        <div class="stat-row stat-available"><span>Active</span><span class="badge">{{ $available }}</span></div>
-                                        <div class="stat-row stat-breakdown"><span>Down</span><span class="badge">{{ $breakdown }}</span></div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                @empty
-                    <div class="p-16 text-center bg-white border border-slate-200 rounded-2xl"><p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Tidak ada data utilitas</p></div>
-                @endforelse
-            </div>
         </div>
 
-        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm animate-fade" style="animation-delay: 300ms;">
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm " >
             <div class="px-6 py-5 bg-[#00152b] flex items-center justify-between">
                 <div class="flex items-center gap-4">
                     <i class="fas fa-clipboard-list text-red-500 text-xl"></i>
@@ -372,7 +438,153 @@
             </div>
         </div>
 
+        <!-- Super Detail Modal (Interactive UI) -->
+        <div x-show="showDetailModal" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+            <!-- Background Backdrop -->
+            <div x-show="showDetailModal" 
+                 x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" 
+                 x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" 
+                 class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" 
+                 @click="showDetailModal = false"></div>
+
+            <!-- Modal Panel -->
+            <div x-show="showDetailModal" 
+                 x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100" 
+                 x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100" x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" 
+                 class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 w-full max-w-4xl flex flex-col max-h-[90vh]">
+                
+                <!-- Modal Header -->
+                <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50 shrink-0">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-2xl shadow-inner border border-blue-200">
+                            <i class="fas fa-microchip"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-black text-slate-800 uppercase tracking-wide leading-tight" x-text="infraData?.code_name"></h3>
+                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-0.5">
+                                <span x-text="infraData?.entity?.name"></span> &bull; 
+                                <span x-text="infraData?.category"></span> &bull; 
+                                <span x-text="infraData?.type"></span>
+                            </p>
+                        </div>
+                    </div>
+                    <button @click="showDetailModal = false" class="text-slate-400 hover:text-red-500 transition-colors p-2 bg-white rounded-full hover:bg-red-50 border border-slate-200 hover:border-red-200 w-10 h-10 flex items-center justify-center shadow-sm">
+                        <i class="fas fa-times text-lg"></i>
+                    </button>
+                </div>
+
+                <!-- Modal Body (Scrollable) -->
+                <div class="p-6 overflow-y-auto flex-1 bg-white custom-scrollbar">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <!-- Quick Stats -->
+                        <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 flex items-center gap-4 shadow-sm">
+                            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-blue-600 border border-blue-100"><i class="fas fa-history text-lg"></i></div>
+                            <div>
+                                <p class="text-[10px] font-black text-blue-600 uppercase tracking-widest">Total Kerusakan</p>
+                                <p class="text-xl font-black text-slate-800" x-text="infraData?.breakdown_logs?.length + ' Kali'"></p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-amber-50 border border-amber-100 rounded-xl p-4 flex items-center gap-4 shadow-sm">
+                            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-amber-600 border border-amber-100"><i class="fas fa-battery-half text-lg"></i></div>
+                            <div>
+                                <p class="text-[10px] font-black text-amber-600 uppercase tracking-widest">Status Saat Ini</p>
+                                <p class="text-xl font-black text-slate-800 uppercase text-sm mt-1" x-text="infraData?.status"></p>
+                            </div>
+                        </div>
+
+                        <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 flex items-center gap-4 shadow-sm">
+                            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-emerald-600 border border-emerald-100"><i class="fas fa-boxes text-lg"></i></div>
+                            <div>
+                                <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Kuantitas</p>
+                                <p class="text-xl font-black text-slate-800" x-text="infraData?.quantity + ' Unit'"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Kerusakan -->
+                    <div>
+                        <h4 class="text-xs font-black text-slate-800 uppercase tracking-widest mb-6 flex items-center gap-2 border-b border-slate-100 pb-2">
+                            <i class="fas fa-stream text-blue-500"></i> Histori Perbaikan (Timeline)
+                        </h4>
+                        
+                        <div class="relative border-l-2 border-slate-200 ml-3 space-y-8 pb-4">
+                            <template x-for="(log, index) in infraData?.breakdown_logs" :key="index">
+                                <div class="relative pl-6">
+                                    <!-- Timeline Dot -->
+                                    <div class="absolute w-4 h-4 rounded-full border-2 border-white -left-[9px] top-1"
+                                         :class="{
+                                            'bg-red-500': log.repair_status === 'reported',
+                                            'bg-amber-500': log.repair_status === 'on_progress',
+                                            'bg-purple-500': log.repair_status === 'order_part',
+                                            'bg-emerald-500': log.repair_status === 'resolved'
+                                         }">
+                                    </div>
+                                    
+                                    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow relative">
+                                        <!-- Status Badge -->
+                                        <div class="absolute right-4 top-4">
+                                            <span class="text-[9px] font-black px-2 py-1 rounded-md uppercase tracking-widest border"
+                                                  :class="{
+                                                      'bg-red-50 text-red-600 border-red-200': log.repair_status === 'reported',
+                                                      'bg-amber-50 text-amber-600 border-amber-200': log.repair_status === 'on_progress',
+                                                      'bg-purple-50 text-purple-600 border-purple-200': log.repair_status === 'order_part',
+                                                      'bg-emerald-50 text-emerald-600 border-emerald-200': log.repair_status === 'resolved'
+                                                  }"
+                                                  x-text="log.repair_status.replace('_', ' ')">
+                                            </span>
+                                        </div>
+
+                                        <p class="text-[10px] font-bold text-slate-500 mb-2">
+                                            <i class="far fa-calendar-alt mr-1"></i> <span x-text="new Date(log.created_at).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})"></span>
+                                        </p>
+                                        
+                                        <p class="text-sm font-bold text-slate-800 mb-3" x-text="log.issue_detail"></p>
+                                        
+                                        <div class="flex items-center gap-4 text-[10px] text-slate-500 font-bold bg-slate-50 p-2 rounded-lg border border-slate-100">
+                                            <div class="flex items-center gap-1.5">
+                                                <i class="fas fa-user-hard-hat text-slate-400"></i> Pelapor: <span class="text-slate-700" x-text="log.created_by?.name || 'Sistem'"></span>
+                                            </div>
+                                            <div class="w-px h-3 bg-slate-300"></div>
+                                            <div class="flex items-center gap-1.5">
+                                                <i class="fas fa-toolbox text-slate-400"></i> Vendor/PIC: <span class="text-slate-700 uppercase" x-text="log.vendor_pic || '-'"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                            
+                            <!-- Placeholder if no logs -->
+                            <div x-show="!infraData?.breakdown_logs || infraData.breakdown_logs.length === 0" class="pl-6">
+                                <div class="absolute w-4 h-4 rounded-full border-2 border-white bg-slate-300 -left-[9px] top-1"></div>
+                                <div class="bg-slate-50 border border-dashed border-slate-300 rounded-xl p-6 text-center">
+                                    <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Belum ada riwayat kerusakan.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase">Pelindo Infrastructure Reporting System</p>
+                    <a :href="'/admin/infrastructures/' + infraData?.id" class="bg-[#003366] hover:bg-[#001e3c] text-white px-5 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-md transition-colors flex items-center gap-2">
+                        <i class="fas fa-tools"></i> Kelola Perbaikan (Update Status)
+                    </a>
+                </div>
+            </div>
+        </div>
+
     </div>
+
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
 
     <!-- Hidden Report Component (for fallback) -->
     <x-export-report :infrastructures="$allInfrastructures" :recentBreakdowns="$allActiveBreakdowns" />
@@ -382,19 +594,38 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const healthCtx = document.getElementById('healthChart').getContext('2d');
-            new Chart(healthCtx, {
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            new Chart(categoryCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Beroperasi (Ready)', 'Breakdown (Down)'],
+                    labels: ['Peralatan', 'Fasilitas', 'Utilitas'],
                     datasets: [{
-                        data: [{{ $stats['available'] ?? 0 }}, {{ $stats['breakdown'] ?? 0 }}],
-                        backgroundColor: ['#10b981', '#ef4444'],
+                        data: [
+                            {{ $chartData['breakdownsByCategory']['equipment'] ?? 0 }}, 
+                            {{ $chartData['breakdownsByCategory']['facility'] ?? 0 }},
+                            {{ $chartData['breakdownsByCategory']['utility'] ?? 0 }}
+                        ],
+                        backgroundColor: ['#3b82f6', '#f59e0b', '#8b5cf6'],
                         borderWidth: 0,
                         hoverOffset: 4
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { position: 'bottom' } } }
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    cutout: '75%', 
+                    plugins: { 
+                        legend: { 
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                usePointStyle: true,
+                                font: { size: 10, weight: 'bold' },
+                                padding: 20
+                            }
+                        } 
+                    } 
+                }
             });
 
             const trendCtx = document.getElementById('trendChart').getContext('2d');

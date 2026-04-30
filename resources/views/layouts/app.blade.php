@@ -31,7 +31,7 @@
                 </div>
             </header>
 
-            <main class="p-6">
+            <main class="flex-1 w-full p-4 sm:p-6 lg:p-8 overflow-x-hidden">
                 {{ $slot }}
             </main>
         </div>

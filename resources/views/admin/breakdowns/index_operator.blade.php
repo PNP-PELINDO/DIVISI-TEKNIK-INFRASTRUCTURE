@@ -1,7 +1,6 @@
 <x-app-layout>
-    <div class="min-h-screen bg-slate-50 -mt-8 pt-12 pb-16">
-        <div class="max-w-[1600px] mx-auto w-full px-4 space-y-8 animate-fade-up" 
-             x-data="{ 
+    <div class="max-w-[1600px] mx-auto w-full space-y-6 animate-fade-up" 
+         x-data="{ 
                  showReportModal: false, 
                  showUpdateModal: false, 
                  selectedAsset: null,
@@ -281,7 +280,6 @@
                 </div>
             </div>
             
-        </div>
     </div>
 
     <x-export-report :infrastructures="$allInfrastructures" :recentBreakdowns="$recentBreakdowns" />

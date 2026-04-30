@@ -1,7 +1,6 @@
 <x-app-layout>
-    <div class="min-h-screen bg-slate-50 -mt-8 pt-12">
-        <div class="max-w-[1600px] mx-auto w-full space-y-8 pb-16 px-4 animate-fade-up" 
-             x-data="{ 
+    <div class="max-w-[1600px] mx-auto w-full space-y-6 animate-fade-up" 
+         x-data="{ 
                 search: '', 
                 filterEntity: 'all',
                 filterCategory: 'all',
@@ -372,6 +371,5 @@
                     </table>
                 </div>
             </div>
-        </div>
     </div>
 </x-app-layout>

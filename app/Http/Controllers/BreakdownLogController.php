@@ -14,11 +14,18 @@ class BreakdownLogController extends Controller
     public function index()
     {
         $user = auth()->user();
+        $filterInfraId = request('infrastructure_id');
 
         // JIKA YANG LOGIN ADALAH SUPERADMIN (TAMPILAN RIWAYAT LOG GLOBAL)
         if ($user->role === 'superadmin') {
             // MAJOR FIX: Add pagination (20 items per page for admin view) and handle soft-deleted infrastructures
-            $logs = BreakdownLog::with(['infrastructure' => fn($q) => $q->withTrashed()->with('entity')])->latest()->paginate(20);
+            $query = BreakdownLog::with(['infrastructure' => fn($q) => $q->withTrashed()->with('entity')]);
+            
+            if ($filterInfraId) {
+                $query->where('infrastructure_id', $filterInfraId);
+            }
+            
+            $logs = $query->latest()->paginate(20);
             
             // For the export report
             $allInfrastructures = Infrastructure::with('entity')->get();
@@ -33,18 +40,25 @@ class BreakdownLogController extends Controller
         // JIKA YANG LOGIN ADALAH OPERATOR (TAMPILAN EXCEL KESIAPAN ALAT)
         else {
             // MAJOR FIX: Add pagination for operator view (15 items per page)
-            $infrastructures = Infrastructure::with('entity')
-                ->where('entity_id', $user->entity_id)
-                ->latest()
-                ->paginate(15);
+            $infraQuery = Infrastructure::with('entity')->where('entity_id', $user->entity_id);
+            
+            if ($filterInfraId) {
+                $infraQuery->where('id', $filterInfraId);
+            }
+            
+            $infrastructures = $infraQuery->latest()->paginate(15);
 
             // Ambil log yang belum 'resolved' (selesai) untuk cabang tersebut
-            $activeBreakdowns = BreakdownLog::where('repair_status', '!=', 'resolved')
+            $activeQuery = BreakdownLog::where('repair_status', '!=', 'resolved')
                 ->whereHas('infrastructure', function($q) use ($user) {
                     $q->where('entity_id', $user->entity_id);
-                })
-                ->get()
-                ->keyBy('infrastructure_id');
+                });
+                
+            if ($filterInfraId) {
+                $activeQuery->where('infrastructure_id', $filterInfraId);
+            }
+                
+            $activeBreakdowns = $activeQuery->get()->keyBy('infrastructure_id');
                 
             // For the export report
             $allInfrastructures = Infrastructure::with('entity')
@@ -60,6 +74,23 @@ class BreakdownLogController extends Controller
 
             return view('admin.breakdowns.index_operator', compact('infrastructures', 'activeBreakdowns', 'allInfrastructures', 'recentBreakdowns'));
         }
+    }
+
+    public function create()
+    {
+        $user = auth()->user();
+
+        // Hanya ambil infrastruktur yang statusnya available (beroperasi)
+        if ($user->role === 'superadmin') {
+            $infrastructures = Infrastructure::with('entity')->where('status', 'available')->get();
+        } else {
+            $infrastructures = Infrastructure::with('entity')
+                ->where('entity_id', $user->entity_id)
+                ->where('status', 'available')
+                ->get();
+        }
+
+        return view('admin.breakdowns.create', compact('infrastructures'));
     }
 
     public function store(StoreBreakdownLogRequest $request)

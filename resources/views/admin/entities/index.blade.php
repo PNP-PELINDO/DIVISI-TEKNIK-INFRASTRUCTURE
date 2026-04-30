@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="max-w-[1600px] mx-auto w-full space-y-8 pb-16 pt-8 px-4 animate-fade-up"
+    <div class="max-w-[1600px] mx-auto w-full space-y-6 animate-fade-up"
          x-data="{ 
             showDeleteModal: false, 
             deleteUrl: '', 

@@ -13,7 +13,7 @@
         .text-pelindo { color: #0055a4; }
         .border-pelindo { border-color: #0055a4; }
         
-        .animate-fade { animation: fadeIn 0.8s ease-out forwards; opacity: 0; }
+        .{ animation: fadeIn 0.8s ease-out forwards; opacity: 0; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Professional Cards */
@@ -28,9 +28,9 @@
         #hiddenExportTable { display: none; background: white; }
     </style>
 
-    <div id="main-ui" class="max-w-[1600px] mx-auto w-full space-y-8 pb-16 px-4 pt-8">
+    <div id="main-ui" class="max-w-[1600px] mx-auto w-full space-y-6 animate-fade-up">
 
-        <div class="bg-pelindo rounded-[2rem] p-8 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 animate-fade relative z-[60]">
+        <div class="bg-pelindo rounded-[2rem] p-8 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 relative z-[60]">
             <div class="absolute inset-0 overflow-hidden rounded-[2rem] pointer-events-none">
                 <div class="absolute right-0 top-0 opacity-10 -mr-10 -mt-10">
                     <i class="fas fa-chart-line text-[15rem] text-white"></i>
@@ -66,7 +66,7 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade" style="animation-delay: 150ms;">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 " >
             
             <div class="lg:col-span-2 card-stats p-8">
                 <div class="flex items-center justify-between mb-8">
@@ -104,7 +104,7 @@
             </div>
         </div>
 
-        <div class="card-stats p-8 animate-fade" style="animation-delay: 250ms;">
+        <div class="card-stats p-8 " >
             <div class="mb-8">
                 <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest">
                     {{ $user->role === 'superadmin' ? 'Perbandingan Performa Antar Terminal' : 'Statistik Kesiapan per Kategori' }}
@@ -115,7 +115,7 @@
             </div>
         </div>
 
-        <div class="card-stats overflow-hidden animate-fade shadow-sm" style="animation-delay: 350ms;">
+        <div class="card-stats overflow-hidden shadow-sm" >
             <div class="px-8 py-6 bg-[#00152b] border-b border-slate-800 flex items-center gap-4">
                 <i class="fas fa-book-spells text-blue-400"></i>
                 <h3 class="text-white font-black uppercase tracking-widest text-sm leading-none">Buku Log Pemeliharaan Alat</h3>

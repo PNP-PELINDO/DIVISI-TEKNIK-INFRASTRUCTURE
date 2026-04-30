@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="max-w-4xl mx-auto w-full space-y-8 pb-16 pt-8 px-4 animate-fade-up" x-data="{ showConfirmModal: false }">
+    <div class="max-w-4xl mx-auto w-full space-y-6 animate-fade-up" x-data="{ showConfirmModal: false }">
         
         <template x-teleport="body">
             <div x-show="showConfirmModal" 

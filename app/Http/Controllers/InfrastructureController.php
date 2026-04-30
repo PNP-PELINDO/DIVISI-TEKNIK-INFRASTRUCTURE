@@ -94,6 +94,12 @@ class InfrastructureController extends Controller
             ->with('success', ResponseMessage::INFRASTRUCTURE_CREATED);
     }
 
+    public function show(Infrastructure $infrastructure)
+    {
+        // Redirect ke halaman Log Kerusakan dengan parameter filter agar user bisa langsung mengupdate status perbaikannya
+        return redirect()->route('admin.breakdowns.index', ['infrastructure_id' => $infrastructure->id]);
+    }
+
     public function edit(Infrastructure $infrastructure)
     {
         $user = auth()->user();
