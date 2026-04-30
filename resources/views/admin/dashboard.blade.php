@@ -183,10 +183,10 @@
         <!-- MAIN ANALYTICS GRID -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade" style="animation-delay: 100ms;">
 
-            <!-- Tren Laporan (Line Chart) -->
+            <!-- Tren Laporan (Line Chart) dengan Efek Gradient Makin Merah -->
             <div class="lg:col-span-2 ent-card flex flex-col">
                 <div class="ent-card-header">
-                    <h3 class="ent-card-title"><i class="fas fa-chart-area text-[#0055a4]"></i> Tren Laporan Insiden (30 Hari)</h3>
+                    <h3 class="ent-card-title"><i class="fas fa-fire-flame-curved text-red-500"></i> Tren Laporan Insiden (30 Hari)</h3>
                 </div>
                 <div class="p-5 flex-1 relative h-64 w-full">
                     <canvas id="trendChart"></canvas>
@@ -351,30 +351,56 @@
                 options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: {size: 11, weight: '600'} } } } }
             });
 
-            // 2. Trend Line Chart
-            new Chart(document.getElementById('trendChart').getContext('2d'), {
+            // 2. Trend Line Chart (DYNAMIC GRADIENT)
+            const trendCtx = document.getElementById('trendChart').getContext('2d');
+
+            // Konfigurasi Canvas Gradient (Y-Axis)
+            // Semakin tinggi nilai grafik (Y mendekati 0 di canvas), warna makin Merah.
+            // Semakin rendah (Y membesar ke bawah), warna makin Hijau/Aman.
+            const gradientBg = trendCtx.createLinearGradient(0, 0, 0, 250);
+            gradientBg.addColorStop(0, 'rgba(239, 68, 68, 0.6)');    // Merah menyala di atas
+            gradientBg.addColorStop(0.5, 'rgba(245, 158, 11, 0.3)'); // Amber di tengah
+            gradientBg.addColorStop(1, 'rgba(16, 185, 129, 0.05)');  // Hijau di bawah
+
+            const gradientBorder = trendCtx.createLinearGradient(0, 0, 0, 250);
+            gradientBorder.addColorStop(0, 'rgba(239, 68, 68, 1)');
+            gradientBorder.addColorStop(0.5, 'rgba(245, 158, 11, 1)');
+            gradientBorder.addColorStop(1, 'rgba(16, 185, 129, 1)');
+
+            new Chart(trendCtx, {
                 type: 'line',
                 data: {
                     labels: {!! json_encode($chartData['trendLabels'] ?? []) !!},
                     datasets: [{
                         label: 'Insiden Tercatat',
                         data: {!! json_encode($chartData['trendCounts'] ?? []) !!},
-                        borderColor: '#0055a4',
-                        backgroundColor: 'rgba(0, 85, 164, 0.1)',
-                        borderWidth: 2,
-                        tension: 0.3,
+                        borderColor: gradientBorder,
+                        backgroundColor: gradientBg,
+                        borderWidth: 3,
+                        tension: 0.4, // Memberikan efek kurva yang smooth
                         fill: true,
                         pointBackgroundColor: '#ffffff',
-                        pointBorderColor: '#0055a4',
-                        pointRadius: 3
+                        pointBorderColor: gradientBorder,
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
                     }]
                 },
                 options: {
-                    responsive: true, maintainAspectRatio: false,
+                    responsive: true,
+                    maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        y: { beginAtZero: true, border: { display: false }, grid: { color: '#f1f5f9' }, ticks: { stepSize: 1, font: {size: 10} } },
-                        x: { grid: { display: false }, ticks: { font: {size: 10} } }
+                        y: {
+                            beginAtZero: true,
+                            border: { display: false },
+                            grid: { color: '#f1f5f9' },
+                            ticks: { stepSize: 1, font: {size: 10} }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: {size: 10} }
+                        }
                     }
                 }
             });
@@ -433,7 +459,7 @@
                     }]
                 },
                 options: {
-                    indexAxis: 'y', // Membuatnya menjadi Horizontal Bar Chart
+                    indexAxis: 'y', // Horizontal Bar Chart
                     responsive: true, maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
