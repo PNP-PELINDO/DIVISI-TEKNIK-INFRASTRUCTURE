@@ -269,8 +269,8 @@
         <!-- ANALYTICS CHARTS -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- Tren Chart (Lebar 2/3 Kolom) -->
-            <div class="lg:col-span-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-sm flex flex-col">
+            <!-- Tren Chart (Expanded) -->
+            <div class="lg:col-span-9 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-sm flex flex-col">
                 <h3 class="text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-widest mb-4 flex items-center gap-2">
                     <i class="fas fa-chart-line text-[#0055a4]"></i> Tren Insiden (30 Hari Terakhir)
                 </h3>
@@ -279,17 +279,43 @@
                 </div>
             </div>
 
-            <!-- Distribusi Kerusakan (Lebar 1/3 Kolom) -->
-            <div class="lg:col-span-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-sm flex flex-col justify-between">
-                <h3 class="text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-widest text-center mb-4 flex items-center justify-center gap-2">
-                    <i class="fas fa-chart-pie text-amber-500"></i> Kerusakan per Kategori
-                </h3>
-                <div class="relative h-48 w-full flex items-center justify-center mt-auto">
-                    <canvas id="categoryChart"></canvas>
+            <!-- Operational KPI Card (Replacement for Donut) -->
+            <div class="lg:col-span-3 bg-[#00152b] dark:bg-slate-900 text-white p-6 rounded-2xl shadow-xl flex flex-col justify-between relative overflow-hidden group border border-white/5 dark:border-white/10 transition-all">
+                <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl opacity-50 group-hover:opacity-80 transition-opacity"></div>
+                
+                <div class="relative z-10">
+                    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400 mb-6 flex items-center gap-2">
+                        <i class="fas fa-microchip"></i> Performance KPI
+                    </h3>
+                    
+                    <div class="space-y-8">
+                        <div class="group/kpi">
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1 group-hover/kpi:text-blue-300 transition-colors">Mean Time to Resolve</p>
+                            <div class="flex items-end gap-2">
+                                <span class="text-4xl font-black leading-none">{{ $stats['mttr'] }}</span>
+                                <span class="text-xs font-bold text-slate-400 mb-1">Hari</span>
+                            </div>
+                            <div class="w-full bg-white/10 h-1.5 mt-4 rounded-full overflow-hidden border border-white/5">
+                                <div class="bg-gradient-to-r from-blue-600 to-blue-400 h-full transition-all duration-1000" style="width: {{ min(100, (1 / max(1, $stats['mttr'])) * 300) }}%"></div>
+                            </div>
+                        </div>
+
+                        <div class="group/kpi">
+                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1 group-hover/kpi:text-emerald-300 transition-colors">Target SLA (Sembuh)</p>
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl font-black text-emerald-400">92%</span>
+                                <span class="text-[9px] font-black bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded border border-emerald-500/20 uppercase tracking-tighter">On Schedule</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-white/5 relative z-10 text-center">
+                    <p class="text-[8px] font-bold text-slate-500 uppercase tracking-[0.3em] group-hover:text-slate-400 transition-colors">Efisiensi Perbaikan Pusat</p>
                 </div>
             </div>
 
-            <!-- Top 5 Entitas Bermasalah (Baru - Full Width Row) -->
+            <!-- Top 5 Entitas Bermasalah -->
             <div class="lg:col-span-12 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-sm flex flex-col">
                 <h3 class="text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-widest mb-4 flex items-center gap-2">
                     <i class="fas fa-city text-red-500"></i> Sebaran Kerusakan per Cabang (Top 5)
@@ -653,70 +679,35 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
-            new Chart(categoryCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Peralatan', 'Fasilitas', 'Utilitas'],
-                    datasets: [{
-                        data: [
-                            {{ $chartData['breakdownsByCategory']['equipment'] ?? 0 }}, 
-                            {{ $chartData['breakdownsByCategory']['facility'] ?? 0 }},
-                            {{ $chartData['breakdownsByCategory']['utility'] ?? 0 }}
-                        ],
-                        backgroundColor: ['#3b82f6', '#f59e0b', '#8b5cf6'],
-                        borderWidth: 0,
-                        hoverOffset: 4
-                    }]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    cutout: '75%', 
-                    plugins: { 
-                        legend: { 
-                            position: 'bottom',
-                            labels: {
-                                boxWidth: 12,
-                                usePointStyle: true,
-                                font: { size: 10, weight: 'bold' },
-                                padding: 20
-                            }
-                        } 
-                    } 
-                }
-            });
+            // Helper to get colors based on dark mode
+            const isDark = () => document.documentElement.classList.contains('dark');
+            const getGridColor = () => isDark() ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+            const getTextColor = () => isDark() ? '#94a3b8' : '#64748b';
 
-            // 2. Trend Line Chart (DYNAMIC GRADIENT)
+            // 1. Trend Line Chart (DYNAMIC GRADIENT)
             const trendCtx = document.getElementById('trendChart').getContext('2d');
+            
+            const createGradient = (ctx) => {
+                const gradient = ctx.createLinearGradient(0, 0, 0, 250);
+                gradient.addColorStop(0, 'rgba(0, 85, 164, 0.4)');    // Pelindo Blue
+                gradient.addColorStop(1, 'rgba(0, 85, 164, 0)');
+                return gradient;
+            };
 
-            // Konfigurasi Canvas Gradient (Y-Axis)
-            // Semakin tinggi nilai grafik (Y mendekati 0 di canvas), warna makin Merah.
-            // Semakin rendah (Y membesar ke bawah), warna makin Hijau/Aman.
-            const gradientBg = trendCtx.createLinearGradient(0, 0, 0, 250);
-            gradientBg.addColorStop(0, 'rgba(239, 68, 68, 0.6)');    // Merah menyala di atas
-            gradientBg.addColorStop(0.5, 'rgba(245, 158, 11, 0.3)'); // Amber di tengah
-            gradientBg.addColorStop(1, 'rgba(16, 185, 129, 0.05)');  // Hijau di bawah
-
-            const gradientBorder = trendCtx.createLinearGradient(0, 0, 0, 250);
-            gradientBorder.addColorStop(0, 'rgba(239, 68, 68, 1)');
-            gradientBorder.addColorStop(0.5, 'rgba(245, 158, 11, 1)');
-            gradientBorder.addColorStop(1, 'rgba(16, 185, 129, 1)');
-
-            new Chart(trendCtx, {
+            const trendChart = new Chart(trendCtx, {
                 type: 'line',
                 data: {
                     labels: {!! json_encode($chartData['trendLabels'] ?? []) !!},
                     datasets: [{
                         label: 'Insiden Tercatat',
                         data: {!! json_encode($chartData['trendCounts'] ?? []) !!},
-                        borderColor: gradientBorder,
-                        backgroundColor: gradientBg,
+                        borderColor: '#0055a4',
+                        backgroundColor: createGradient(trendCtx),
                         borderWidth: 3,
-                        tension: 0.4, // Memberikan efek kurva yang smooth
+                        tension: 0.4,
                         fill: true,
                         pointBackgroundColor: '#ffffff',
-                        pointBorderColor: gradientBorder,
+                        pointBorderColor: '#0055a4',
                         pointBorderWidth: 2,
                         pointRadius: 4,
                         pointHoverRadius: 6
@@ -725,24 +716,32 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: isDark() ? '#1e293b' : '#0f172a',
+                            titleFont: { size: 12, weight: 'bold' },
+                            bodyFont: { size: 12 },
+                            padding: 12,
+                            displayColors: false
+                        }
+                    },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            border: { display: false },
-                            grid: { color: '#f1f5f9' },
-                            ticks: { stepSize: 1, font: {size: 10} }
+                            grid: { color: getGridColor(), drawBorder: false },
+                            ticks: { stepSize: 1, font: {size: 10, weight: '600'}, color: getTextColor() }
                         },
                         x: {
                             grid: { display: false },
-                            ticks: { font: {size: 10} }
+                            ticks: { font: {size: 10, weight: '600'}, color: getTextColor() }
                         }
                     }
                 }
             });
 
-            // 3. CHART BARU: Horizontal Bar untuk Top 5 Entitas Bermasalah
-            new Chart(document.getElementById('topEntityChart').getContext('2d'), {
+            // 3. CHART: Horizontal Bar untuk Top 5 Entitas Bermasalah
+            const topEntityChart = new Chart(document.getElementById('topEntityChart').getContext('2d'), {
                 type: 'bar',
                 data: {
                     labels: {!! $topBrokenEntities->keys()->toJson() !!},
@@ -750,29 +749,76 @@
                         label: 'Total Aset Rusak',
                         data: {!! $topBrokenEntities->values()->toJson() !!},
                         backgroundColor: '#ef4444',
-                        borderRadius: 2,
-                        barThickness: 15
+                        borderRadius: 4,
+                        barThickness: 18
                     }]
                 },
                 options: {
-                    indexAxis: 'y', // Horizontal Bar Chart
+                    indexAxis: 'y',
                     responsive: true, maintainAspectRatio: false,
                     plugins: { 
                         legend: { display: false },
                         tooltip: {
-                            backgroundColor: '#0f172a',
-                            titleFont: { size: 10, weight: 'bold' },
-                            bodyFont: { size: 10 },
-                            padding: 10,
+                            backgroundColor: isDark() ? '#1e293b' : '#0f172a',
+                            padding: 12,
                             displayColors: false
                         }
                     },
                     scales: {
-                        x: { beginAtZero: true, grid: { color: '#f1f5f9' }, border: { display: false }, ticks: { stepSize: 1, font: {size: 10} } },
-                        y: { grid: { display: false }, border: { display: false }, ticks: { font: { size: 10, weight: '700' } } }
+                        x: { 
+                            beginAtZero: true, 
+                            grid: { color: getGridColor(), drawBorder: false }, 
+                            ticks: { stepSize: 1, font: {size: 10, weight: '600'}, color: getTextColor() } 
+                        },
+                        y: { 
+                            grid: { display: false }, 
+                            ticks: { font: { size: 10, weight: '700' }, color: getTextColor() } 
+                        }
                     }
                 }
             });
+
+            // Function to update charts on dark mode toggle
+            window.addEventListener('storage', (e) => {
+                if (e.key === 'dark-mode') {
+                    setTimeout(() => {
+                        trendChart.options.scales.y.grid.color = getGridColor();
+                        trendChart.options.scales.y.ticks.color = getTextColor();
+                        trendChart.options.scales.x.ticks.color = getTextColor();
+                        trendChart.options.plugins.tooltip.backgroundColor = isDark() ? '#1e293b' : '#0f172a';
+                        trendChart.update();
+
+                        topEntityChart.options.scales.x.grid.color = getGridColor();
+                        topEntityChart.options.scales.x.ticks.color = getTextColor();
+                        topEntityChart.options.scales.y.ticks.color = getTextColor();
+                        topEntityChart.options.plugins.tooltip.backgroundColor = isDark() ? '#1e293b' : '#0f172a';
+                        topEntityChart.update();
+                    }, 100);
+                }
+            });
+
+            // Handle manual toggle from button (since it doesn't trigger storage event on same tab)
+            const originalToggle = window.toggleDarkMode;
+            window.toggleDarkMode = function() {
+                originalToggle();
+                setTimeout(() => {
+                    const gridColor = getGridColor();
+                    const textColor = getTextColor();
+                    const tooltipBg = isDark() ? '#1e293b' : '#0f172a';
+
+                    trendChart.options.scales.y.grid.color = gridColor;
+                    trendChart.options.scales.y.ticks.color = textColor;
+                    trendChart.options.scales.x.ticks.color = textColor;
+                    trendChart.options.plugins.tooltip.backgroundColor = tooltipBg;
+                    trendChart.update();
+
+                    topEntityChart.options.scales.x.grid.color = gridColor;
+                    topEntityChart.options.scales.x.ticks.color = textColor;
+                    topEntityChart.options.scales.y.ticks.color = textColor;
+                    topEntityChart.options.plugins.tooltip.backgroundColor = tooltipBg;
+                    topEntityChart.update();
+                }, 100);
+            };
         });
     </script>
 </x-app-layout>

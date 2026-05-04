@@ -149,6 +149,23 @@ class DashboardController extends Controller
         $stats['order_part'] = $activeTicketStats['order_part'] ?? 0;
         $stats['readiness_rate'] = $stats['total'] > 0 ? round(($stats['available'] / $stats['total']) * 100, 1) : 0;
 
+        // 7. NEW: Calculate Mean Time to Resolve (MTTR) - Average Days to Fix
+        $resolvedLogs = BreakdownLog::where('repair_status', 'resolved')
+            ->whereNotNull('resolved_date')
+            ->when($filterEntity, function($q) use ($filterEntity) {
+                $q->whereHas('infrastructure', fn($sq) => $sq->where('entity_id', $filterEntity));
+            })
+            ->get();
+
+        $totalDays = 0;
+        foreach($resolvedLogs as $rl) {
+            $created = \Carbon\Carbon::parse($rl->created_at);
+            $resolved = \Carbon\Carbon::parse($rl->resolved_date);
+            $totalDays += $created->diffInDays($resolved);
+        }
+        
+        $stats['mttr'] = $resolvedLogs->count() > 0 ? round($totalDays / $resolvedLogs->count(), 1) : 0;
+
         // -------------------------------------------------------------
         // ANALYTICS DATA MERGE FOR CHARTS
         // -------------------------------------------------------------
