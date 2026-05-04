@@ -6,8 +6,9 @@ use App\Http\Controllers\EntityController;
 use App\Http\Controllers\InfrastructureController;
 use App\Http\Controllers\BreakdownLogController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\AnalyticsController; // <-- Tambahan Controller Analytics
+use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\ExportController;
+use App\Http\Controllers\MaintenanceScheduleController;
 use App\Models\Entity;
 use App\Models\Infrastructure;
 use App\Models\BreakdownLog;
@@ -68,6 +69,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         
         Route::resource('infrastructures', InfrastructureController::class);
         Route::resource('breakdowns', BreakdownLogController::class);
+        Route::resource('maintenance', MaintenanceScheduleController::class);
 
         /* --- KHUSUS AKSES SUPERADMIN (Administrator Pusat) --- */
         Route::middleware(['superadmin'])->group(function () {

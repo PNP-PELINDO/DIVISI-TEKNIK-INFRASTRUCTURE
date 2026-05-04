@@ -13,18 +13,41 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::with('entity')->latest()->get();
-        return view('admin.users.index', compact('users'));
+        $this->authorize('viewAny', User::class);
+        $query = User::with('entity');
+
+        if (request('search')) {
+            $search = request('search');
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        if (request('role') && request('role') !== 'all') {
+            $query->where('role', request('role'));
+        }
+
+        if (request('entity_id') && request('entity_id') !== 'all') {
+            $query->where('entity_id', request('entity_id'));
+        }
+
+        $users = $query->latest()->get();
+        $entities = Entity::orderBy('name')->get();
+
+        return view('admin.users.index', compact('users', 'entities'));
     }
 
     public function create()
     {
+        $this->authorize('create', User::class);
         $entities = Entity::all();
         return view('admin.users.create', compact('entities'));
     }
 
     public function store(Request $request)
     {
+        $this->authorize('create', User::class);
         $request->validate([
             'name'      => 'required|string|max:255',
             'email'     => 'required|string|email|max:255|unique:users',
@@ -46,12 +69,14 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
+        $this->authorize('update', $user);
         $entities = Entity::all();
         return view('admin.users.edit', compact('user', 'entities'));
     }
 
     public function update(Request $request, User $user)
     {
+        $this->authorize('update', $user);
         $request->validate([
             'name'      => 'required|string|max:255',
             'email'     => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
@@ -78,6 +103,7 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
+        $this->authorize('delete', $user);
         if ($user->id === auth()->id()) {
             return back()->with('error', 'Anda tidak bisa menghapus akun yang sedang Anda gunakan.');
         }

@@ -47,4 +47,9 @@ class BreakdownLog extends Model
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
+
+    public function statusHistories()
+    {
+        return $this->hasMany(StatusHistory::class)->with('user')->latest();
+    }
 }

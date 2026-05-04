@@ -1,14 +1,14 @@
 <x-app-layout>
     <div class="max-w-[1600px] mx-auto w-full space-y-6 animate-fade-up">
         
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
             <div class="flex items-center gap-5">
-                <div class="w-14 h-14 bg-red-50 text-red-600 rounded-xl flex items-center justify-center text-2xl border border-red-100 shadow-inner">
+                <div class="w-14 h-14 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-xl flex items-center justify-center text-2xl border border-red-100 dark:border-red-800 shadow-inner">
                     <i class="fas fa-tools"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-black text-[#003366] uppercase tracking-tight">Log Kerusakan Alat</h1>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Pemantauan progres perbaikan infrastruktur secara real-time</p>
+                    <h1 class="text-2xl font-black text-[#003366] dark:text-blue-400 uppercase tracking-tight">Log Kerusakan Alat</h1>
+                    <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">Pemantauan progres perbaikan infrastruktur secara real-time</p>
                 </div>
             </div>
             <a href="{{ route('admin.breakdowns.create') }}" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-red-900/20 transition-all flex items-center gap-2 group">
@@ -22,11 +22,11 @@
             </div>
         @endif
 
-        <div class="bg-white rounded-[2rem] border border-slate-200 overflow-hidden shadow-sm">
+        <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="bg-[#001e3c] text-white text-[10px] font-black uppercase tracking-[0.2em] border-b border-slate-700">
+                        <tr class="bg-[#001e3c] dark:bg-slate-800 text-white text-[10px] font-black uppercase tracking-[0.2em] border-b border-slate-700 dark:border-slate-700">
                             <th class="px-8 py-6 w-16 text-center">NO</th>
                             <th class="px-8 py-5">Unit ID</th>
                             <th class="px-8 py-5">Lokasi Entitas</th>
@@ -36,31 +36,31 @@
                             <th class="px-8 py-5 text-right">Opsi</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100">
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                         @forelse($logs as $index => $log)
-                        <tr class="hover:bg-blue-50/30 transition-colors group">
-                            <td class="px-8 py-6 text-center text-slate-400 font-bold text-xs">{{ $index + 1 }}</td>
+                        <tr class="hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-colors group">
+                            <td class="px-8 py-6 text-center text-slate-400 dark:text-slate-500 font-bold text-xs">{{ $index + 1 }}</td>
                             <td class="px-8 py-6">
-                                <span class="font-black text-[#003366] text-xs uppercase px-3 py-1.5 bg-slate-100 rounded-lg border border-slate-200">
+                                <span class="font-black text-[#003366] dark:text-blue-400 text-xs uppercase px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                                     {{ $log->infrastructure->code_name ?? '-' }}
                                 </span>
                             </td>
-                            <td class="px-8 py-6 text-xs font-bold text-slate-500 uppercase tracking-tight">
+                            <td class="px-8 py-6 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tight">
                                 {{ $log->infrastructure->entity->name ?? '-' }}
                             </td>
                             <td class="px-8 py-6">
-                                <p class="text-xs text-slate-600 font-medium max-w-xs leading-relaxed">{{ $log->issue_detail }}</p>
+                                <p class="text-xs text-slate-600 dark:text-slate-300 font-medium max-w-xs leading-relaxed">{{ $log->issue_detail }}</p>
                                 <div class="flex items-center gap-2 mt-2">
-                                    <i class="far fa-clock text-[10px] text-slate-400"></i>
-                                    <span class="text-[9px] text-slate-400 font-bold uppercase">{{ $log->created_at->format('d M Y | H:i') }}</span>
+                                    <i class="far fa-clock text-[10px] text-slate-400 dark:text-slate-500"></i>
+                                    <span class="text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase">{{ $log->created_at->format('d M Y | H:i') }}</span>
                                 </div>
                             </td>
                             <td class="px-8 py-6 text-center">
                                 <form action="{{ route('admin.breakdowns.update', $log->id) }}" method="POST" class="inline-flex">
                                     @csrf @method('PUT')
                                     <select name="repair_status" onchange="this.form.submit()" 
-                                        class="text-[9px] font-black uppercase tracking-widest rounded-lg border-slate-200 py-1.5 px-3 focus:ring-2 focus:ring-[#003366] cursor-pointer transition-all
-                                        {{ $log->repair_status == 'resolved' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200' }}">
+                                        class="text-[9px] font-black uppercase tracking-widest rounded-lg border-slate-200 dark:border-slate-700 py-1.5 px-3 focus:ring-2 focus:ring-[#003366] cursor-pointer transition-all
+                                        {{ $log->repair_status == 'resolved' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800' : 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800' }}">
                                         <option value="reported" {{ $log->repair_status == 'reported' ? 'selected' : '' }}>Reported</option>
                                         <option value="order_part" {{ $log->repair_status == 'order_part' ? 'selected' : '' }}>Order Part</option>
                                         <option value="on_progress" {{ $log->repair_status == 'on_progress' ? 'selected' : '' }}>On Progress</option>
@@ -70,13 +70,13 @@
                             </td>
                             <td class="px-8 py-6">
                                 <div class="flex items-center gap-2">
-                                    <div class="w-1.5 h-1.5 rounded-full bg-slate-400"></div>
-                                    <span class="text-xs font-black text-slate-700 uppercase">{{ $log->vendor_pic ?? 'Internal' }}</span>
+                                    <div class="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-500"></div>
+                                    <span class="text-xs font-black text-slate-700 dark:text-slate-200 uppercase">{{ $log->vendor_pic ?? 'Internal' }}</span>
                                 </div>
                                 @if($log->updated_by)
                                     <div class="flex items-center gap-1.5 mt-2 opacity-60">
-                                        <i class="fas fa-user-edit text-[8px] text-slate-400"></i>
-                                        <p class="text-[8px] font-black tracking-widest text-slate-400 uppercase">{{ $log->updatedBy->name ?? 'System' }}</p>
+                                        <i class="fas fa-user-edit text-[8px] text-slate-400 dark:text-slate-500"></i>
+                                        <p class="text-[8px] font-black tracking-widest text-slate-400 dark:text-slate-500 uppercase">{{ $log->updatedBy->name ?? 'System' }}</p>
                                     </div>
                                 @endif
                             </td>
@@ -105,11 +105,11 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="7" class="px-8 py-24 text-center">
+                            <td colspan="7" class="px-8 py-24 text-center bg-slate-50/50 dark:bg-slate-800/20">
                                 <div class="flex flex-col items-center justify-center opacity-30">
-                                    <i class="fas fa-clipboard-check text-6xl mb-4"></i>
-                                    <p class="font-black uppercase tracking-[0.3em] text-sm text-slate-800">No Active Incident Reports</p>
-                                    <p class="text-[10px] mt-2 font-bold uppercase tracking-widest text-slate-500">Seluruh alat saat ini beroperasi secara normal</p>
+                                    <i class="fas fa-clipboard-check text-6xl mb-4 text-slate-400 dark:text-slate-500"></i>
+                                    <p class="font-black uppercase tracking-[0.3em] text-sm text-slate-800 dark:text-slate-200">No Active Incident Reports</p>
+                                    <p class="text-[10px] mt-2 font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Seluruh alat saat ini beroperasi secara normal</p>
                                 </div>
                             </td>
                         </tr>

@@ -21,6 +21,11 @@ class DashboardController extends Controller
         // Jika user bukan superadmin, paksa filter entity ke entity_id miliknya
         if ($user->role !== 'superadmin') {
             $filterEntity = $user->entity_id;
+            
+            // Jika operator tidak punya entity_id, pastikan dia tidak melihat apa-apa (leakage guard)
+            if (!$filterEntity) {
+                $filterEntity = -1; // ID yang tidak mungkin ada
+            }
         }
 
         // Ambil semua entitas untuk dropdown filter (Hanya untuk Superadmin)
@@ -31,7 +36,7 @@ class DashboardController extends Controller
 
         // Menentukan Nama Area untuk UI
         $areaName = 'Pusat (Seluruh Regional)';
-        if ($filterEntity) {
+        if ($filterEntity && $filterEntity != -1) {
             $entityModel = \App\Models\Entity::find($filterEntity);
             $areaName = $entityModel ? $entityModel->name : 'Area Tidak Diketahui';
         }

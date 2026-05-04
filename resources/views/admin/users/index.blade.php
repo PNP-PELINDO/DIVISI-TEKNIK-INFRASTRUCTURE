@@ -18,7 +18,7 @@
                  style="display: none;">
                 
                 <div @click.away="showDeleteModal = false" 
-                     class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200 transform transition-all">
+                     class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200 dark:border-slate-800 transform transition-all">
                     
                     <div class="p-6 sm:p-8">
                         <div class="flex items-start gap-5">
@@ -26,16 +26,16 @@
                                 <i class="fas fa-exclamation-triangle"></i>
                             </div>
                             <div>
-                                <h2 class="text-lg font-bold text-slate-900 mb-1">Hapus Akses Pengguna</h2>
-                                <p class="text-sm text-slate-600 leading-relaxed">
-                                    Apakah Anda yakin ingin menghapus akun <span class="font-bold text-slate-900" x-text="userName"></span>? Data akses ini akan dihapus secara permanen dari sistem.
+                                <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-1">Hapus Akses Pengguna</h2>
+                                <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                                    Apakah Anda yakin ingin menghapus akun <span class="font-bold text-slate-900 dark:text-slate-100" x-text="userName"></span>? Data akses ini akan dihapus secara permanen dari sistem.
                                 </p>
                             </div>
                         </div>
 
                         <div class="mt-8 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
                             <button type="button" @click="showDeleteModal = false" 
-                                    class="w-full sm:w-auto px-5 py-2.5 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 rounded-lg text-sm font-semibold transition-colors">
+                                    class="w-full sm:w-auto px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-semibold transition-colors">
                                 Batal
                             </button>
                             
@@ -52,20 +52,55 @@
             </div>
         </template>
 
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border-l-4 border-l-[#003366]">
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 border-l-4 border-l-[#003366]">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-blue-50 text-[#0055a4] rounded-xl flex items-center justify-center text-xl border border-blue-100">
+                <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 text-[#0055a4] dark:text-blue-400 rounded-xl flex items-center justify-center text-xl border border-blue-100 dark:border-blue-800">
                     <i class="fas fa-users-gear"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl md:text-2xl font-bold text-[#003366]">Manajemen Akun</h1>
-                    <p class="text-sm text-slate-500 mt-1">Kelola hak akses personil berdasarkan entitas dan bagian terminal.</p>
+                    <h1 class="text-xl md:text-2xl font-bold text-[#003366] dark:text-blue-400">Manajemen Akun</h1>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Kelola hak akses personil berdasarkan entitas dan bagian terminal.</p>
                 </div>
             </div>
             
             <a href="{{ route('admin.users.create') }}" class="w-full md:w-auto bg-[#003366] hover:bg-[#002244] text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-sm transition-colors flex items-center justify-center gap-2">
                 <i class="fas fa-user-plus text-xs"></i> Tambah Pengguna
             </a>
+        </div>
+
+        <!-- Filter Form -->
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            <form action="{{ route('admin.users.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="relative lg:col-span-1">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-xs"></i>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari Nama atau Email..." 
+                           class="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-[#003366] focus:border-[#003366] transition-all">
+                </div>
+
+                <select name="role" onchange="this.form.submit()" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 focus:ring-[#003366] uppercase transition-all">
+                    <option value="all">Semua Role</option>
+                    <option value="superadmin" {{ request('role') == 'superadmin' ? 'selected' : '' }}>Superadmin</option>
+                    <option value="operator" {{ request('role') == 'operator' ? 'selected' : '' }}>Operator</option>
+                </select>
+
+                <select name="entity_id" onchange="this.form.submit()" class="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 focus:ring-[#003366] uppercase transition-all">
+                    <option value="all">Semua Terminal</option>
+                    @foreach($entities as $entity)
+                        <option value="{{ $entity->id }}" {{ request('entity_id') == $entity->id ? 'selected' : '' }}>{{ $entity->name }}</option>
+                    @endforeach
+                </select>
+
+                <div class="flex gap-2">
+                    <button type="submit" class="flex-1 bg-[#003366] hover:bg-[#002244] text-white py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-md shadow-blue-900/10">
+                        Filter
+                    </button>
+                    @if(request()->anyFilled(['search', 'role', 'entity_id']))
+                        <a href="{{ route('admin.users.index') }}" class="px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-xl flex items-center justify-center transition-all">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    @endif
+                </div>
+            </form>
         </div>
 
         @if(session('success'))
@@ -102,18 +137,18 @@
                     $iconClass = $isSuperadmin ? 'fa-user-shield text-amber-500' : 'fa-user-tie text-[#0055a4]';
                 @endphp
 
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                     
-                    <div class="bg-slate-50/80 border-b border-slate-200 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="bg-slate-50/80 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div class="flex items-center gap-3">
-                            <div class="w-8 h-8 rounded-lg bg-white border border-slate-200 flex items-center justify-center shadow-sm">
+                            <div class="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-sm">
                                 <i class="fas {{ $iconClass }} text-sm"></i>
                             </div>
-                            <h2 class="font-bold text-slate-800 text-base uppercase tracking-wide">
+                            <h2 class="font-bold text-slate-800 dark:text-slate-100 text-base uppercase tracking-wide">
                                 {{ $role }}
                             </h2>
                         </div>
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border {{ $badgeBg }}">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border {{ $isSuperadmin ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-400 border-amber-200 dark:border-amber-800' : 'bg-blue-100 dark:bg-blue-900/30 text-[#003366] dark:text-blue-400 border-blue-200 dark:border-blue-800' }}">
                             {{ $roleUsers->count() }} Pengguna Terdaftar
                         </span>
                     </div>
@@ -121,34 +156,34 @@
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse whitespace-nowrap">
                             <thead>
-                                <tr class="bg-white border-b border-slate-200">
-                                    <th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider w-16 text-center">No</th>
-                                    <th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Informasi Pegawai</th>
-                                    <th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Penempatan Area</th>
-                                    <th class="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Tindakan</th>
+                                <tr class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+                                    <th class="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider w-16 text-center">No</th>
+                                    <th class="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Informasi Pegawai</th>
+                                    <th class="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Penempatan Area</th>
+                                    <th class="px-6 py-4 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-right">Tindakan</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-100">
+                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                                 @foreach($roleUsers as $index => $user)
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="px-6 py-4 text-center text-sm text-slate-500 font-medium">
+                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                                    <td class="px-6 py-4 text-center text-sm text-slate-500 dark:text-slate-400 font-medium">
                                         {{ $index + 1 }}
                                     </td>
                                     
                                     <td class="px-6 py-4">
                                         <div class="flex flex-col">
-                                            <span class="text-sm font-bold text-[#003366]">{{ $user->name }}</span>
-                                            <span class="text-xs text-slate-500 mt-0.5"><i class="far fa-envelope mr-1"></i> {{ $user->email }}</span>
+                                            <span class="text-sm font-bold text-[#003366] dark:text-blue-400">{{ $user->name }}</span>
+                                            <span class="text-xs text-slate-500 dark:text-slate-400 mt-0.5"><i class="far fa-envelope mr-1"></i> {{ $user->email }}</span>
                                         </div>
                                     </td>
                                     
                                     <td class="px-6 py-4">
                                         @if($user->entity)
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium bg-blue-50 text-[#0055a4] border border-blue-100">
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium bg-blue-50 dark:bg-blue-900/30 text-[#0055a4] dark:text-blue-400 border border-blue-100 dark:border-blue-800">
                                                 <i class="fas fa-map-marker-alt opacity-70"></i> {{ $user->entity->name }}
                                             </span>
                                         @else
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium bg-slate-100 text-slate-600 border border-slate-200">
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">
                                                 <i class="fas fa-globe opacity-70"></i> Akses Pusat (Global)
                                             </span>
                                         @endif
@@ -157,7 +192,7 @@
                                     <td class="px-6 py-4 text-right">
                                         <div class="flex items-center justify-end gap-2">
                                             <a href="{{ route('admin.users.edit', $user->id) }}" 
-                                               class="inline-flex items-center justify-center w-8 h-8 rounded-md text-slate-400 bg-white border border-slate-200 hover:text-[#0055a4] hover:bg-blue-50 hover:border-blue-200 transition-all shadow-sm" 
+                                               class="inline-flex items-center justify-center w-8 h-8 rounded-md text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:text-[#0055a4] dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:border-blue-200 dark:hover:border-blue-800 transition-all shadow-sm" 
                                                title="Edit Akun">
                                                 <i class="fas fa-pen text-xs"></i>
                                             </a>
@@ -169,12 +204,12 @@
                                                         userName = '{{ addslashes($user->name) }}'; 
                                                         showDeleteModal = true;
                                                     " 
-                                                    class="inline-flex items-center justify-center w-8 h-8 rounded-md text-slate-400 bg-white border border-slate-200 hover:text-red-600 hover:bg-red-50 hover:border-red-200 transition-all shadow-sm" 
+                                                    class="inline-flex items-center justify-center w-8 h-8 rounded-md text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 hover:border-red-200 dark:hover:border-red-800 transition-all shadow-sm" 
                                                     title="Hapus Akun">
                                                 <i class="fas fa-trash-alt text-xs"></i>
                                             </button>
                                             @else
-                                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-md text-slate-300 bg-slate-50 border border-slate-100 cursor-not-allowed" title="Tidak dapat menghapus akun sendiri">
+                                            <span class="inline-flex items-center justify-center w-8 h-8 rounded-md text-slate-300 dark:text-slate-600 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 cursor-not-allowed" title="Tidak dapat menghapus akun sendiri">
                                                 <i class="fas fa-trash-alt text-xs"></i>
                                             </span>
                                             @endif
@@ -187,12 +222,12 @@
                     </div>
                 </div>
             @empty
-                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-12 text-center flex flex-col items-center justify-center">
-                    <div class="w-20 h-20 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center text-3xl mb-4 border border-slate-100">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-12 text-center flex flex-col items-center justify-center">
+                    <div class="w-20 h-20 bg-slate-50 dark:bg-slate-800 text-slate-300 dark:text-slate-600 rounded-full flex items-center justify-center text-3xl mb-4 border border-slate-100 dark:border-slate-700">
                         <i class="fas fa-users-slash"></i>
                     </div>
-                    <h3 class="text-base font-bold text-slate-700">Belum Ada Pengguna</h3>
-                    <p class="text-sm text-slate-500 mt-1 max-w-sm">Sistem belum memiliki data akun terdaftar selain Anda. Silakan tambahkan pengguna baru.</p>
+                    <h3 class="text-base font-bold text-slate-700 dark:text-slate-100">Belum Ada Pengguna</h3>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-sm">Sistem belum memiliki data akun terdaftar selain Anda. Silakan tambahkan pengguna baru.</p>
                     <a href="{{ route('admin.users.create') }}" class="mt-6 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-5 py-2.5 rounded-lg text-sm font-semibold shadow-sm transition-colors">
                         Tambah Pengguna Pertama
                     </a>
