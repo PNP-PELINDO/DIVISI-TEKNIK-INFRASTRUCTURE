@@ -302,7 +302,7 @@
         </div>
 
         <!-- ACTIONABLE LISTS -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 " >
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
             <!-- Top Infrastruktur Rusak -->
             <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm flex flex-col">
@@ -310,85 +310,111 @@
                     <div class="flex items-center gap-4">
                         <i class="fas fa-tools text-slate-600 dark:text-slate-400 text-xl"></i>
                         <div>
-                            <h3 class="text-slate-800 dark:text-slate-100 font-black uppercase tracking-widest text-sm leading-none">Top 5 Infrastruktur Sering Rusak</h3>
+                            <h3 class="text-slate-800 dark:text-slate-100 font-black uppercase tracking-widest text-sm leading-none">Top 5 Kerusakan Terbanyak</h3>
                             <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1">Evaluasi Aset Kritis</p>
                         </div>
                     </div>
                 </div>
                 <div class="p-6 flex-1">
-                    <div class="space-y-4">
+                    <div class="space-y-3">
                         @forelse($frequentInfrastructures as $index => $infra)
-                        <div @click="openDetailModal({{ json_encode($infra) }})" class="cursor-pointer group flex items-center justify-between p-4 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md transition-all relative">
-                            <div class="absolute right-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <i class="fas fa-chevron-right text-blue-500"></i>
-                            </div>
-                            <div class="flex items-center gap-4">
-                                <div class="w-10 h-10 rounded-lg bg-red-100 text-red-600 flex items-center justify-center font-black text-sm group-hover:bg-red-500 group-hover:text-white transition-colors">
+                        <div @click="openDetailModal({{ json_encode($infra) }})" class="cursor-pointer group flex items-center justify-between p-3.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md transition-all relative">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center font-black text-[10px] group-hover:bg-red-500 group-hover:text-white transition-colors">
                                     #{{ $index + 1 }}
                                 </div>
                                 <div>
-                                    <h4 class="text-xs font-black text-slate-800 dark:text-slate-200 uppercase group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">{{ $infra->code_name }}</h4>
-                                    <p class="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-bold mt-1">{{ $infra->entity->name ?? '-' }} &bull; {{ ucfirst($infra->category) }}</p>
+                                    <h4 class="text-[11px] font-black text-slate-800 dark:text-slate-200 uppercase group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">{{ $infra->code_name }}</h4>
+                                    <p class="text-[9px] text-slate-400 dark:text-slate-500 uppercase font-bold">{{ $infra->entity->name ?? '-' }}</p>
                                 </div>
                             </div>
-                            <div class="text-right mr-6">
-                                <span class="text-lg font-black text-[#003366] dark:text-blue-400">{{ $infra->breakdown_logs_count }}</span>
-                                <p class="text-[9px] text-slate-400 dark:text-slate-500 uppercase font-bold">Kali Rusak</p>
+                            <div class="text-right">
+                                <span class="text-sm font-black text-[#003366] dark:text-blue-400">{{ $infra->breakdown_logs_count }}</span>
+                                <p class="text-[8px] text-slate-400 uppercase font-bold">Kali</p>
                             </div>
                         </div>
                         @empty
-                        <div class="text-center py-8">
-                            <p class="text-xs text-slate-400 uppercase font-bold tracking-widest">Belum ada data kerusakan historis.</p>
+                        <p class="text-[10px] text-slate-400 uppercase font-bold text-center py-8">Belum ada riwayat.</p>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pemeliharaan Mendatang (Maintenance) -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm flex flex-col">
+                <div class="px-6 py-5 bg-blue-50/50 dark:bg-blue-900/10 border-b border-blue-100 dark:border-blue-800 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <i class="fas fa-calendar-alt text-blue-600 dark:text-blue-400 text-xl"></i>
+                        <div>
+                            <h3 class="text-slate-800 dark:text-slate-100 font-black uppercase tracking-widest text-sm leading-none">Pemeliharaan Mendatang</h3>
+                            <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1">Jadwal 7 Hari Ke Depan</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6 flex-1">
+                    <div class="space-y-3">
+                        @forelse($upcomingMaintenance as $sched)
+                        <div class="flex items-center justify-between p-3.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800/50 shadow-sm relative group overflow-hidden">
+                            <div class="absolute left-0 top-0 w-1 h-full bg-blue-500 opacity-20 group-hover:opacity-100 transition-opacity"></div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-900 flex flex-col items-center justify-center border border-slate-100 dark:border-slate-700">
+                                    <span class="text-[9px] font-black text-blue-600 dark:text-blue-400 leading-none">{{ \Carbon\Carbon::parse($sched->scheduled_date)->format('d') }}</span>
+                                    <span class="text-[8px] font-bold text-slate-400 uppercase leading-none mt-0.5">{{ \Carbon\Carbon::parse($sched->scheduled_date)->format('M') }}</span>
+                                </div>
+                                <div>
+                                    <h4 class="text-[11px] font-black text-slate-800 dark:text-slate-200 uppercase truncate max-w-[120px]">{{ $sched->title }}</h4>
+                                    <p class="text-[9px] text-slate-400 uppercase font-bold">{{ $sched->infrastructure->code_name }}</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[9px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-tighter">{{ \Carbon\Carbon::parse($sched->scheduled_date)->diffForHumans() }}</span>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="text-center py-10 opacity-30">
+                            <i class="fas fa-calendar-check text-4xl mb-3"></i>
+                            <p class="text-[10px] font-black uppercase tracking-widest">Tidak ada jadwal terdekat</p>
                         </div>
                         @endforelse
                     </div>
                 </div>
             </div>
 
-            <!-- Top Terminal / Urgent / Info Tambahan -->
+            <!-- Laporan Mendesak (Urgent) -->
             <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm flex flex-col">
                 <div class="px-6 py-5 bg-red-50 dark:bg-red-900/20 border-b border-red-100 dark:border-red-900/30 flex items-center justify-between">
                     <div class="flex items-center gap-4">
                         <i class="fas fa-siren-on text-red-600 dark:text-red-400 text-xl"></i>
                         <div>
-                            <h3 class="text-red-800 dark:text-red-200 font-black uppercase tracking-widest text-sm leading-none">Laporan Mendesak (Urgent)</h3>
-                            <p class="text-[9px] text-red-500 dark:text-red-400 font-bold uppercase tracking-widest mt-1">Laporan Belum Ditindaklanjuti</p>
+                            <h3 class="text-red-800 dark:text-red-200 font-black uppercase tracking-widest text-sm leading-none">Laporan Mendesak</h3>
+                            <p class="text-[9px] text-red-500 dark:text-red-400 font-bold uppercase tracking-widest mt-1">Tiket Status 'Reported'</p>
                         </div>
                     </div>
                 </div>
                 <div class="p-6 flex-1">
-                    <div class="space-y-4">
+                    <div class="space-y-3">
                         @forelse($urgentBreakdowns as $log)
-                        <div @click="openDetailModal({{ json_encode($log->infrastructure) }})" class="cursor-pointer group flex items-start gap-4 p-4 border border-red-100 dark:border-red-900/30 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:border-red-400 dark:hover:border-red-700 hover:shadow-md transition-all relative">
-                            <div class="absolute right-4 top-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <i class="fas fa-chevron-right text-red-500"></i>
+                        <div @click="openDetailModal({{ json_encode($log->infrastructure) }})" class="cursor-pointer group flex items-start gap-3 p-3.5 border border-red-100 dark:border-red-900/30 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:border-red-400 dark:hover:border-red-700 transition-all">
+                            <div class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-red-500 group-hover:text-white transition-colors">
+                                <i class="fas fa-exclamation text-[10px]"></i>
                             </div>
-                            <div class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0 mt-1 group-hover:bg-red-500 group-hover:text-white transition-colors">
-                                <i class="fas fa-exclamation"></i>
-                            </div>
-                            <div class="flex-1 pr-6">
-                                <div class="flex justify-between items-start mb-1">
-                                    <h4 class="text-[11px] font-black text-slate-800 dark:text-slate-200 uppercase group-hover:text-red-700 dark:group-hover:text-red-400 transition-colors">{{ $log->infrastructure->code_name ?? 'Unknown Asset' }}</h4>
-                                    <span class="text-[9px] font-bold text-red-500 bg-red-50 dark:bg-red-900/30 px-2 py-0.5 rounded" title="{{ $log->created_at->format('d M Y H:i') }}">{{ $log->created_at->diffForHumans() }}</span>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex justify-between items-start mb-0.5">
+                                    <h4 class="text-[11px] font-black text-slate-800 dark:text-slate-200 uppercase truncate max-w-[100px]">{{ $log->infrastructure->code_name ?? 'Asset' }}</h4>
+                                    <span class="text-[8px] font-bold text-red-500">{{ $log->created_at->diffForHumans() }}</span>
                                 </div>
-                                <p class="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">{{ $log->issue_detail }}</p>
-                                <div class="mt-3 flex items-center justify-between text-[9px] uppercase font-bold text-slate-400 dark:text-slate-500 border-t border-slate-50 dark:border-slate-800 pt-2">
-                                    <span>Lokasi: {{ $log->infrastructure->entity->name ?? '-' }}</span>
-                                    <span>Pelapor: {{ $log->createdBy->name ?? 'Sistem' }}</span>
-                                </div>
+                                <p class="text-[10px] text-slate-600 dark:text-slate-400 line-clamp-1 italic">"{{ $log->issue_detail }}"</p>
                             </div>
                         </div>
                         @empty
-                        <div class="text-center py-12 flex flex-col items-center justify-center h-full">
-                            <div class="w-16 h-16 bg-emerald-50 text-emerald-500 border border-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl shadow-sm"><i class="fas fa-shield-check"></i></div>
-                            <p class="text-xs text-slate-500 uppercase font-black tracking-widest">Semua Aman!</p>
-                            <p class="text-[10px] text-slate-400 uppercase font-bold mt-1">Tidak ada laporan mendesak saat ini.</p>
+                        <div class="text-center py-10 opacity-30">
+                            <i class="fas fa-shield-check text-4xl mb-3 text-emerald-500"></i>
+                            <p class="text-[10px] font-black uppercase tracking-widest">Semua Laporan Teratasi</p>
                         </div>
                         @endforelse
                     </div>
                 </div>
             </div>
-
         </div>
 
         <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm " >

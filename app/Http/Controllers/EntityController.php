@@ -44,7 +44,10 @@ class EntityController extends Controller
             'code.unique' => 'Kode entitas ini sudah digunakan, silakan gunakan kode lain.'
         ]);
 
-        Entity::create($request->all());
+        Entity::create([
+            'name' => strtoupper($request->name),
+            'code' => strtoupper($request->code),
+        ]);
 
         return redirect()->route('admin.entities.index')
             ->with('success', ResponseMessage::ENTITY_CREATED);
@@ -66,7 +69,10 @@ class EntityController extends Controller
             'code' => 'required|string|max:20|unique:entities,code,' . $entity->id,
         ]);
 
-        $entity->update($request->all());
+        $entity->update([
+            'name' => strtoupper($request->name),
+            'code' => strtoupper($request->code),
+        ]);
 
         return redirect()->route('admin.entities.index')
             ->with('success', ResponseMessage::ENTITY_UPDATED);

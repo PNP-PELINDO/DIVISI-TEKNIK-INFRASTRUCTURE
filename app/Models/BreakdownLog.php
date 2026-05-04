@@ -29,6 +29,19 @@ class BreakdownLog extends Model
         'updated_by'
     ];
 
+    protected $casts = [
+        'troubleshoot_date' => 'date',
+        'ba_date' => 'date',
+        'work_order_date' => 'date',
+        'pr_po_date' => 'date',
+        'sparepart_date' => 'date',
+        'start_work_date' => 'date',
+        'com_test_date' => 'date',
+        'resolved_date' => 'date',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
     // Relasi ke tabel Infrastruktur
     public function infrastructure()
     {

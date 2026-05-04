@@ -18,6 +18,12 @@ class MaintenanceSchedule extends Model
         'created_by'
     ];
 
+    protected $casts = [
+        'scheduled_date' => 'date',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
     public function infrastructure()
     {
         return $this->belongsTo(Infrastructure::class);

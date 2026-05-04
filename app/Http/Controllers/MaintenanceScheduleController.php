@@ -104,7 +104,7 @@ class MaintenanceScheduleController extends Controller
             'created_by' => $user->id,
         ]);
 
-        return redirect()->route('admin.maintenance.index')->with('success', 'Jadwal pemeliharaan berhasil ditambahkan.');
+        return redirect()->route('admin.maintenance.index')->with('success', ResponseMessage::MAINTENANCE_CREATED);
     }
 
     public function update(Request $request, MaintenanceSchedule $maintenance)
@@ -143,13 +143,13 @@ class MaintenanceScheduleController extends Controller
 
         $maintenance->update($request->all());
 
-        return redirect()->route('admin.maintenance.index')->with('success', 'Jadwal pemeliharaan berhasil diperbarui.');
+        return redirect()->route('admin.maintenance.index')->with('success', ResponseMessage::MAINTENANCE_UPDATED);
     }
 
     public function destroy(MaintenanceSchedule $maintenanceSchedule)
     {
         $this->authorize('delete', $maintenanceSchedule);
         $maintenanceSchedule->delete();
-        return back()->with('success', 'Jadwal berhasil dihapus.');
+        return back()->with('success', ResponseMessage::MAINTENANCE_DELETED);
     }
 }

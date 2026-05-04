@@ -20,7 +20,7 @@
         </div>
 
         <div class="bg-white dark:bg-slate-900 p-8 md:p-12 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm transition-colors duration-300">
-            <form action="{{ route('admin.maintenance.update_full', $maintenanceSchedule->id) }}" method="POST" class="space-y-8">
+            <form action="{{ route('admin.maintenance.update', $maintenanceSchedule->id) }}" method="POST" class="space-y-8">
                 @csrf
                 @method('PUT')
                 

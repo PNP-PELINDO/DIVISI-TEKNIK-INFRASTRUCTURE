@@ -25,6 +25,10 @@ class ResponseMessage
     const USER_DELETED = 'Akun berhasil dihapus.';
     const USER_CANNOT_DELETE_SELF = 'Anda tidak bisa menghapus akun yang sedang Anda gunakan.';
 
+    const MAINTENANCE_CREATED = 'Jadwal pemeliharaan berhasil ditambahkan.';
+    const MAINTENANCE_UPDATED = 'Jadwal pemeliharaan berhasil diperbarui.';
+    const MAINTENANCE_DELETED = 'Jadwal pemeliharaan berhasil dihapus.';
+
     // Error Messages
     const UNAUTHORIZED_ACCESS = 'Akses Ditolak: Anda tidak memiliki hak akses untuk aksi ini.';
     const UNAUTHORIZED_OTHER_BRANCH = 'Akses ditolak! Ini bukan aset di wilayah Anda.';

@@ -17,7 +17,7 @@ class InfrastructureController extends Controller
         $this->authorize('viewAny', Infrastructure::class);
         $user = auth()->user();
 
-        $query = Infrastructure::with(['entity', 'createdBy', 'updatedBy']);
+        $query = Infrastructure::with(['entity', 'createdBy', 'updatedBy', 'breakdownLogs.createdBy']);
 
         // Filter berdasarkan peran
         if ($user->role !== 'superadmin') {

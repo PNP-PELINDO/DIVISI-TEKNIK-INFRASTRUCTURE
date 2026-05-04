@@ -89,13 +89,22 @@
 
                 <div>
                     <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Entitas Kepemilikan (Lokasi)</label>
-                    <x-searchable-select 
-                        name="entity_id" 
-                        :value="old('entity_id') ?? $infrastructure->entity_id"
-                        placeholder="-- Pilih Cabang / Entitas --"
-                        :options="$entities->map(fn($e) => ['value' => $e->id, 'label' => $e->name . ' (' . $e->code . ')'])->toArray()"
-                        required
-                    />
+                    
+                    @if(auth()->user()->role === 'superadmin')
+                        <x-searchable-select 
+                            name="entity_id" 
+                            :value="old('entity_id') ?? $infrastructure->entity_id"
+                            placeholder="-- Pilih Cabang / Entitas --"
+                            :options="$entities->map(fn($e) => ['value' => $e->id, 'label' => $e->name . ' (' . $e->code . ')'])->toArray()"
+                            required
+                        />
+                    @else
+                        <div class="w-full border border-slate-200 dark:border-slate-700 bg-slate-100/70 dark:bg-slate-800/70 rounded-2xl text-sm font-black p-5 text-slate-500 dark:text-slate-400 uppercase cursor-not-allowed flex items-center justify-between">
+                            <span>{{ $infrastructure->entity->name ?? 'Entitas Tidak Diketahui' }}</span>
+                            <i class="fas fa-lock text-slate-300 dark:text-slate-600"></i>
+                        </div>
+                        <input type="hidden" name="entity_id" value="{{ $infrastructure->entity_id }}">
+                    @endif
                     @error('entity_id') <p class="text-red-500 text-xs mt-2 font-bold ml-1">{{ $message }}</p> @enderror
                 </div>
 

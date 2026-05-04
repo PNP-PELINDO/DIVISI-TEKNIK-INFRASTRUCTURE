@@ -122,6 +122,18 @@ class DashboardController extends Controller
         // 5. Laporan Terbaru (Activity Feed)
         $recentLogs = (clone $logQuery)->latest()->take(5)->get();
 
+        // 6. Jadwal Maintenance Mendatang (7 Hari ke Depan)
+        $upcomingMaintenance = \App\Models\MaintenanceSchedule::with(['infrastructure.entity'])
+            ->where('status', 'scheduled')
+            ->where('scheduled_date', '>=', now()->toDateString())
+            ->where('scheduled_date', '<=', now()->addDays(7)->toDateString())
+            ->when($filterEntity, function($q) use ($filterEntity) {
+                $q->whereHas('infrastructure', fn($sq) => $sq->where('entity_id', $filterEntity));
+            })
+            ->orderBy('scheduled_date', 'asc')
+            ->take(5)
+            ->get();
+
         // Ambil SEMUA Log Kerusakan yang belum resolved untuk Laporan PDF/Excel
         $allActiveBreakdowns = (clone $logQuery)->latest()->get();
 
@@ -200,6 +212,7 @@ class DashboardController extends Controller
             'infrastructures', 
             'allInfrastructures', 
             'recentLogs', 
+            'upcomingMaintenance',
             'allActiveBreakdowns', 
             'areaName', 
             'chartData',
