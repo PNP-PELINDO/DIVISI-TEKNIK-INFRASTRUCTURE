@@ -384,8 +384,8 @@
                             <div class="absolute left-0 top-0 w-1 h-full bg-blue-500 opacity-20 group-hover:opacity-100 transition-opacity"></div>
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-900 flex flex-col items-center justify-center border border-slate-100 dark:border-slate-700">
-                                    <span class="text-[9px] font-black text-blue-600 dark:text-blue-400 leading-none">{{ \Carbon\Carbon::parse($sched->scheduled_date)->format('d') }}</span>
-                                    <span class="text-[8px] font-bold text-slate-400 uppercase leading-none mt-0.5">{{ \Carbon\Carbon::parse($sched->scheduled_date)->format('M') }}</span>
+                                    <span class="text-[9px] font-black text-blue-600 dark:text-blue-400 leading-none">{{ \Carbon\Carbon::parse($sched->scheduled_date)->translatedFormat('d') }}</span>
+                                    <span class="text-[8px] font-bold text-slate-400 uppercase leading-none mt-0.5">{{ \Carbon\Carbon::parse($sched->scheduled_date)->translatedFormat('M') }}</span>
                                 </div>
                                 <div>
                                     <h4 class="text-[11px] font-black text-slate-800 dark:text-slate-200 uppercase truncate max-w-[120px]">{{ $sched->title }}</h4>
@@ -622,7 +622,7 @@
                                         </div>
 
                                         <p class="text-[10px] font-bold text-slate-500 mb-2">
-                                            <i class="far fa-calendar-alt mr-1"></i> <span x-text="new Date(log.created_at).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})"></span>
+                                            <i class="far fa-calendar-alt mr-1"></i> <span x-text="new Date(log.created_at).toLocaleDateString('id-ID', {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'})"></span>
                                         </p>
                                         
                                         <p class="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3" x-text="log.issue_detail"></p>

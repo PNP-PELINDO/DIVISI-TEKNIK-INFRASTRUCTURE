@@ -184,12 +184,12 @@
                                         <div class="flex flex-col gap-1">
                                             <div class="flex items-center justify-between gap-4">
                                                 <span class="text-[8px] font-black text-slate-400 uppercase">Lapor</span>
-                                                <span class="text-[10px] font-bold text-[#0055a4]">{{ $log->created_at->format('d/m/y') }}</span>
+                                                <span class="text-[10px] font-bold text-[#0055a4]">{{ $log->created_at->format('d/m/Y') }}</span>
                                             </div>
                                             @if($log->resolved_date)
                                             <div class="flex items-center justify-between gap-4">
                                                 <span class="text-[8px] font-black text-emerald-600 uppercase">Selesai</span>
-                                                <span class="text-[10px] font-black text-emerald-600">{{ \Carbon\Carbon::parse($log->resolved_date)->format('d/m/y') }}</span>
+                                                <span class="text-[10px] font-black text-emerald-600">{{ \Carbon\Carbon::parse($log->resolved_date)->format('d/m/Y') }}</span>
                                             </div>
                                             @endif
                                         </div>

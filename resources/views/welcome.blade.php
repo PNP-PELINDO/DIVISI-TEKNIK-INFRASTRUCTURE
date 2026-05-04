@@ -112,7 +112,33 @@
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col animate-fade-up" x-data="{ filter: 'all', showTypeModal: false, selectedTypeTitle: '', selectedTypeEntity: '', selectedTypeItems: [] }">
+<body class="min-h-screen flex flex-col animate-fade-up" 
+      x-data="{ 
+        search: '',
+        filter: 'all', 
+        filterEntity: 'all',
+        showTypeModal: false, 
+        selectedTypeTitle: '', 
+        selectedTypeEntity: '', 
+        selectedTypeItems: [],
+        
+        getTotalUnits(entityId = null) {
+            let total = 0;
+            const sections = document.querySelectorAll('section[data-entity-id]');
+            sections.forEach(section => {
+                if (entityId && section.dataset.entityId != entityId) return;
+                const cards = section.querySelectorAll('.asset-card');
+                cards.forEach(card => {
+                    if (card.style.display !== 'none') {
+                        // Assuming each card represents a group, we should actually count items
+                        const items = JSON.parse(card.dataset.items);
+                        total += items.length;
+                    }
+                });
+            });
+            return total;
+        }
+      }">
 
     <nav class="bg-white/90 dark:bg-[#001e3c]/90 backdrop-blur-md sticky top-0 z-[70] border-b border-slate-200 dark:border-slate-800 shadow-sm transition-colors duration-300">
         <div class="max-w-[1600px] mx-auto px-4 md:px-10 h-16 md:h-20 flex items-center justify-between">
@@ -153,15 +179,36 @@
                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span class="relative inline-flex rounded-full h-2.5 w-2.5 md:h-3 md:w-3 bg-emerald-500"></span>
                 </span>
-                Diperbarui : {{ now()->format('d M Y - H:i') }}
+                Diperbarui : {{ now()->translatedFormat('l, d F Y - H:i') }}
             </div>
 
-            <div class="mt-8 md:mt-10 overflow-x-auto hide-scrollbar pb-2 px-2 -mx-4 md:mx-0">
-                <div class="inline-flex gap-2 bg-white/80 border border-slate-200 rounded-full p-1.5 md:p-2 shadow-sm min-w-max mx-auto">
-                    <button @click="filter = 'all'" :class="filter === 'all' ? 'bg-[#003366] text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'" class="px-5 py-2 md:px-6 md:py-3 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest transition-all">Semua</button>
-                    <button @click="filter = 'equipment'" :class="filter === 'equipment' ? 'bg-[#003366] text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'" class="px-5 py-2 md:px-6 md:py-3 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest transition-all">Peralatan</button>
-                    <button @click="filter = 'facility'" :class="filter === 'facility' ? 'bg-[#003366] text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'" class="px-5 py-2 md:px-6 md:py-3 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest transition-all">Fasilitas</button>
-                    <button @click="filter = 'utility'" :class="filter === 'utility' ? 'bg-[#003366] text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'" class="px-5 py-2 md:px-6 md:py-3 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest transition-all">Utilitas</button>
+            <!-- SEARCH & ENHANCED FILTERS -->
+            <div class="max-w-4xl mx-auto mt-10 space-y-4 px-4">
+                <!-- Search Bar -->
+                <div class="relative group">
+                    <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#0055a4] transition-colors"></i>
+                    <input type="text" x-model="search" placeholder="Cari Kode Alat, Nama, atau Jenis..." 
+                           class="w-full pl-12 pr-6 py-4 bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-sm focus:ring-2 focus:ring-[#0055a4] focus:border-transparent outline-none transition-all text-sm font-bold placeholder:text-slate-400 placeholder:font-normal">
+                </div>
+
+                <!-- Filter Pills -->
+                <div class="flex flex-wrap items-center justify-center gap-2">
+                    <div class="bg-white/80 border border-slate-200 rounded-full p-1.5 shadow-sm flex flex-wrap gap-1">
+                        <button @click="filter = 'all'" :class="filter === 'all' ? 'bg-[#003366] text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'" class="px-4 py-2 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all">Semua Kategori</button>
+                        <button @click="filter = 'equipment'" :class="filter === 'equipment' ? 'bg-[#003366] text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'" class="px-4 py-2 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all">Peralatan</button>
+                        <button @click="filter = 'facility'" :class="filter === 'facility' ? 'bg-[#003366] text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'" class="px-4 py-2 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all">Fasilitas</button>
+                        <button @click="filter = 'utility'" :class="filter === 'utility' ? 'bg-[#003366] text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'" class="px-4 py-2 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all">Utilitas</button>
+                    </div>
+
+                    <div class="bg-white/80 border border-slate-200 rounded-full p-1.5 shadow-sm flex items-center gap-2">
+                        <i class="fas fa-filter text-[#0055a4] ml-3 text-xs"></i>
+                        <select x-model="filterEntity" class="bg-transparent text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-600 outline-none pr-4 py-1 cursor-pointer">
+                            <option value="all">Seluruh Wilayah</option>
+                            @foreach($entities as $e)
+                                <option value="{{ $e->name }}">{{ $e->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>
@@ -173,7 +220,28 @@
                 $availableCategories = $entity->infrastructures->pluck('category')->unique()->values()->toJson();
             @endphp
             
-            <section class="" x-show="filter === 'all' || {{ $availableCategories }}.includes(filter)" x-data="{ showModal: false }">
+            <section 
+                data-entity-id="{{ $entity->id }}"
+                data-entity-name="{{ $entity->name }}"
+                x-show="(filter === 'all' || {{ $availableCategories }}.includes(filter)) && (filterEntity === 'all' || filterEntity === '{{ $entity->name }}')" 
+                x-data="{ 
+                    showModal: false,
+                    visibleUnits: 0,
+                    updateCounter() {
+                        this.$nextTick(() => {
+                            let count = 0;
+                            const cards = this.$el.querySelectorAll('.asset-card');
+                            cards.forEach(card => {
+                                if (card.style.display !== 'none') {
+                                    const items = JSON.parse(card.dataset.items);
+                                    count += items.length;
+                                }
+                            });
+                            this.visibleUnits = count;
+                        });
+                    }
+                }"
+                x-init="updateCounter(); $watch('filter', () => updateCounter()); $watch('search', () => updateCounter()); $watch('filterEntity', () => updateCounter());">
                 
                 <div class="bg-gradient-to-r from-[#003366] to-[#0055a4] text-white px-5 py-4 md:px-8 md:py-5 rounded-t-2xl shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <h3 class="font-black text-sm md:text-lg uppercase tracking-widest flex items-center gap-2 md:gap-3">
@@ -181,7 +249,7 @@
                     </h3>
                     
                     <span class="text-[9px] md:text-[10px] font-bold text-blue-100 uppercase bg-black/20 px-3 py-1 md:px-4 md:py-1.5 rounded-full border border-white/20">
-                        Total Unit: {{ $entity->infrastructures->count() }}
+                        Unit Terfilter: <span x-text="visibleUnits"></span> / {{ $entity->infrastructures->count() }}
                     </span>
                 </div>
 
@@ -202,7 +270,7 @@
                                      data-entity="{{ htmlspecialchars($entity->name, ENT_QUOTES) }}"
                                      data-items="{{ json_encode($items->map(function($i) { return ['code' => $i->code_name, 'status' => $i->status]; })->values()) }}"
                                      @click="selectedTypeTitle = $el.dataset.type; selectedTypeEntity = $el.dataset.entity; selectedTypeItems = JSON.parse($el.dataset.items); showTypeModal = true;"
-                                     x-show="filter === 'all' || filter === '{{ $itemCategory }}'">
+                                     x-show="(filter === 'all' || filter === '{{ $itemCategory }}') && (search === '' || '{{ strtolower($type) }}'.includes(search.toLowerCase()) || '{{ strtolower($entity->name) }}'.includes(search.toLowerCase()) || JSON.parse($el.dataset.items).some(item => item.code.toLowerCase().includes(search.toLowerCase())))">
                                      
                                     <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
                                         <div class="w-6 h-6 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-[#0055a4] shadow-sm border border-slate-200">

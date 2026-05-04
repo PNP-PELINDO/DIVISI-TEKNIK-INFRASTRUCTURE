@@ -456,10 +456,10 @@
                                     </td>
                                     <td class="px-8 py-6 text-center">
                                         <div class="flex flex-col items-center">
-                                            <span class="text-[10px] font-black text-[#0055a4] dark:text-blue-400">{{ $log->created_at->format('d/m/y') }}</span>
+                                            <span class="text-[10px] font-black text-[#0055a4] dark:text-blue-400">{{ $log->created_at->format('d/m/Y') }}</span>
                                             @if($log->resolved_date)
                                                 <i class="fas fa-arrow-down text-[8px] my-0.5 text-slate-300"></i>
-                                                <span class="text-[10px] font-black text-emerald-600">{{ \Carbon\Carbon::parse($log->resolved_date)->format('d/m/y') }}</span>
+                                                <span class="text-[10px] font-black text-emerald-600">{{ \Carbon\Carbon::parse($log->resolved_date)->format('d/m/Y') }}</span>
                                             @endif
                                         </div>
                                     </td>

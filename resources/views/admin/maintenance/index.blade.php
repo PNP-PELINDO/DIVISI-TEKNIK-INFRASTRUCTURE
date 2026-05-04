@@ -104,8 +104,8 @@
                             </td>
                             <td class="px-8 py-5 text-center">
                                 <div class="inline-flex flex-col items-center bg-slate-50 dark:bg-slate-800 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700">
-                                    <span class="text-[10px] font-black text-[#003366] dark:text-blue-400 uppercase tracking-tighter">{{ \Carbon\Carbon::parse($item->scheduled_date)->format('d M') }}</span>
-                                    <span class="text-[14px] font-black text-slate-700 dark:text-slate-200">{{ \Carbon\Carbon::parse($item->scheduled_date)->format('Y') }}</span>
+                                    <span class="text-[10px] font-black text-[#003366] dark:text-blue-400 uppercase tracking-tighter">{{ \Carbon\Carbon::parse($item->scheduled_date)->translatedFormat('d M') }}</span>
+                                    <span class="text-[14px] font-black text-slate-700 dark:text-slate-200">{{ \Carbon\Carbon::parse($item->scheduled_date)->translatedFormat('Y') }}</span>
                                 </div>
                             </td>
                             <td class="px-8 py-5 text-center">
