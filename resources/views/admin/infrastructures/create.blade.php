@@ -4,7 +4,6 @@
         <div class="bg-white dark:bg-slate-900 p-8 md:p-10 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
             <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#003366] to-[#0055a4]"></div>
 
-            <div class="mb-8 flex items-center justify-between">
                 <div>
                     <h2 class="text-2xl font-black text-[#003366] dark:text-blue-400 uppercase tracking-tight">Tambah Inventaris Aset</h2>
                     <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">Sistem 1 Data = 1 Unit Fisik</p>
@@ -12,6 +11,7 @@
                 <i class="fas fa-boxes-stacked text-slate-100 dark:text-slate-800 text-4xl"></i>
             </div>
 
+            <!-- ERROR ALERTS -->
             @if ($errors->any())
                 <div class="mb-8 p-5 bg-red-50 dark:bg-red-900/20 border-2 border-red-200 dark:border-red-800 rounded-2xl flex items-start gap-4 animate-fade">
                     <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center shrink-0">
@@ -21,7 +21,7 @@
                         <h3 class="text-sm font-black text-red-700 dark:text-red-400 uppercase tracking-widest mb-1">Gagal Menyimpan Data!</h3>
                         <ul class="list-disc list-inside text-xs font-bold text-red-500/80 uppercase tracking-wide">
                             @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
+                                <li>• {{ $error }}</li>
                             @endforeach
                         </ul>
                     </div>
@@ -49,9 +49,9 @@
                             <i class="fas fa-cloud-upload-alt text-4xl text-slate-300 dark:text-slate-600 mb-2 group-hover:text-blue-500 dark:group-hover:text-blue-400 transition-colors"></i>
                             <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Klik untuk pilih gambar aset</p>
                         </div>
+
                         <input type="file" name="image" id="image-input" class="hidden" accept="image/*" onchange="previewImage(this)">
                     </div>
-                </div>
 
                 <div>
                     <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Entitas Kepemilikan (Lokasi)</label>
@@ -101,15 +101,19 @@
                                 </div>
                             @enderror
                         </div>
-                        
-                        @error('code_name') 
-                            <div class="flex items-center gap-1.5 mt-2 ml-1 text-red-500">
-                                <i class="fas fa-times-circle text-[10px]"></i>
-                                <p class="text-[10px] font-black uppercase">{{ $message }}</p> 
-                            </div>
+
+                        <div x-show="inputMode === 'text'" x-cloak class="flex flex-col sm:flex-row gap-3">
+                            <input type="text" name="type_new" value="{{ old('type_new') }}" placeholder="Ketik jenis alat baru (Contoh: Rubber Tyred Gantry)..."
+                                   class="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-md block p-2.5 transition-colors">
+                            <button type="button" @click="inputMode = 'select'; selectedType = ''; selectedCategory = '';"
+                                    class="w-full sm:w-auto px-5 py-2.5 bg-white text-slate-600 border border-slate-300 rounded-md font-semibold text-xs transition-colors hover:bg-slate-100 whitespace-nowrap">
+                                Batal Input Baru
+                            </button>
+                        </div>
+                        @error('type_new')
+                            <p class="text-[10px] font-bold text-red-500 mt-1"><i class="fas fa-exclamation-circle"></i> {{ $message }}</p>
                         @enderror
                     </div>
-                </div>
 
                 <div class="bg-slate-50 dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-200 dark:border-slate-800">
                     <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-3 ml-1">Jenis Alat / Fasilitas</label>
@@ -137,15 +141,8 @@
                         <input type="text" name="type_new" value="{{ old('type_new') }}" placeholder="Ketik jenis alat baru di sini..." class="w-full border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-xl text-sm font-bold p-4 focus:ring-4 focus:ring-blue-50 dark:focus:ring-blue-900/20 focus:border-[#003366] dark:focus:border-blue-400 transition-all uppercase text-slate-900 dark:text-slate-100">
                         <button type="button" @click="inputMode = 'select'; selectedType = ''; selectedCategory = '';" class="px-6 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-red-100 dark:hover:bg-red-900/50 transition-all">Batal</button>
                     </div>
-                    @error('type_new') 
-                        <div class="flex items-center gap-1.5 mt-2 ml-1 text-red-500">
-                            <i class="fas fa-times-circle text-[10px]"></i>
-                            <p class="text-[10px] font-black uppercase">{{ $message }}</p> 
-                        </div>
-                    @enderror
-                </div>
-
-                <input type="hidden" name="status" value="available">
+                </form>
+            </div>
 
                 <div class="pt-8 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row gap-4">
                     <button type="submit" class="flex-1 bg-[#003366] dark:bg-blue-600 hover:bg-[#001e3c] dark:hover:bg-blue-700 text-white py-4 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-900/20 transition-all flex items-center justify-center gap-2">
@@ -164,7 +161,7 @@
             const previewContainer = document.getElementById('image-preview-container');
             const previewImage = document.getElementById('image-preview');
             const placeholder = document.getElementById('upload-placeholder');
-            
+
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {

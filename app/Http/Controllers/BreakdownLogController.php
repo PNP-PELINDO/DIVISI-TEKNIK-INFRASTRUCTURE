@@ -169,7 +169,7 @@ class BreakdownLogController extends Controller
         $activeTicketExists = BreakdownLog::where('infrastructure_id', $infrastructure->id)
             ->where('repair_status', '!=', 'resolved')
             ->exists();
-            
+
         if ($activeTicketExists) {
             return redirect()->back()->withErrors(['infrastructure_id' => 'Aset ini sedang dalam status Breakdown dan memiliki laporan perbaikan yang belum selesai.'])->withInput();
         }
@@ -223,11 +223,11 @@ class BreakdownLogController extends Controller
 
         // Workflow Validation: Strict sequential progression
         $statusOrder = ['reported' => 1, 'order_part' => 2, 'on_progress' => 3, 'resolved' => 4];
-        
+
         if (isset($request->repair_status)) {
             $currentStatus = $log->repair_status;
             $newStatus = $request->repair_status;
-            
+
             // Prevent skipping steps forward
             if ($statusOrder[$newStatus] > $statusOrder[$currentStatus] + 1) {
                 return redirect()->back()->withErrors(['repair_status' => "Lompatan status tidak diizinkan! Harap ikuti alur: Reported -> Order Part -> On Progress -> Resolved."])->withInput();

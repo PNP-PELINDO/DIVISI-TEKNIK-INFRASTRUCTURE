@@ -11,10 +11,6 @@
                     <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">Pemantauan progres perbaikan infrastruktur secara real-time</p>
                 </div>
             </div>
-            <a href="{{ route('admin.breakdowns.create') }}" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-red-900/20 transition-all flex items-center gap-2 group">
-                <i class="fas fa-plus text-white group-hover:rotate-90 transition-transform duration-300"></i> Buat Laporan Baru
-            </a>
-        </div>
 
         @if(session('success'))
             <div class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-6 py-4 rounded-xl text-sm font-bold shadow-sm flex items-center gap-3 animate-fade-up">
@@ -78,27 +74,39 @@
                                         <i class="fas fa-user-edit text-[8px] text-slate-400 dark:text-slate-500"></i>
                                         <p class="text-[8px] font-black tracking-widest text-slate-400 dark:text-slate-500 uppercase">{{ $log->updatedBy->name ?? 'System' }}</p>
                                     </div>
-                                @endif
-                            </td>
-                            <td class="px-8 py-6 text-right">
-                                <div class="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    
-                                    <a href="{{ route('admin.breakdowns.edit', $log->id) }}" 
-                                       class="w-8 h-8 bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white rounded-lg flex items-center justify-center transition-all shadow-sm" 
-                                       title="Edit Detail Laporan">
-                                        <i class="fas fa-edit text-xs"></i>
-                                    </a>
+                                </td>
 
-                                    <form action="{{ route('admin.breakdowns.destroy', $log->id) }}" method="POST" 
-                                          onsubmit="return confirm('Apakah Anda yakin ingin menghapus log kerusakan ini? Status alat akan dikembalikan menjadi Ready.');">
-                                        @csrf 
-                                        @method('DELETE')
-                                        <button type="submit" 
-                                                class="w-8 h-8 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-lg flex items-center justify-center transition-all shadow-sm" 
-                                                title="Hapus Laporan">
-                                            <i class="fas fa-trash text-xs"></i>
-                                        </button>
+                                <td class="px-5 py-4 font-semibold text-slate-700">
+                                    {{ $log->infrastructure->entity->name ?? '-' }}
+                                </td>
+
+                                <td class="px-5 py-4">
+                                    <!-- Line clamp agar tidak terlalu panjang memakan ruang vertikal -->
+                                    <p class="text-slate-700 font-medium leading-relaxed line-clamp-2" title="{{ $log->issue_detail }}">
+                                        {{ $log->issue_detail }}
+                                    </p>
+                                    <div class="flex items-center gap-1.5 mt-1.5 text-[10px] text-slate-400 font-medium">
+                                        <i class="far fa-clock"></i> Dilaporkan: {{ $log->created_at->format('d M Y, H:i') }}
+                                    </div>
+                                </td>
+
+                                <td class="px-5 py-4 text-center">
+                                    <form action="{{ route('admin.breakdowns.update', $log->id) }}" method="POST" class="w-full">
+                                        @csrf @method('PUT')
+                                        <select name="repair_status" onchange="this.form.submit()"
+                                            class="status-select w-full text-[11px] font-semibold rounded border py-1.5 px-3 focus:ring-1 focus:ring-offset-0 focus:ring-[#003366] transition-colors cursor-pointer
+                                            {{ $log->repair_status == 'resolved' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 focus:border-emerald-500' :
+                                              ($log->repair_status == 'on_progress' ? 'bg-amber-50 text-amber-700 border-amber-200 focus:border-amber-500' :
+                                              ($log->repair_status == 'order_part' ? 'bg-purple-50 text-purple-700 border-purple-200 focus:border-purple-500' :
+                                              'bg-red-50 text-red-700 border-red-200 focus:border-red-500')) }}">
+
+                                            <option value="reported" {{ $log->repair_status == 'reported' ? 'selected' : '' }}>Dilaporkan</option>
+                                            <option value="order_part" {{ $log->repair_status == 'order_part' ? 'selected' : '' }}>Order Suku Cadang</option>
+                                            <option value="on_progress" {{ $log->repair_status == 'on_progress' ? 'selected' : '' }}>Sedang Diperbaiki</option>
+                                            <option value="resolved" {{ $log->repair_status == 'resolved' ? 'selected' : '' }}>Telah Selesai (Resolved)</option>
+                                        </select>
                                     </form>
+                                </td>
 
                                 </div>
                             </td>
@@ -126,11 +134,25 @@
                     <div class="w-2 h-2 rounded-full bg-red-500"></div>
                     <span class="text-[9px] font-bold uppercase">Breakdown</span>
                 </div>
-                <div class="flex items-center gap-1.5">
-                    <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
-                    <span class="text-[9px] font-bold uppercase">Resolved</span>
+
+                <!-- Pagination Section (Jika data sangat banyak) -->
+                @if(method_exists($logs, 'links') && $logs->hasPages())
+                <div class="bg-slate-50 border-t border-slate-200 px-6 py-3">
+                    {{ $logs->links() }}
+                </div>
+                @endif
+            </div>
+
+            <!-- FOOTER INFO -->
+            <div class="flex items-center justify-between text-slate-500 pt-2">
+                <p class="text-[10px] font-semibold uppercase tracking-wider">&copy; {{ date('Y') }} Pelindo Command Center</p>
+                <div class="flex gap-4">
+                    <span class="text-[10px] font-medium flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-red-500"></span> Dilaporkan</span>
+                    <span class="text-[10px] font-medium flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Proses</span>
+                    <span class="text-[10px] font-medium flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Selesai</span>
                 </div>
             </div>
+
         </div>
     </div>
 </x-app-layout>

@@ -5,7 +5,8 @@
             deleteUrl: '', 
             entityName: '' 
          }">
-        
+
+        <!-- MODAL DELETE (Enterprise Style) -->
         <template x-teleport="body">
             <div x-show="showDeleteModal" 
                  x-transition:enter="transition ease-out duration-300"
@@ -47,6 +48,13 @@
                             </form>
                         </div>
                     </div>
+                    <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex justify-end gap-2">
+                        <button @click="showDeleteModal = false" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded text-xs font-semibold hover:bg-slate-50 transition-colors">Batal</button>
+                        <form :action="deleteUrl" method="POST">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded text-xs font-semibold hover:bg-red-700 transition-colors shadow-sm">Hapus Entitas</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </template>
@@ -62,12 +70,6 @@
                     <h1 class="text-2xl font-black text-[#003366] dark:text-blue-400 uppercase tracking-tight">Manajemen Entitas</h1>
                     <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">Daftar Cabang & Anak Perusahaan</p>
                 </div>
-            </div>
-            
-            <a href="{{ route('admin.entities.create') }}" class="bg-[#003366] hover:bg-[#001e3c] text-white px-6 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest shadow-md shadow-blue-900/10 transition-all flex items-center gap-2">
-                <i class="fas fa-plus"></i> Tambah Entitas
-            </a>
-        </div>
 
         <!-- Search Form -->
         <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
@@ -92,7 +94,6 @@
             <div class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-6 py-4 rounded-xl text-sm font-bold shadow-sm flex items-center gap-3 animate-fade-in">
                 <i class="fas fa-check-circle text-emerald-500 text-lg"></i> {{ session('success') }}
             </div>
-        @endif
 
         @if(session('error'))
             <div class="bg-red-50 text-red-700 border border-red-200 px-6 py-4 rounded-xl text-sm font-bold shadow-sm flex items-center gap-3 animate-fade-in">
@@ -169,6 +170,12 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- FOOTER INFO -->
+            <div class="flex items-center justify-between text-slate-400 pt-2">
+                <p class="text-[10px] font-semibold uppercase tracking-wider">&copy; {{ date('Y') }} Pelindo Command Center</p>
+            </div>
+
         </div>
     </div>
 </x-app-layout>

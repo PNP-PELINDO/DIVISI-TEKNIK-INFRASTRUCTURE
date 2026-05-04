@@ -20,26 +20,12 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 Route::get('/', function () {
+    // Ambil data untuk katalog utama
     $infrastructures = Infrastructure::all();
 
-    $entities = Entity::with('infrastructures')->get()->map(function($entity) {
-        $entity->Infrastructure_stats_by_cat = [
-            'equipment' => $entity->infrastructures->where('category', 'equipment')->groupBy('type')->map(fn($items) => [
-                'available' => $items->where('status', 'available')->count(), // Menggunakan count() kembali
-                'breakdown' => $items->where('status', 'breakdown')->count(),
-            ]),
-            'facility' => $entity->infrastructures->where('category', 'facility')->groupBy('type')->map(fn($items) => [
-                'available' => $items->where('status', 'available')->count(),
-                'breakdown' => $items->where('status', 'breakdown')->count(),
-            ]),
-            'utility' => $entity->infrastructures->where('category', 'utility')->groupBy('type')->map(fn($items) => [
-                'available' => $items->where('status', 'available')->count(),
-                'breakdown' => $items->where('status', 'breakdown')->count(),
-            ]),
-        ];
-        return $entity;
-    });
+    $entities = Entity::with('infrastructures')->get();
 
+    // Ambil log insiden aktif (yang belum sembuh/resolved)
     $breakdowns = BreakdownLog::with(['infrastructure' => fn($q) => $q->withTrashed()->with('entity')])
         ->where('repair_status', '!=', 'resolved')
         ->orderBy('created_at', 'desc')
@@ -54,19 +40,18 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth', 'verified'])->group(function () {
-    
-    // 1. Dashboard Utama Admin
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // 2. Grup Utama Admin (Operasional & Master Data)
+    // Kita buat grup 'admin' untuk membungkus semua fitur manajemen
     Route::prefix('admin')->name('admin.')->group(function () {
 
-        /* --- AKSES SEMUA LEVEL (Superadmin & Operator Cabang) --- */
-        
-        // Fitur Analytics / Statistik Detail
+        // 1. Dashboard Utama (Sekarang namanya menjadi admin.dashboard)
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+        // 2. Fitur Analytics & Export
         Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
         Route::get('/export/process', [ExportController::class, 'process'])->name('export.process');
-        
+
+        // 3. Resource Operasional (Akses Semua Level)
         Route::resource('infrastructures', InfrastructureController::class);
         Route::resource('breakdowns', BreakdownLogController::class);
         Route::resource('maintenance', MaintenanceScheduleController::class);
@@ -78,10 +63,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // Manajemen Akun Pegawai
             Route::resource('users', UserController::class);
         });
-        
+
     });
 
-    // 3. Manajemen Profil Pengguna
+    // Alias untuk memudahkan jika ada yang mengetik /dashboard secara manual
+    Route::get('/dashboard', function() {
+        return redirect()->route('admin.dashboard');
+    })->name('dashboard');
+
+    // 4. Manajemen Profil Pengguna
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');

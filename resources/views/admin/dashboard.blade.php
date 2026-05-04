@@ -1,13 +1,15 @@
 <x-app-layout>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
 
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        /* Menggunakan font Inter yang merupakan standar de-facto UI Enterprise */
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #f4f7fa;
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+            color: #334155;
         }
 
         .dark body {
@@ -21,11 +23,12 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .asset-card {
+        /* Card Enterprise Style: Sudut lebih tajam, shadow tipis, border tegas */
+        .ent-card {
             background-color: #ffffff;
             border: 1px solid #e2e8f0;
             border-radius: 12px;
@@ -54,6 +57,7 @@
             border: 1px solid #f1f5f9;
             border-radius: 8px;
             display: flex;
+            justify-content: space-between;
             align-items: center;
             justify-content: center;
             margin-bottom: 8px;
@@ -84,6 +88,8 @@
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            padding: 12px 16px;
+            border-bottom: 2px solid #e2e8f0;
         }
 
         .stat-available { background-color: #ecfdf5; border: 1px solid #d1fae5; color: #065f46; }
@@ -95,20 +101,28 @@
         .stat-breakdown .badge { background-color: #ef4444; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; }
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
+
     @php
+        // LOGIKA & RUMUS BARU UNTUK ENTERPRISE DASHBOARD
         $equipment = isset($allInfrastructures) ? $allInfrastructures->where('category', 'equipment') : collect();
         $facility = isset($allInfrastructures) ? $allInfrastructures->where('category', 'facility') : collect();
         $utility = isset($allInfrastructures) ? $allInfrastructures->where('category', 'utility') : collect();
 
-        $groupedEquipment = $equipment->groupBy(fn($i) => $i->entity->name ?? 'Unknown Entity');
-        $groupedFacility = $facility->groupBy(fn($i) => $i->entity->name ?? 'Unknown Entity');
-        $groupedUtility = $utility->groupBy(fn($i) => $i->entity->name ?? 'Unknown Entity');
+        // 1. Rumus Availability Rate (SLA KPI)
+        $totalAssets = $stats['total'] ?? 0;
+        $availableAssets = $stats['available'] ?? 0;
+        $availabilityRate = $totalAssets > 0 ? round(($availableAssets / $totalAssets) * 100, 1) : 0;
 
-        $countEq = $equipment->count();
-        $countFac = $facility->count();
-        $countUtil = $utility->count();
+        // Penentuan Warna SLA
+        $slaColor = $availabilityRate >= 90 ? 'bg-emerald-500' : ($availabilityRate >= 75 ? 'bg-amber-500' : 'bg-red-500');
+
+        // 2. Data Top 5 Entitas dengan Kerusakan Terbanyak (Untuk Horizontal Bar Chart)
+        $entityBreakdowns = isset($allInfrastructures) ? $allInfrastructures->where('status', 'breakdown')->groupBy(fn($i) => $i->entity->name ?? 'Unknown') : collect();
+        $topBrokenEntities = $entityBreakdowns->map->count()->sortByDesc(fn($c) => $c)->take(5);
     @endphp
 
     <div id="main-ui" class="max-w-[1600px] mx-auto w-full space-y-6 animate-fade-up" x-data="{ showDetailModal: false, infraData: null, openDetailModal(data) { this.infraData = data; this.showDetailModal = true; } }">
@@ -143,8 +157,8 @@
                 <a href="{{ route('admin.infrastructures.create') }}" class="w-full sm:w-auto justify-center bg-[#003366] hover:bg-[#001e3c] text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-900/20 transition-all flex items-center gap-2">
                     <i class="fas fa-plus"></i> Aset Baru
                 </a>
-                <a href="{{ route('admin.breakdowns.create') }}" class="w-full sm:w-auto justify-center bg-amber-500 hover:bg-amber-600 text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-amber-900/20 transition-all flex items-center gap-2">
-                    <i class="fas fa-triangle-exclamation"></i> Lapor Kerusakan
+                <a href="{{ route('admin.infrastructures.create') }}" class="bg-[#0055a4] hover:bg-[#004380] text-white px-4 py-2 rounded text-xs font-semibold transition-colors flex items-center gap-2 shadow-sm">
+                    <i class="fas fa-plus"></i> Register Aset
                 </a>
             </div>
         </div>
@@ -305,7 +319,7 @@
                     <canvas id="categoryChart"></canvas>
                 </div>
             </div>
-            
+
         </div>
 
         <!-- ACTIONABLE LISTS -->
@@ -411,9 +425,8 @@
                     Kelola Laporan
                 </a>
             </div>
-
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse min-w-[800px]">
+            <div class="overflow-x-auto w-full">
+                <table class="w-full text-left border-collapse ent-table min-w-[900px]">
                     <thead>
                         <tr class="bg-[#002244] dark:bg-slate-800 text-slate-300 dark:text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">
                             <th class="px-8 py-5 w-16 text-center">NO</th>
@@ -444,7 +457,7 @@
                                     <span class="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-[9px] font-black px-3 py-1.5 rounded-md uppercase tracking-widest shadow-sm">Selesai</span>
                                 @endif
                             </td>
-                            <td class="px-8 py-5 text-slate-500 uppercase">{{ $log->vendor_pic ?? '-' }}</td>
+                            <td class="text-xs font-medium">{{ $log->vendor_pic ?? 'Internal' }}</td>
                         </tr>
                         @empty
                         <tr><td colspan="6" class="px-8 py-16 text-center text-slate-400 dark:text-slate-500">Tidak ada laporan kerusakan alat saat ini.</td></tr>
@@ -644,21 +657,36 @@
                 }
             });
 
+            // 2. Trend Line Chart (DYNAMIC GRADIENT)
             const trendCtx = document.getElementById('trendChart').getContext('2d');
+
+            // Konfigurasi Canvas Gradient (Y-Axis)
+            // Semakin tinggi nilai grafik (Y mendekati 0 di canvas), warna makin Merah.
+            // Semakin rendah (Y membesar ke bawah), warna makin Hijau/Aman.
+            const gradientBg = trendCtx.createLinearGradient(0, 0, 0, 250);
+            gradientBg.addColorStop(0, 'rgba(239, 68, 68, 0.6)');    // Merah menyala di atas
+            gradientBg.addColorStop(0.5, 'rgba(245, 158, 11, 0.3)'); // Amber di tengah
+            gradientBg.addColorStop(1, 'rgba(16, 185, 129, 0.05)');  // Hijau di bawah
+
+            const gradientBorder = trendCtx.createLinearGradient(0, 0, 0, 250);
+            gradientBorder.addColorStop(0, 'rgba(239, 68, 68, 1)');
+            gradientBorder.addColorStop(0.5, 'rgba(245, 158, 11, 1)');
+            gradientBorder.addColorStop(1, 'rgba(16, 185, 129, 1)');
+
             new Chart(trendCtx, {
                 type: 'line',
                 data: {
-                    labels: {!! json_encode($chartData['trendLabels']) !!},
+                    labels: {!! json_encode($chartData['trendLabels'] ?? []) !!},
                     datasets: [{
-                        label: 'Laporan Kerusakan',
-                        data: {!! json_encode($chartData['trendCounts']) !!},
-                        borderColor: '#ef4444',
-                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                        borderWidth: 2,
-                        tension: 0.4,
+                        label: 'Insiden Tercatat',
+                        data: {!! json_encode($chartData['trendCounts'] ?? []) !!},
+                        borderColor: gradientBorder,
+                        backgroundColor: gradientBg,
+                        borderWidth: 3,
+                        tension: 0.4, // Memberikan efek kurva yang smooth
                         fill: true,
                         pointBackgroundColor: '#ffffff',
-                        pointBorderColor: '#ef4444',
+                        pointBorderColor: gradientBorder,
                         pointBorderWidth: 2,
                         pointRadius: 4,
                         pointHoverRadius: 6
@@ -669,8 +697,80 @@
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        y: { beginAtZero: true, ticks: { stepSize: 1 } },
-                        x: { grid: { display: false } }
+                        y: {
+                            beginAtZero: true,
+                            border: { display: false },
+                            grid: { color: '#f1f5f9' },
+                            ticks: { stepSize: 1, font: {size: 10} }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { font: {size: 10} }
+                        }
+                    }
+                }
+            });
+
+            // 3. Category Bar Chart
+            new Chart(document.getElementById('categoryChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['Peralatan', 'Fasilitas', 'Utilitas'],
+                    datasets: [
+                        {
+                            label: 'Ready',
+                            data: [
+                                {{ $equipment->where('status', 'available')->count() }},
+                                {{ $facility->where('status', 'available')->count() }},
+                                {{ $utility->where('status', 'available')->count() }}
+                            ],
+                            backgroundColor: '#10b981',
+                            borderRadius: 2,
+                            barPercentage: 0.5
+                        },
+                        {
+                            label: 'Down',
+                            data: [
+                                {{ $equipment->where('status', 'breakdown')->count() }},
+                                {{ $facility->where('status', 'breakdown')->count() }},
+                                {{ $utility->where('status', 'breakdown')->count() }}
+                            ],
+                            backgroundColor: '#ef4444',
+                            borderRadius: 2,
+                            barPercentage: 0.5
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11, weight: '500' } } },
+                        y: { stacked: true, beginAtZero: true, border: { display: false }, grid: { color: '#f1f5f9' } }
+                    },
+                    plugins: { legend: { position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 8, font: {size: 11} } } }
+                }
+            });
+
+            // 4. CHART BARU: Horizontal Bar untuk Top 5 Entitas Bermasalah
+            new Chart(document.getElementById('topEntityChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: {!! $topBrokenEntities->keys()->toJson() !!},
+                    datasets: [{
+                        label: 'Total Aset Rusak',
+                        data: {!! $topBrokenEntities->values()->toJson() !!},
+                        backgroundColor: '#ef4444',
+                        borderRadius: 2,
+                        barThickness: 15
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // Horizontal Bar Chart
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { beginAtZero: true, grid: { color: '#f1f5f9' }, border: { display: false }, ticks: { stepSize: 1, font: {size: 10} } },
+                        y: { grid: { display: false }, ticks: { font: { size: 10, weight: '500' } } }
                     }
                 }
             });

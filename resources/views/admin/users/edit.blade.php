@@ -19,11 +19,27 @@
                         <input type="text" name="name" value="{{ $user->name }}" class="w-full border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-sm font-bold p-4 focus:ring-4 focus:ring-blue-50 dark:focus:ring-blue-900/20 focus:border-[#003366] dark:focus:border-blue-400 transition-all text-slate-900 dark:text-slate-100" required>
                     </div>
 
+            <!-- ERROR ALERTS -->
+            @if ($errors->any())
+                <div class="bg-red-50 border border-red-200 p-4 rounded-lg flex items-start gap-3 shadow-sm">
+                    <i class="fas fa-exclamation-triangle text-red-600 mt-0.5"></i>
                     <div>
                         <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Alamat Email</label>
                         <input type="email" name="email" value="{{ $user->email }}" class="w-full border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-sm font-bold p-4 focus:ring-4 focus:ring-blue-50 dark:focus:ring-blue-900/20 focus:border-[#003366] dark:focus:border-blue-400 transition-all text-slate-900 dark:text-slate-100" required>
                     </div>
                 </div>
+            @endif
+
+            <!-- MAIN FORM CARD -->
+            <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
+                <div class="bg-[#00152b] px-6 py-4 border-b border-slate-700 flex items-center gap-3">
+                    <i class="fas fa-id-card-clip text-blue-400"></i>
+                    <h2 class="text-xs font-bold text-white uppercase tracking-widest">Informasi Autentikasi Pegawai</h2>
+                </div>
+
+                <form action="{{ route('admin.users.update', $user->id) }}" method="POST" class="p-6 md:p-8 space-y-6" x-data="{ role: '{{ old('role', $user->role) }}' }">
+                    @csrf
+                    @method('PUT')
 
                 <div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-800">
                     <p class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4 italic">Ganti Password (Kosongkan jika tidak ingin ganti)</p>
@@ -31,7 +47,6 @@
                         <input type="password" name="password" placeholder="Password Baru" class="w-full border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-xl text-sm font-bold p-4 focus:ring-4 focus:ring-blue-50 dark:focus:ring-blue-900/20 focus:border-[#003366] dark:focus:border-blue-400 transition-all text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500">
                         <input type="password" name="password_confirmation" placeholder="Konfirmasi Password Baru" class="w-full border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-xl text-sm font-bold p-4 focus:ring-4 focus:ring-blue-50 dark:focus:ring-blue-900/20 focus:border-[#003366] dark:focus:border-blue-400 transition-all text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500">
                     </div>
-                </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
@@ -51,7 +66,6 @@
                             :options="$entities->map(fn($e) => ['value' => $e->id, 'label' => $e->name . ' (' . $e->code . ')'])->toArray()"
                         />
                     </div>
-                </div>
 
                 <div class="pt-8 flex flex-col sm:flex-row gap-4">
                     <button type="submit" class="flex-1 bg-[#003366] dark:bg-blue-600 hover:bg-[#001e3c] dark:hover:bg-blue-700 text-white py-4 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-900/20 transition-all flex items-center justify-center gap-2">

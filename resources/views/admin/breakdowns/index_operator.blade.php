@@ -325,6 +325,7 @@
                 <div class="mt-6">
                     {{ $historyLogs->links() }}
                 </div>
+                @endif
             </div>
 
         </div>
@@ -455,7 +456,8 @@
 
     </div>
 
-    <x-export-report :infrastructures="$allInfrastructures" :recentBreakdowns="$recentBreakdowns" />
+    <!-- Export Logic (Hidden Component) -->
+    <x-export-report :infrastructures="$allInfrastructures ?? collect()" :recentBreakdowns="$recentBreakdowns ?? collect()" />
     <x-export-filter-modal />
 
     <style>

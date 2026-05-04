@@ -49,11 +49,50 @@
                                 </form>
                             </div>
                         </div>
+                    </template>
+
+                    <!-- State Kosong -->
+                    <div x-show="filteredItems.length === 0" style="display: none;" class="py-24 text-center">
+                        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center border border-slate-200 mx-auto mb-4">
+                            <i class="fas fa-folder-open text-2xl text-slate-300"></i>
+                        </div>
+                        <p class="font-semibold text-sm text-slate-700">Data Tidak Ditemukan</p>
+                        <p class="text-xs mt-1 font-medium text-slate-500">Coba sesuaikan filter atau kata kunci pencarian Anda.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL DELETE (Clean Enterprise Style) -->
+            <template x-teleport="body">
+                <div x-show="showDeleteModal" x-cloak
+                     class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+                    <div @click.away="showDeleteModal = false"
+                         x-show="showDeleteModal"
+                         x-transition.scale.origin.bottom.duration.200ms
+                         class="bg-white rounded-lg shadow-xl max-w-sm w-full border border-slate-200 overflow-hidden">
+                        <div class="p-6">
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 bg-red-100 text-red-600 rounded-full flex items-center justify-center shrink-0">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-bold text-slate-900">Konfirmasi Penghapusan</h3>
+                                    <p class="text-xs text-slate-500 mt-1">Anda yakin ingin menghapus data <strong class="text-slate-800" x-text="assetCode"></strong>? Data ini akan dihapus secara permanen.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex justify-end gap-2">
+                            <button @click="showDeleteModal = false" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded text-xs font-semibold hover:bg-slate-50 transition-colors">Batal</button>
+                            <form :action="deleteUrl" method="POST">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded text-xs font-semibold hover:bg-red-700 transition-colors shadow-sm">Hapus Data</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </template>
 
-            <!-- Detail Modal -->
+            <!-- MODAL DETAIL (Clean Enterprise Style) -->
             <template x-teleport="body">
                 <div x-show="showDetailModal" 
                      x-transition:enter="transition ease-out duration-300"
@@ -72,21 +111,22 @@
                             <h2 class="text-lg font-black text-white uppercase tracking-widest flex items-center gap-3">
                                 <i class="fas fa-info-circle text-blue-300"></i> Detail Infrastruktur
                             </h2>
-                            <button @click="showDetailModal = false" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-red-500 transition-colors">
+                            <button @click="showDetailModal = false" class="text-slate-400 hover:text-red-500 transition-colors">
                                 <i class="fas fa-times"></i>
                             </button>
                         </div>
 
-                        <div class="p-6 md:p-8 overflow-y-auto">
-                            <div class="flex flex-col md:flex-row gap-8">
+                        <div class="p-6 overflow-y-auto bg-slate-50 flex-1">
+                            <div class="flex flex-col md:flex-row gap-6">
+
+                                <!-- Foto / Image -->
                                 <div class="w-full md:w-1/3 shrink-0">
                                     <div class="aspect-square bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden flex items-center justify-center relative group">
                                         <template x-if="selectedItem.image">
-                                            <img :src="selectedItem.image" class="w-full h-full object-cover" alt="Foto Alat">
+                                            <img :src="selectedItem.image" class="w-full h-full object-cover">
                                         </template>
                                         <template x-if="!selectedItem.image">
-                                            <i class="fas text-5xl text-slate-300" 
-                                               :class="{'fa-truck': selectedItem.category === 'equipment', 'fa-building': selectedItem.category === 'facility', 'fa-bolt': selectedItem.category === 'utility', 'fa-image': !selectedItem.category}"></i>
+                                            <i class="fas text-4xl text-slate-300" :class="{'fa-truck': selectedItem.category === 'equipment', 'fa-building': selectedItem.category === 'facility', 'fa-bolt': selectedItem.category === 'utility', 'fa-image': !selectedItem.category}"></i>
                                         </template>
                                         
                                         <div class="absolute top-3 left-3 px-3 py-1 bg-white/90 dark:bg-slate-800/90 backdrop-blur text-[10px] font-black rounded-lg uppercase tracking-widest border border-white/50 dark:border-slate-700/50 shadow-sm"
@@ -101,7 +141,7 @@
                                               :class="selectedItem.status === 'available' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400'">
                                             <i class="fas" :class="selectedItem.status === 'available' ? 'fa-check-circle' : 'fa-engine-warning'"></i>
                                             <span x-text="selectedItem.status === 'available' ? 'Ready' : 'Breakdown'"></span>
-                                        </span>
+                                        </div>
                                     </div>
                                 </div>
                                 

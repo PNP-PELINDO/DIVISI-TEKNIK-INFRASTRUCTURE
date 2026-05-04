@@ -1,49 +1,79 @@
 <style>
-    .hide-sidebar-scroll::-webkit-scrollbar { 
-        display: none; 
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    .hide-sidebar-scroll::-webkit-scrollbar {
+        display: none;
     }
-    .hide-sidebar-scroll { 
-        -ms-overflow-style: none; 
-        scrollbar-width: none; 
+    .hide-sidebar-scroll {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
     }
+
+    /* Animasi Hover Modern */
+    .nav-item {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .nav-item:hover {
+        transform: translateX(6px);
+    }
+
+    /* Styling Active State Premium */
     .sidebar-link-active {
-        background-color: rgba(0, 85, 164, 0.15) !important;
+        background: linear-gradient(90deg, #0055a4 0%, #003366 100%) !important;
         color: #ffffff !important;
-        border-left: 4px solid #0055a4 !important;
+        box-shadow: 0 4px 15px -3px rgba(0, 85, 164, 0.4) !important;
+        border-radius: 12px !important;
+        font-weight: 700 !important;
+    }
+
+    /* Warna Ikon saat Aktif */
+    .sidebar-link-active i {
+        color: #93c5fd !important; /* Warna biru muda menyala */
     }
 </style>
 
-<aside id="main-sidebar" class="sidebar-transition w-[280px] bg-[#001a33] flex flex-col fixed lg:relative inset-y-0 left-0 z-[90] shadow-2xl shrink-0 border-r border-white/5">
-    
-    <div class="h-24 flex items-center px-8 bg-[#001122] border-b border-white/5">
-        <img src="{{ asset('pelindo.png') }}" alt="Pelindo Logo" class="h-8 md:h-9 object-contain filter brightness-110">
+<aside id="main-sidebar" style="font-family: 'Inter', sans-serif;" class="sidebar-transition w-[280px] bg-[#021326] flex flex-col fixed lg:relative inset-y-0 left-0 z-[90] shadow-[4px_0_24px_rgba(0,0,0,0.15)] shrink-0 border-r border-white/5">
+
+    <!-- Logo Area -->
+    <div class="h-[88px] flex items-center px-8 bg-[#010e1c] border-b border-white/5 shrink-0 relative overflow-hidden">
+        <!-- Efek Glow di belakang logo -->
+        <div class="absolute inset-0 bg-[#0055a4] opacity-10 blur-xl rounded-full scale-150 transform -translate-y-1/2"></div>
+        <img src="{{ asset('pelindo.png') }}" alt="Pelindo Logo" class="h-8 md:h-9 object-contain filter brightness-110 relative z-10">
     </div>
 
+    <!-- Navigation Area -->
     <div class="flex-1 overflow-y-auto hide-sidebar-scroll py-6 flex flex-col gap-6">
-        
-        <nav class="space-y-1">
-            <a href="{{ route('dashboard') }}" 
-               class="group flex items-center gap-4 px-8 py-3.5 transition-all duration-300 {{ request()->routeIs('dashboard') ? 'sidebar-link-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
-                <i class="fas fa-desktop text-sm w-5 text-center {{ request()->routeIs('dashboard') ? 'text-[#0055a4]' : 'text-slate-500 group-hover:text-slate-300' }}"></i>
-                <span class="text-xs font-bold tracking-wide uppercase">Dashboard Utama</span>
+
+        <nav class="space-y-1.5 px-4">
+            <!-- Menu Dashboard -->
+            <a href="{{ route('dashboard') }}"
+               class="nav-item group flex items-center gap-4 px-4 py-3 rounded-xl {{ request()->routeIs('dashboard') ? 'sidebar-link-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
+                <i class="fas fa-desktop text-sm w-6 text-center {{ request()->routeIs('dashboard') ? '' : 'text-slate-500 group-hover:text-slate-300' }}"></i>
+                <span class="text-xs font-semibold tracking-wide uppercase">Dashboard Utama</span>
+            </a>
+
+            <!-- Menu Portal Publik (Katalog) -->
+            <a href="{{ route('home') }}" target="_blank"
+               class="nav-item group flex items-center gap-4 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 hover:text-white"
+               title="Buka halaman depan di tab baru">
+                <i class="fas fa-external-link-alt text-sm w-6 text-center text-slate-500 group-hover:text-slate-300"></i>
+                <span class="text-xs font-semibold tracking-wide uppercase">Portal Publik</span>
             </a>
         </nav>
 
+        <nav class="space-y-1.5 px-4">
+            <p class="px-4 text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-3">Operasional</p>
 
-
-        <nav class="space-y-1">
-            <p class="px-8 text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Operasional</p>
-            
-            <a href="{{ route('admin.infrastructures.index') }}" 
-               class="group flex items-center gap-4 px-8 py-3.5 transition-all duration-300 {{ request()->routeIs('admin.infrastructures.*') ? 'sidebar-link-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
-                <i class="fas fa-boxes text-sm w-5 text-center {{ request()->routeIs('admin.infrastructures.*') ? 'text-[#0055a4]' : 'text-slate-500 group-hover:text-slate-300' }}"></i>
-                <span class="text-xs font-bold tracking-wide uppercase">Infrastruktur</span>
+            <a href="{{ route('admin.infrastructures.index') }}"
+               class="nav-item group flex items-center gap-4 px-4 py-3 rounded-xl {{ request()->routeIs('admin.infrastructures.*') ? 'sidebar-link-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
+                <i class="fas fa-boxes text-sm w-6 text-center {{ request()->routeIs('admin.infrastructures.*') ? '' : 'text-slate-500 group-hover:text-slate-300' }}"></i>
+                <span class="text-xs font-semibold tracking-wide uppercase">Infrastruktur</span>
             </a>
-            
-            <a href="{{ route('admin.breakdowns.index') }}" 
-               class="group flex items-center gap-4 px-8 py-3.5 transition-all duration-300 {{ request()->routeIs('admin.breakdowns.*') ? 'sidebar-link-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
-                <i class="fas fa-clipboard-list text-sm w-5 text-center {{ request()->routeIs('admin.breakdowns.*') ? 'text-[#0055a4]' : 'text-slate-500 group-hover:text-slate-300' }}"></i>
-                <span class="text-xs font-bold tracking-wide uppercase">Log Kerusakan</span>
+
+            <a href="{{ route('admin.breakdowns.index') }}"
+               class="nav-item group flex items-center gap-4 px-4 py-3 rounded-xl {{ request()->routeIs('admin.breakdowns.*') ? 'sidebar-link-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
+                <i class="fas fa-clipboard-list text-sm w-6 text-center {{ request()->routeIs('admin.breakdowns.*') ? '' : 'text-slate-500 group-hover:text-slate-300' }}"></i>
+                <span class="text-xs font-semibold tracking-wide uppercase">Log Kerusakan</span>
             </a>
 
             <a href="{{ route('admin.maintenance.index') }}" 
@@ -54,52 +84,57 @@
         </nav>
 
         @if(auth()->check() && auth()->user()->role === 'superadmin')
-        <nav class="space-y-1">
-            <p class="px-8 text-[9px] font-black text-slate-500 uppercase tracking-[0.2em] mb-3">Sistem Pusat</p>
-            
-            <a href="{{ route('admin.entities.index') }}" 
-               class="group flex items-center gap-4 px-8 py-3.5 transition-all duration-300 {{ request()->routeIs('admin.entities.*') ? 'sidebar-link-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
-                <i class="fas fa-building text-sm w-5 text-center {{ request()->routeIs('admin.entities.*') ? 'text-[#0055a4]' : 'text-slate-500 group-hover:text-slate-300' }}"></i>
-                <span class="text-xs font-bold tracking-wide uppercase">Manajemen Bagian</span>
+        <nav class="space-y-1.5 px-4">
+            <p class="px-4 text-[10px] font-black text-slate-500 uppercase tracking-[0.15em] mb-3 mt-2">Sistem Pusat</p>
+
+            <a href="{{ route('admin.entities.index') }}"
+               class="nav-item group flex items-center gap-4 px-4 py-3 rounded-xl {{ request()->routeIs('admin.entities.*') ? 'sidebar-link-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
+                <i class="fas fa-building text-sm w-6 text-center {{ request()->routeIs('admin.entities.*') ? '' : 'text-slate-500 group-hover:text-slate-300' }}"></i>
+                <span class="text-xs font-semibold tracking-wide uppercase">Manajemen Bagian</span>
             </a>
 
-            <a href="{{ route('admin.users.index') }}" 
-               class="group flex items-center gap-4 px-8 py-3.5 transition-all duration-300 {{ request()->routeIs('admin.users.*') ? 'sidebar-link-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
-                <i class="fas fa-users-cog text-sm w-5 text-center {{ request()->routeIs('admin.users.*') ? 'text-[#0055a4]' : 'text-slate-500 group-hover:text-slate-300' }}"></i>
-                <span class="text-xs font-bold tracking-wide uppercase">Kelola Akun</span>
+            <a href="{{ route('admin.users.index') }}"
+               class="nav-item group flex items-center gap-4 px-4 py-3 rounded-xl {{ request()->routeIs('admin.users.*') ? 'sidebar-link-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
+                <i class="fas fa-users-cog text-sm w-6 text-center {{ request()->routeIs('admin.users.*') ? '' : 'text-slate-500 group-hover:text-slate-300' }}"></i>
+                <span class="text-xs font-semibold tracking-wide uppercase">Kelola Akun</span>
             </a>
         </nav>
         @endif
 
     </div>
 
-    <div class="p-6">
+    <!-- User Profile & Action Area -->
+    <div class="mt-auto bg-[#010e1c] border-t border-white/5 shrink-0 pb-2">
         @auth
-            <div class="bg-black/20 rounded-2xl border border-white/5 p-4 transition-all">
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="w-10 h-10 rounded-lg bg-[#0055a4] flex items-center justify-center text-white font-black text-sm shadow-lg shrink-0">
+            <div class="p-4 flex items-center justify-between gap-3">
+
+                <!-- Profile Info -->
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="relative w-10 h-10 rounded-full bg-gradient-to-br from-[#0055a4] to-[#003366] flex items-center justify-center text-white font-bold text-sm shadow-md shrink-0 border border-blue-400/20">
                         {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                        <!-- Online Indicator -->
+                        <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-[#010e1c] rounded-full"></span>
                     </div>
-                    
-                    <div class="overflow-hidden">
-                        <p class="text-xs font-bold text-white truncate">{{ Auth::user()->name }}</p>
-                        <span class="inline-block mt-0.5 text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-[#0055a4]/20 text-blue-400 border border-[#0055a4]/30">
-                            {{ auth()->user()->role }}
-                        </span>
+
+                    <div class="truncate">
+                        <p class="text-xs font-bold text-slate-200 truncate leading-tight">{{ Auth::user()->name }}</p>
+                        <p class="text-[9px] font-semibold text-blue-400 uppercase tracking-widest mt-0.5 truncate">{{ auth()->user()->role }}</p>
                     </div>
                 </div>
 
-                <form method="POST" action="{{ route('logout') }}">
+                <!-- Modern Logout Button -->
+                <form method="POST" action="{{ route('logout') }}" class="shrink-0">
                     @csrf
-                    <button type="submit" class="w-full py-2.5 bg-transparent hover:bg-white/5 border border-white/10 hover:border-white/20 text-slate-400 hover:text-white text-[10px] font-black rounded-xl transition-all duration-300 uppercase tracking-widest flex items-center justify-center gap-2">
-                        <i class="fas fa-power-off text-[9px]"></i> Akhiri Sesi
+                    <button type="submit" title="Akhiri Sesi" class="w-9 h-9 flex items-center justify-center rounded-xl bg-white/5 text-slate-400 hover:bg-red-500 hover:text-white hover:shadow-lg hover:shadow-red-500/20 transition-all duration-300 group">
+                        <i class="fas fa-power-off text-sm group-hover:scale-110 transition-transform"></i>
                     </button>
                 </form>
             </div>
         @endauth
-        
-        <div class="mt-4 text-center">
-            <p class="text-[8px] font-bold text-slate-600 uppercase tracking-[0.2em]">DIA PORTAL v4.0</p>
+
+        <!-- Version Footer -->
+        <div class="px-4 text-center">
+            <p class="text-[9px] font-bold text-slate-600 uppercase tracking-[0.2em]">Dashboard Infrastructure</p>
         </div>
     </div>
 </aside>

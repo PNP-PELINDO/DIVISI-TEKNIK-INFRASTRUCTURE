@@ -5,7 +5,8 @@
             deleteUrl: '', 
             userName: '' 
          }">
-        
+
+        <!-- MODAL DELETE (Enterprise Style, Konsisten) -->
         <template x-teleport="body">
             <div x-show="showDeleteModal" 
                  x-transition:enter="transition ease-out duration-300"
@@ -61,12 +62,6 @@
                     <h1 class="text-xl md:text-2xl font-bold text-[#003366] dark:text-blue-400">Manajemen Akun</h1>
                     <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Kelola hak akses personil berdasarkan entitas dan bagian terminal.</p>
                 </div>
-            </div>
-            
-            <a href="{{ route('admin.users.create') }}" class="w-full md:w-auto bg-[#003366] hover:bg-[#002244] text-white px-5 py-2.5 rounded-lg text-sm font-semibold shadow-sm transition-colors flex items-center justify-center gap-2">
-                <i class="fas fa-user-plus text-xs"></i> Tambah Pengguna
-            </a>
-        </div>
 
         <!-- Filter Form -->
         <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
@@ -111,14 +106,11 @@
                     <p class="text-sm text-emerald-700 mt-0.5">{{ session('success') }}</p>
                 </div>
             </div>
-        @endif
 
-        @if(session('error'))
-            <div class="bg-red-50 border border-red-200 p-4 rounded-xl flex items-start gap-3 shadow-sm animate-fade-in">
-                <i class="fas fa-exclamation-triangle text-red-600 mt-0.5"></i>
-                <div>
-                    <h3 class="text-sm font-bold text-red-800">Gagal</h3>
-                    <p class="text-sm text-red-700 mt-0.5">{{ session('error') }}</p>
+            <!-- ALERTS -->
+            @if(session('success'))
+                <div class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-4 py-3 rounded-md text-sm font-medium shadow-sm flex items-center gap-3">
+                    <i class="fas fa-check-circle text-emerald-500"></i> {{ session('success') }}
                 </div>
             </div>
         @endif
@@ -143,6 +135,9 @@
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-sm">
                                 <i class="fas {{ $iconClass }} text-sm"></i>
+                                <h2 class="font-bold text-slate-800 text-xs uppercase tracking-widest">
+                                    Akses: {{ $role }}
+                                </h2>
                             </div>
                             <h2 class="font-bold text-slate-800 dark:text-slate-100 text-base uppercase tracking-wide">
                                 {{ $role }}
@@ -213,12 +208,36 @@
                                                 <i class="fas fa-trash-alt text-xs"></i>
                                             </span>
                                             @endif
-                                        </div>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                                        </td>
+
+                                        <td class="px-6 py-4 text-center">
+                                            <div class="flex items-center justify-center gap-2">
+                                                <a href="{{ route('admin.users.edit', $user->id) }}"
+                                                   class="w-7 h-7 inline-flex items-center justify-center bg-white border border-slate-300 text-slate-500 hover:bg-slate-50 hover:text-[#0055a4] rounded transition-colors"
+                                                   title="Edit Akun">
+                                                    <i class="fas fa-pen text-[10px]"></i>
+                                                </a>
+
+                                                @if($user->id !== auth()->id())
+                                                    <button type="button"
+                                                            @click="deleteUrl = '{{ route('admin.users.destroy', $user->id) }}'; userName = '{{ addslashes($user->name) }}'; showDeleteModal = true;"
+                                                            class="w-7 h-7 inline-flex items-center justify-center bg-white border border-slate-300 text-slate-500 hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded transition-colors"
+                                                            title="Hapus Akun">
+                                                        <i class="fas fa-trash-alt text-[10px]"></i>
+                                                    </button>
+                                                @else
+                                                    <!-- Indikator tidak bisa hapus diri sendiri -->
+                                                    <span class="w-7 h-7 inline-flex items-center justify-center bg-slate-50 border border-slate-200 text-slate-300 rounded cursor-not-allowed" title="Sedang Aktif (Current User)">
+                                                        <i class="fas fa-user-check text-[10px]"></i>
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             @empty
