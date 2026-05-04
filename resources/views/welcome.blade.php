@@ -33,7 +33,7 @@
             100% { opacity: 1; transform: translateY(0); }
         }
 
-        .animate-fade-up {
+        .{
             animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             opacity: 0;
         }
@@ -50,7 +50,7 @@
         }
 
         @media (min-width: 768px) {
-            .asset-card { padding: 16px; }
+            .asset-card { padding: 12px; }
         }
 
         .asset-card:hover {
@@ -61,13 +61,13 @@
 
         .asset-image-placeholder {
             width: 100%;
-            aspect-ratio: 4/3;
+            aspect-ratio: 16/9;
             background: #f8fafc;
-            border-radius: 10px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             overflow: hidden; 
         }
 
@@ -104,7 +104,7 @@
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col" x-data="{ filter: 'all' }">
+<body class="min-h-screen flex flex-col animate-fade-up" x-data="{ filter: 'all', showTypeModal: false, selectedTypeTitle: '', selectedTypeEntity: '', selectedTypeItems: [] }">
 
     <nav class="bg-white/90 backdrop-blur-md sticky top-0 z-[70] border-b border-slate-200 shadow-sm">
         <div class="max-w-[1600px] mx-auto px-4 md:px-10 h-16 md:h-20 flex items-center justify-between">
@@ -115,7 +115,7 @@
             </div>
             <div>
                 @auth
-                    <a href="{{ route('admin.dashboard') }}" class="px-4 py-2 md:px-6 md:py-2.5 bg-[#003366] text-white rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest shadow-md transition-all whitespace-nowrap">
+                    <a href="{{ route('dashboard') }}" class="px-4 py-2 md:px-6 md:py-2.5 bg-[#003366] text-white rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest shadow-md transition-all whitespace-nowrap">
                         <i class="fas fa-desktop md:mr-2"></i> <span class="hidden md:inline">Dashboard</span>
                     </a>
                 @else
@@ -129,7 +129,7 @@
 
     <main class="flex-1 w-full max-w-[1600px] mx-auto px-4 md:px-10 py-8 md:py-10 space-y-10 md:space-y-12">
 
-        <div class="text-center py-4 md:py-8 animate-fade-up">
+        <div class="text-center py-4 md:py-8 ">
             <h1 class="text-3xl md:text-5xl font-black text-[#003366] uppercase tracking-tight leading-tight">
                 Dasbor Kesiapan <br>
                 <span class="text-[#0055a4]">Infrastruktur</span>
@@ -161,7 +161,7 @@
                 $availableCategories = $entity->infrastructures->pluck('category')->unique()->values()->toJson();
             @endphp
             
-            <section class="animate-fade-up" x-show="filter === 'all' || {{ $availableCategories }}.includes(filter)" x-data="{ showModal: false }">
+            <section class="" x-show="filter === 'all' || {{ $availableCategories }}.includes(filter)" x-data="{ showModal: false }">
                 
                 <div class="bg-gradient-to-r from-[#003366] to-[#0055a4] text-white px-5 py-4 md:px-8 md:py-5 rounded-t-2xl shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <h3 class="font-black text-sm md:text-lg uppercase tracking-widest flex items-center gap-2 md:gap-3">
@@ -176,7 +176,7 @@
                 <div class="bg-white/80 border-x border-b border-slate-200 rounded-b-2xl p-4 md:p-8 shadow-sm">
                     @if($entity->infrastructures->count() > 0)
                         
-                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-7 gap-3 md:gap-6">
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-3 md:gap-4">
                             @foreach ($entity->infrastructures->groupBy('type') as $type => $items)
                                 @php
                                     $availableQty = $items->where('status', 'available')->count();
@@ -185,8 +185,20 @@
                                     $itemCategory = $items->first()->category ?? 'equipment';
                                 @endphp
                                 
-                                <div class="asset-card group" x-show="filter === 'all' || filter === '{{ $itemCategory }}'">
-                                    <div class="asset-image-placeholder relative group">
+                                <div class="asset-card group cursor-pointer relative" 
+                                     data-type="{{ htmlspecialchars($type, ENT_QUOTES) }}"
+                                     data-entity="{{ htmlspecialchars($entity->name, ENT_QUOTES) }}"
+                                     data-items="{{ json_encode($items->map(function($i) { return ['code' => $i->code_name, 'status' => $i->status]; })->values()) }}"
+                                     @click="selectedTypeTitle = $el.dataset.type; selectedTypeEntity = $el.dataset.entity; selectedTypeItems = JSON.parse($el.dataset.items); showTypeModal = true;"
+                                     x-show="filter === 'all' || filter === '{{ $itemCategory }}'">
+                                     
+                                    <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                                        <div class="w-6 h-6 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-[#0055a4] shadow-sm border border-slate-200">
+                                            <i class="fas fa-expand-alt text-[10px]"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="asset-image-placeholder relative group overflow-hidden">
                                         @if($representativeItem && $representativeItem->image)
                                             <img src="{{ asset('storage/' . ltrim($representativeItem->image, '/')) }}" 
                                                  onerror="this.onerror=null; this.src='{{ asset(ltrim($representativeItem->image, '/')) }}';"
@@ -203,9 +215,9 @@
                                         @endif
                                     </div>
 
-                                    <h4 class="text-[9px] md:text-[10px] font-black text-[#003366] text-center uppercase mb-3 md:mb-4 h-8 flex items-center justify-center leading-tight">{{ $type }}</h4>
+                                    <h4 class="text-[9px] font-black text-[#003366] text-center uppercase mb-2 h-6 flex items-center justify-center leading-tight">{{ $type }}</h4>
                                     
-                                    <div class="mt-auto border-t border-slate-100 pt-3 md:pt-4">
+                                    <div class="mt-auto border-t border-slate-100 pt-2 md:pt-3">
                                         <div class="stat-row stat-available">
                                             <span class="stat-label">Tersedia (Ready)</span>
                                             <span class="stat-value">{{ $availableQty }}</span>
@@ -239,8 +251,8 @@
                                 </div>
 
                                 <div class="flex-1 overflow-y-auto p-6 bg-slate-50">
-                                    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
-                                        <table class="w-full text-left text-xs whitespace-nowrap">
+                                    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden overflow-x-auto hide-scrollbar">
+                                        <table class="w-full text-left text-xs whitespace-nowrap min-w-[500px]">
                                             <thead class="bg-slate-100 text-slate-500 text-[9px] font-black uppercase tracking-widest border-b border-slate-200">
                                                 <tr>
                                                     <th class="px-5 py-3 w-12 text-center">No</th>
@@ -320,8 +332,11 @@
                                 @php
                                     $statusConfig = [
                                         'reported' => ['bg' => 'bg-red-50', 'text' => 'text-red-600', 'border' => 'border-red-200', 'icon' => 'fa-exclamation-circle', 'label' => 'Dilaporkan'],
-                                        'order_part' => ['bg' => 'bg-purple-50', 'text' => 'text-purple-600', 'border' => 'border-purple-200', 'icon' => 'fa-box-open', 'label' => 'Menunggu Suku Cadang'],
+                                        'troubleshooting' => ['bg' => 'bg-orange-50', 'text' => 'text-orange-600', 'border' => 'border-orange-200', 'icon' => 'fa-search', 'label' => 'Troubleshoot'],
+                                        'work_order' => ['bg' => 'bg-blue-50', 'text' => 'text-blue-600', 'border' => 'border-blue-200', 'icon' => 'fa-file-signature', 'label' => 'Work Order'],
+                                        'order_part' => ['bg' => 'bg-purple-50', 'text' => 'text-purple-600', 'border' => 'border-purple-200', 'icon' => 'fa-box-open', 'label' => 'Order Part'],
                                         'on_progress' => ['bg' => 'bg-amber-50', 'text' => 'text-amber-600', 'border' => 'border-amber-200', 'icon' => 'fa-tools', 'label' => 'Sedang Diperbaiki'],
+                                        'testing' => ['bg' => 'bg-indigo-50', 'text' => 'text-indigo-600', 'border' => 'border-indigo-200', 'icon' => 'fa-vial', 'label' => 'Com Test'],
                                         'resolved' => ['bg' => 'bg-emerald-50', 'text' => 'text-emerald-600', 'border' => 'border-emerald-200', 'icon' => 'fa-check-circle', 'label' => 'Selesai']
                                     ];
                                     $conf = $statusConfig[$log->repair_status] ?? $statusConfig['reported'];
@@ -353,5 +368,50 @@
         </p>
     </footer>
 
+    <template x-teleport="body">
+        <div x-show="showTypeModal" class="fixed inset-0 z-[100] flex items-center justify-center px-4 bg-slate-900/60 backdrop-blur-sm transition-opacity" x-cloak style="display: none;">
+            <div @click.away="showTypeModal = false" x-show="showTypeModal" x-transition.scale.origin.bottom class="bg-white rounded-2xl w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+                <div class="bg-[#003366] px-6 py-4 flex items-center justify-between shrink-0">
+                    <div>
+                        <h3 class="text-white font-black uppercase tracking-widest text-sm" x-text="selectedTypeTitle"></h3>
+                        <p class="text-blue-200 text-[10px] font-bold uppercase tracking-wider mt-1" x-text="selectedTypeEntity"></p>
+                    </div>
+                    <button @click="showTypeModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-red-500 text-white flex items-center justify-center transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto p-6 bg-slate-50">
+                    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden overflow-x-auto hide-scrollbar">
+                        <table class="w-full text-left text-xs whitespace-nowrap min-w-[300px]">
+                            <thead class="bg-slate-100 text-slate-500 text-[9px] font-black uppercase tracking-widest border-b border-slate-200">
+                                <tr>
+                                    <th class="px-5 py-3 w-12 text-center">No</th>
+                                    <th class="px-5 py-3">Kode Alat</th>
+                                    <th class="px-5 py-3 text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <template x-for="(item, index) in selectedTypeItems" :key="index">
+                                    <tr class="hover:bg-slate-50 transition-colors">
+                                        <td class="px-5 py-3 text-center font-bold text-slate-400" x-text="index + 1"></td>
+                                        <td class="px-5 py-3 font-black text-[#003366] uppercase" x-text="item.code"></td>
+                                        <td class="px-5 py-3 text-center">
+                                            <template x-if="item.status === 'available'">
+                                                <span class="px-2 py-1 rounded bg-emerald-50 text-emerald-600 border border-emerald-100 text-[9px] font-black uppercase">Tersedia</span>
+                                            </template>
+                                            <template x-if="item.status !== 'available'">
+                                                <span class="px-2 py-1 rounded bg-red-50 text-red-600 border border-red-100 text-[9px] font-black uppercase animate-pulse">Rusak</span>
+                                            </template>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
 </body>
 </html>

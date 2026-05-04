@@ -4,52 +4,103 @@ namespace App\Http\Controllers;
 
 use App\Models\BreakdownLog;
 use App\Models\Infrastructure;
+use App\Models\Entity;
+use App\Models\StatusHistory;
 use App\Http\Requests\StoreBreakdownLogRequest;
 use App\Http\Requests\UpdateBreakdownLogRequest;
 use App\Helpers\ResponseMessage;
+use App\Mail\BreakdownReportedMail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
 
 class BreakdownLogController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', BreakdownLog::class);
         $user = auth()->user();
+        $filterInfraId = request('infrastructure_id');
+        $search = request('search');
+        $filterEntity = request('entity_id');
+        $filterStatus = request('repair_status');
 
         // JIKA YANG LOGIN ADALAH SUPERADMIN (TAMPILAN RIWAYAT LOG GLOBAL)
         if ($user->role === 'superadmin') {
-            // MAJOR FIX: Add pagination (20 items per page for admin view) and handle soft-deleted infrastructures
-            $logs = BreakdownLog::with(['infrastructure' => fn($q) => $q->withTrashed()->with('entity')])->latest()->paginate(20);
+            $query = BreakdownLog::with(['infrastructure' => fn($q) => $q->withTrashed()->with('entity'), 'createdBy', 'updatedBy', 'statusHistories']);
+            
+            if ($filterInfraId) {
+                $query->where('infrastructure_id', $filterInfraId);
+            }
 
-            // For the export report
+            if ($search) {
+                $query->where(function($q) use ($search) {
+                    $q->where('issue_detail', 'like', "%{$search}%")
+                      ->orWhereHas('infrastructure', function($sq) use ($search) {
+                          $sq->where('code_name', 'like', "%{$search}%")
+                             ->orWhere('type', 'like', "%{$search}%")
+                             ->orWhere('category', 'like', "%{$search}%");
+                      });
+                });
+            }
+
+            if ($filterEntity && $filterEntity !== 'all') {
+                $query->whereHas('infrastructure', fn($q) => $q->where('entity_id', $filterEntity));
+            }
+
+            if ($filterStatus && $filterStatus !== 'all') {
+                $query->where('repair_status', $filterStatus);
+            }
+            
+            $logs = $query->latest()->paginate(20)->withQueryString();
+            
             $allInfrastructures = Infrastructure::with('entity')->get();
             $recentBreakdowns = BreakdownLog::with(['infrastructure' => fn($q) => $q->withTrashed()->with('entity')])
                 ->where('repair_status', '!=', 'resolved')
                 ->latest()
                 ->get();
-
-            return view('admin.breakdowns.index_admin', compact('logs', 'allInfrastructures', 'recentBreakdowns'));
+            
+            $allEntities = Entity::orderBy('name')->get();
+                
+            return view('admin.breakdowns.index_admin', compact('logs', 'allInfrastructures', 'recentBreakdowns', 'allEntities'));
         }
 
         // JIKA YANG LOGIN ADALAH OPERATOR (TAMPILAN EXCEL KESIAPAN ALAT)
         else {
-            // MAJOR FIX: Add pagination for operator view (15 items per page)
-            $infrastructures = Infrastructure::with('entity')
-                ->where('entity_id', $user->entity_id)
-                ->latest()
-                ->paginate(15);
+            $infraQuery = Infrastructure::with('entity')->where('entity_id', $user->entity_id);
+            
+            if ($filterInfraId) {
+                $infraQuery->where('id', $filterInfraId);
+            }
 
-            // Ambil log yang belum 'resolved' (selesai) untuk cabang tersebut
-            $activeBreakdowns = BreakdownLog::where('repair_status', '!=', 'resolved')
+            if ($search) {
+                $infraQuery->where(function($q) use ($search) {
+                    $q->where('code_name', 'like', "%{$search}%")
+                      ->orWhere('type', 'like', "%{$search}%")
+                      ->orWhere('category', 'like', "%{$search}%");
+                });
+            }
+
+            if ($filterStatus && $filterStatus !== 'all') {
+                $infraQuery->where('status', $filterStatus === 'resolved' ? 'available' : 'breakdown');
+            }
+            
+            $infrastructures = $infraQuery->latest()->paginate(15)->withQueryString();
+
+            $activeQuery = BreakdownLog::where('repair_status', '!=', 'resolved')
                 ->whereHas('infrastructure', function($q) use ($user) {
                     $q->where('entity_id', $user->entity_id);
-                })
-                ->get()
-                ->keyBy('infrastructure_id');
-
-            // For the export report
+                });
+                
+            if ($filterInfraId) {
+                $activeQuery->where('infrastructure_id', $filterInfraId);
+            }
+                
+            $activeBreakdowns = $activeQuery->get()->keyBy('infrastructure_id');
+                
             $allInfrastructures = Infrastructure::with('entity')
                 ->where('entity_id', $user->entity_id)
                 ->get();
+
             $recentBreakdowns = BreakdownLog::with(['infrastructure' => fn($q) => $q->withTrashed()->with('entity')])
                 ->where('repair_status', '!=', 'resolved')
                 ->whereHas('infrastructure', function($q) use ($user) {
@@ -58,19 +109,38 @@ class BreakdownLogController extends Controller
                 ->latest()
                 ->get();
 
-            return view('admin.breakdowns.index_operator', compact('infrastructures', 'activeBreakdowns', 'allInfrastructures', 'recentBreakdowns'));
+            // TAMBAHAN: Ambil SEMUA LOG (History) untuk Operator agar bisa melihat riwayat
+            $historyQuery = BreakdownLog::with(['infrastructure' => fn($q) => $q->withTrashed(), 'createdBy', 'updatedBy', 'statusHistories'])
+                ->whereHas('infrastructure', function($q) use ($user, $search) {
+                    $q->where('entity_id', $user->entity_id);
+                    if ($search) {
+                        $q->where(function($sq) use ($search) {
+                            $sq->where('code_name', 'like', "%{$search}%")
+                               ->orWhere('type', 'like', "%{$search}%");
+                        });
+                    }
+                });
+
+            if ($search) {
+                $historyQuery->orWhere(function($q) use ($search, $user) {
+                    $q->whereHas('infrastructure', fn($sq) => $sq->where('entity_id', $user->entity_id))
+                      ->where('issue_detail', 'like', "%{$search}%");
+                });
+            }
+
+            $historyLogs = $historyQuery->latest()
+                ->paginate(15, ['*'], 'history_page')
+                ->withQueryString();
+
+            return view('admin.breakdowns.index_operator', compact('infrastructures', 'activeBreakdowns', 'allInfrastructures', 'recentBreakdowns', 'historyLogs'));
         }
     }
 
-    /**
-     * MENAMPILKAN FORMULIR PELAPORAN INSIDEN (FUNGSI BARU)
-     */
     public function create()
     {
         $user = auth()->user();
 
-        // Ambil infrastruktur yang statusnya masih 'available'
-        // Jika Superadmin, tampilkan semua. Jika bukan, tampilkan yang di entitasnya saja.
+        // Hanya ambil infrastruktur yang statusnya available (beroperasi)
         if ($user->role === 'superadmin') {
             $infrastructures = Infrastructure::with('entity')->where('status', 'available')->get();
         } else {
@@ -105,7 +175,7 @@ class BreakdownLogController extends Controller
         }
 
         // 1. Catat ke Log Kerusakan (Tahap awal: reported - FIXED dari 'troubleshooting')
-        BreakdownLog::create([
+        $log = BreakdownLog::create([
             'infrastructure_id' => $request->infrastructure_id,
             'issue_detail' => $request->issue_detail,
             'repair_status' => 'reported',
@@ -117,18 +187,33 @@ class BreakdownLogController extends Controller
         // 2. Ubah status alat menjadi breakdown
         Infrastructure::where('id', $request->infrastructure_id)->update(['status' => 'breakdown']);
 
+        // 3. Record Audit Trail
+        StatusHistory::create([
+            'breakdown_log_id' => $log->id,
+            'new_status' => 'reported',
+            'user_id' => $user->id,
+            'note' => 'Laporan awal dibuat'
+        ]);
+
+        // 4. Send Email Notification
+        try {
+            Mail::to('kardikoanando234@gmail.com')->send(new BreakdownReportedMail($log->load(['infrastructure.entity', 'createdBy'])));
+        } catch (\Exception $e) {
+            // Log error but don't stop the process
+            \Log::error("Gagal mengirim email breakdown: " . $e->getMessage());
+        }
+
         return redirect()->back()->with('success', ResponseMessage::BREAKDOWN_CREATED);
     }
 
     public function update(UpdateBreakdownLogRequest $request, $id)
     {
         $user = auth()->user();
-        $log = BreakdownLog::findOrFail($id);
+        $log = BreakdownLog::with('infrastructure')->findOrFail($id);
 
-        // Authorization check: Operator cannot update breakdown log for other entity
-        if ($user->role !== 'superadmin' && $log->infrastructure->entity_id !== $user->entity_id) {
-            abort(403, 'Unauthorized: Anda tidak bisa mengupdate laporan dari cabang lain.');
-        }
+        $this->authorize('update', $log);
+
+        $oldStatus = $log->repair_status;
 
         // 2. Ambil semua request data kecuali token form
         $dataToUpdate = $request->except(['_token', '_method']);
@@ -164,7 +249,18 @@ class BreakdownLogController extends Controller
         // 4. Update data ke database (Status dan Deretan Tanggal)
         $log->update($dataToUpdate);
 
-        // 5. Jika status perbaikan "resolved", kembalikan status alat jadi "available"
+        // 5. Record Audit Trail if status changed
+        if (isset($request->repair_status) && $request->repair_status !== $oldStatus) {
+            StatusHistory::create([
+                'breakdown_log_id' => $log->id,
+                'old_status' => $oldStatus,
+                'new_status' => $request->repair_status,
+                'user_id' => $user->id,
+                'note' => 'Update status perbaikan'
+            ]);
+        }
+
+        // 6. Jika status perbaikan "resolved", kembalikan status alat jadi "available"
         if ($request->repair_status === 'resolved') {
             $log->infrastructure->update(['status' => 'available']);
             return redirect()->back()->with('success', ResponseMessage::BREAKDOWN_RESOLVED);
@@ -177,13 +273,8 @@ class BreakdownLogController extends Controller
 
     public function destroy($id)
     {
-        $user = auth()->user();
         $log = BreakdownLog::findOrFail($id);
-
-        // Authorization check: Operator cannot delete breakdown log for other entity
-        if ($user->role !== 'superadmin' && $log->infrastructure->entity_id !== $user->entity_id) {
-            abort(403, 'Unauthorized: Anda tidak bisa menghapus laporan dari cabang lain.');
-        }
+        $this->authorize('delete', $log);
 
         // (Soft Deletes: File bukti fisik tidak dihapus dari storage agar tetap tersedia jika data di-restore)
 

@@ -1,389 +1,469 @@
 <x-app-layout>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        [x-cloak] { display: none !important; }
+    <div class="max-w-[1600px] mx-auto w-full space-y-8 animate-fade-up" 
+         x-data="{ 
+                 activeTab: '{{ request('history_page') ? 'history' : 'active' }}',
+                 showReportModal: false, 
+                 showUpdateModal: false, 
+                 selectedAsset: null,
+                 selectedLogId: null,
+                 currentStatus: '',
+                 logDates: {}
+             }">
 
-        /* Custom Scrollbar Korporat */
-        ::-webkit-scrollbar { height: 8px; width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        .hide-scrollbar::-webkit-scrollbar { height: 8px; }
-    </style>
-
-    <!-- State Alpine.js Utama untuk Modals dan Filter -->
-    <div class="min-h-screen py-8"
-         x-data="{
-             showReportModal: false,
-             showUpdateModal: false,
-             selectedAsset: null,
-             selectedLogId: null,
-             currentStatus: '',
-             logDates: {},
-             search: '',
-             filterCondition: 'all',
-             filterStatus: 'all'
-         }">
-
-        <!-- MODAL: LAPOR KERUSAKAN BARU -->
-        <template x-teleport="body">
-            <div x-show="showReportModal" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-                <div @click.away="showReportModal = false" x-show="showReportModal" x-transition.scale.origin.bottom.duration.200ms class="bg-white rounded-lg shadow-xl max-w-md w-full overflow-hidden border border-slate-200">
-                    <div class="bg-red-50 p-5 border-b border-red-100 flex items-start gap-4">
-                        <div class="w-10 h-10 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-lg shrink-0"><i class="fas fa-tools"></i></div>
-                        <div>
-                            <h2 class="text-sm font-bold text-red-700 uppercase tracking-wide">Lapor Insiden Aset</h2>
-                            <p class="text-xs font-semibold text-red-500 mt-0.5" x-text="selectedAsset ? selectedAsset.code : ''"></p>
-                        </div>
-                    </div>
-                    <form action="{{ route('admin.breakdowns.store') }}" method="POST" class="p-6 space-y-4">
-                        @csrf
-                        <input type="hidden" name="infrastructure_id" :value="selectedAsset ? selectedAsset.id : ''">
-                        <input type="hidden" name="repair_status" value="reported">
-
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Rincian Kendala / Masalah <span class="text-red-500">*</span></label>
-                            <textarea name="issue_detail" rows="3" placeholder="Jelaskan kendala secara spesifik..." class="w-full bg-white border border-slate-300 rounded-md text-sm p-2.5 focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-colors" required></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">PIC Pelapor / Vendor (Opsional)</label>
-                            <input type="text" name="vendor_pic" placeholder="Contoh: Internal / PT Vendor" class="w-full bg-white border border-slate-300 rounded-md text-sm p-2.5 focus:ring-1 focus:ring-red-500 focus:border-red-500 transition-colors uppercase">
-                        </div>
-                        <div class="pt-2 flex justify-end gap-2">
-                            <button type="button" @click="showReportModal = false" class="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded text-xs font-semibold transition-colors">Batal</button>
-                            <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-xs font-semibold transition-colors shadow-sm flex items-center gap-2"><i class="fas fa-save"></i> Submit Laporan</button>
-                        </div>
-                    </form>
-                </div>
+        <!-- HEADER SECTION -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+                <nav class="flex mb-4" aria-label="Breadcrumb">
+                    <ol class="flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest text-slate-400">
+                        <li><a href="#" class="hover:text-[#0055a4] transition-colors">Operasional</a></li>
+                        <li><i class="fas fa-chevron-right text-[8px] mx-1"></i></li>
+                        <li class="text-[#0055a4] dark:text-blue-400">Log Kerusakan</li>
+                    </ol>
+                </nav>
+                <h1 class="text-3xl font-black text-[#003366] dark:text-white uppercase tracking-tight flex items-center gap-3">
+                    Log Kerusakan
+                    <span class="bg-blue-100 dark:bg-blue-900/30 text-[#0055a4] dark:text-blue-400 px-3 py-1 rounded-full text-xs font-black">{{ auth()->user()->entity->name ?? 'Regional' }}</span>
+                </h1>
+                <p class="text-slate-500 dark:text-slate-400 text-sm mt-2 font-medium">Kelola laporan kerusakan dan pantau progres perbaikan aset secara real-time.</p>
             </div>
-        </template>
 
-        <!-- MODAL: UPDATE PROGRES PERBAIKAN -->
-        <template x-teleport="body">
-            <div x-show="showUpdateModal" x-cloak class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-                <div @click.away="showUpdateModal = false" x-show="showUpdateModal" x-transition.scale.origin.bottom.duration.200ms class="bg-white rounded-lg shadow-xl max-w-2xl w-full overflow-hidden border border-slate-200 flex flex-col max-h-[90vh]">
-
-                    <div class="bg-[#00152b] p-5 border-b border-slate-700 flex items-center justify-between shrink-0">
-                        <div class="flex items-center gap-3">
-                            <i class="fas fa-bars-progress text-blue-400 text-xl"></i>
-                            <div>
-                                <h2 class="text-sm font-bold text-white uppercase tracking-wide">Pembaruan Progres Kesiapan</h2>
-                                <p class="text-xs font-semibold text-blue-300 mt-0.5" x-text="selectedAsset ? selectedAsset.code : ''"></p>
-                            </div>
-                        </div>
-                        <button @click="showUpdateModal = false" type="button" class="text-slate-400 hover:text-red-400 transition-colors"><i class="fas fa-times text-lg"></i></button>
-                    </div>
-
-                    <form :action="`/admin/breakdowns/${selectedLogId}`" method="POST" enctype="multipart/form-data" class="p-6 space-y-6 overflow-y-auto">
-                        @csrf @method('PUT')
-
-                        <!-- Status Terkini -->
-                        <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                            <label class="block text-xs font-bold text-[#003366] uppercase tracking-wide mb-2">Tahap Pekerjaan Terkini <span class="text-red-500">*</span></label>
-                            <select name="repair_status" x-model="currentStatus" class="w-full bg-white border border-slate-300 rounded text-sm p-2.5 font-semibold focus:ring-1 focus:ring-[#003366] transition-colors cursor-pointer" required>
-                                <option value="reported">1. Dilaporkan (Reported)</option>
-                                <option value="troubleshooting">2. Identifikasi / Trouble Shoot</option>
-                                <option value="work_order">3. Berita Acara / Work Order</option>
-                                <option value="order_part">4. Proses PR / PO / Order Part</option>
-                                <option value="on_progress">5. Proses Pekerjaan Berlangsung (On Progress)</option>
-                                <option value="testing">6. Commissioning Test</option>
-                                <option value="resolved" class="text-emerald-700 font-bold">✔️ 7. SELESAI (ALAT READY)</option>
-                            </select>
-                        </div>
-
-                        <!-- Tanggal Progres -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div class="space-y-1">
-                                <label class="block text-[10px] font-semibold text-slate-500 uppercase">Tgl Trouble Shoot</label>
-                                <input type="date" name="troubleshoot_date" :value="logDates.troubleshoot_date" class="w-full bg-white border border-slate-300 rounded text-xs p-2 focus:ring-1 focus:ring-[#0055a4]">
-                            </div>
-                            <div class="space-y-1">
-                                <label class="block text-[10px] font-semibold text-slate-500 uppercase">Tgl Berita Acara</label>
-                                <input type="date" name="ba_date" :value="logDates.ba_date" class="w-full bg-white border border-slate-300 rounded text-xs p-2 focus:ring-1 focus:ring-[#0055a4]">
-                            </div>
-                            <div class="space-y-1">
-                                <label class="block text-[10px] font-semibold text-slate-500 uppercase">Tgl Work Order</label>
-                                <input type="date" name="work_order_date" :value="logDates.work_order_date" class="w-full bg-white border border-slate-300 rounded text-xs p-2 focus:ring-1 focus:ring-[#0055a4]">
-                            </div>
-                            <div class="space-y-1">
-                                <label class="block text-[10px] font-semibold text-slate-500 uppercase">Tgl PR / PO / Order Part</label>
-                                <input type="date" name="pr_po_date" :value="logDates.pr_po_date" class="w-full bg-white border border-slate-300 rounded text-xs p-2 focus:ring-1 focus:ring-[#0055a4]">
-                            </div>
-                            <div class="space-y-1">
-                                <label class="block text-[10px] font-semibold text-slate-500 uppercase">Tgl Suku Cadang On Site</label>
-                                <input type="date" name="sparepart_date" :value="logDates.sparepart_date" class="w-full bg-white border border-slate-300 rounded text-xs p-2 focus:ring-1 focus:ring-[#0055a4]">
-                            </div>
-                            <div class="space-y-1">
-                                <label class="block text-[10px] font-semibold text-slate-500 uppercase">Tgl Mulai Pekerjaan</label>
-                                <input type="date" name="start_work_date" :value="logDates.start_work_date" class="w-full bg-white border border-slate-300 rounded text-xs p-2 focus:ring-1 focus:ring-[#0055a4]">
-                            </div>
-                            <div class="space-y-1">
-                                <label class="block text-[10px] font-semibold text-slate-500 uppercase">Tgl Com Test</label>
-                                <input type="date" name="com_test_date" :value="logDates.com_test_date" class="w-full bg-white border border-slate-300 rounded text-xs p-2 focus:ring-1 focus:ring-[#0055a4]">
-                            </div>
-                            <div class="space-y-1">
-                                <label class="block text-[10px] font-bold text-emerald-600 uppercase">Tgl Selesai Pekerjaan</label>
-                                <input type="date" name="resolved_date" :value="logDates.resolved_date" class="w-full bg-emerald-50 border border-emerald-300 rounded text-xs font-semibold text-emerald-800 p-2 focus:ring-1 focus:ring-emerald-500">
-                            </div>
-                        </div>
-
-                        <!-- Dokumen Bukti -->
-                        <div class="border-t border-slate-100 pt-4">
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide mb-2">Lampiran Bukti Pengerjaan <span class="text-[10px] font-normal normal-case text-slate-400">(Opsional - PDF/JPG Maks 5MB)</span></label>
-                            <input type="file" name="document_proof" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 transition-colors cursor-pointer border border-slate-200 rounded p-1.5 bg-white">
-                        </div>
-
-                        <div class="pt-4 flex justify-end gap-2 border-t border-slate-100 mt-6">
-                            <button type="button" @click="showUpdateModal = false" class="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 rounded text-xs font-semibold transition-colors">Batal</button>
-                            <button type="submit" class="px-4 py-2 bg-[#0055a4] hover:bg-[#003366] text-white rounded text-xs font-semibold transition-colors shadow-sm flex items-center gap-2"><i class="fas fa-save"></i> Simpan Progres</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </template>
-
-        <div class="max-w-[1600px] mx-auto w-full px-4 sm:px-6 lg:px-8 space-y-6">
-
-            <!-- HEADER KORPORAT -->
-            <div class="bg-white p-6 rounded-lg border border-slate-200 shadow-sm flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 relative overflow-hidden animate-fade">
-                <div class="absolute left-0 top-0 h-full w-1.5 bg-[#0055a4] rounded-l-lg"></div>
-
-                <div>
-                    <h1 class="text-lg font-bold text-[#003366] flex items-center gap-2">
-                        <i class="fas fa-clipboard-check text-[#0055a4]"></i> Panel Laporan Kesiapan Alat (PA)
-                    </h1>
-                    <p class="text-xs font-medium text-slate-500 mt-1">Sistem pelaporan status fisik dan tracking progres perbaikan oleh teknisi / vendor.</p>
-                </div>
-
-                <div class="w-full xl:w-auto shrink-0 relative" x-data="{ openExport: false }">
-                    <button @click="openExport = !openExport" @click.away="openExport = false" class="w-full justify-center bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2.5 rounded text-xs font-semibold transition-colors flex items-center gap-2 shadow-sm">
-                        <i class="fas fa-file-export text-slate-400"></i> Export Data <i class="fas fa-caret-down ml-1"></i>
+            <div class="flex items-center gap-3">
+                <div class="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-inner">
+                    <button @click="activeTab = 'active'" 
+                            :class="activeTab === 'active' ? 'bg-white dark:bg-slate-700 text-[#003366] dark:text-blue-400 shadow-md scale-100' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 scale-95'"
+                            class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
+                        <i class="fas fa-exclamation-triangle"></i> Unit Rusak
                     </button>
-                    <div x-show="openExport" x-transition class="absolute right-0 mt-1 w-40 bg-white rounded shadow-lg border border-slate-200 z-[100] py-1">
-                        <button onclick="openExportModal('pdf')" class="w-full text-left px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 flex items-center gap-2">
-                            <i class="fas fa-file-pdf text-red-500 w-4"></i> Format PDF
+                    <button @click="activeTab = 'ready'" 
+                            :class="activeTab === 'ready' ? 'bg-white dark:bg-slate-700 text-[#003366] dark:text-blue-400 shadow-md scale-100' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 scale-95'"
+                            class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
+                        <i class="fas fa-check-circle"></i> Unit Siap
+                    </button>
+                    <button @click="activeTab = 'history'" 
+                            :class="activeTab === 'history' ? 'bg-white dark:bg-slate-700 text-[#003366] dark:text-blue-400 shadow-md scale-100' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 scale-95'"
+                            class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
+                        <i class="fas fa-history"></i> Riwayat
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- STATS CARDS -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-5 transition-all hover:shadow-md group">
+                <div class="w-14 h-14 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-2xl flex items-center justify-center text-2xl border border-red-100 dark:border-red-800 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Sedang Rusak</p>
+                    <p class="text-3xl font-black text-slate-900 dark:text-white">{{ $infrastructures->where('status', 'breakdown')->count() }} <span class="text-xs text-slate-400 font-bold ml-1">UNIT</span></p>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-5 transition-all hover:shadow-md group">
+                <div class="w-14 h-14 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center text-2xl border border-emerald-100 dark:border-emerald-800 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-clipboard-check"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Tersedia (Ready)</p>
+                    <p class="text-3xl font-black text-slate-900 dark:text-white">{{ $infrastructures->where('status', 'available')->count() }} <span class="text-xs text-slate-400 font-bold ml-1">UNIT</span></p>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-5 transition-all hover:shadow-md group">
+                <div class="w-14 h-14 bg-blue-50 dark:bg-blue-900/20 text-[#0055a4] dark:text-blue-400 rounded-2xl flex items-center justify-center text-2xl border border-blue-100 dark:border-blue-800 group-hover:scale-110 transition-transform">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <div>
+                    <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Kesiapan Alat</p>
+                    @php
+                        $total = $infrastructures->total() > 0 ? $infrastructures->total() : 1;
+                        $rate = round(($infrastructures->where('status', 'available')->count() / $total) * 100, 1);
+                    @endphp
+                    <p class="text-3xl font-black text-slate-900 dark:text-white">{{ $rate }}<span class="text-xs text-slate-400 font-bold ml-1">%</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEARCH & FILTER -->
+        <div class="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row gap-4">
+            <div class="relative flex-1">
+                <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <form action="{{ route('admin.breakdowns.index') }}" method="GET">
+                    <input type="text" name="search" value="{{ request('search') }}" 
+                           placeholder="Cari berdasarkan kode alat atau detail kerusakan..." 
+                           class="w-full pl-12 pr-6 py-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl text-sm font-bold placeholder-slate-400 focus:ring-2 focus:ring-[#0055a4] dark:text-white transition-all">
+                </form>
+            </div>
+            <div class="flex items-center gap-2">
+                <button class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center gap-2">
+                    <i class="fas fa-filter"></i> Filter
+                </button>
+                <div class="relative group">
+                    <button class="bg-[#003366] dark:bg-blue-600 hover:bg-[#002244] dark:hover:bg-blue-700 text-white px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-900/20 transition-all flex items-center gap-2">
+                        <i class="fas fa-file-export"></i> Export Laporan
+                    </button>
+                    <div class="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right scale-95 group-hover:scale-100 flex flex-col overflow-hidden z-50">
+                        <button onclick="openExportModal('pdf')" class="flex items-center gap-3 px-6 py-4 text-left hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px] font-black uppercase tracking-widest transition-colors border-b border-slate-50 dark:border-slate-700">
+                            <i class="fas fa-file-pdf text-red-500 text-base"></i> PDF Document
                         </button>
-                        <button onclick="openExportModal('excel')" class="w-full text-left px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-100 flex items-center gap-2">
-                            <i class="fas fa-file-excel text-emerald-500 w-4"></i> Format Excel
+                        <button onclick="openExportModal('excel')" class="flex items-center gap-3 px-6 py-4 text-left hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px] font-black uppercase tracking-widest transition-colors">
+                            <i class="fas fa-file-excel text-emerald-500 text-base"></i> Excel Sheet
                         </button>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- ALERTS -->
-            @if(session('success'))
-                <div class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-4 py-3 rounded-md text-sm font-medium shadow-sm flex items-center gap-3">
-                    <i class="fas fa-check-circle text-emerald-500"></i> {{ session('success') }}
+        <!-- MAIN CONTENT AREA -->
+        <div class="space-y-6">
+            
+            <!-- TAB: UNIT RUSAK (ACTIVE BREAKDOWNS) -->
+            <div x-show="activeTab === 'active'" x-transition class="space-y-4">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    @forelse($infrastructures->where('status', 'breakdown') as $item)
+                        @php $activeLog = $activeBreakdowns[$item->id] ?? null; @endphp
+                        <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-red-100 dark:border-red-900/30 overflow-hidden shadow-sm hover:shadow-xl transition-all border-l-8 border-l-red-500 relative">
+                            <div class="p-8">
+                                <div class="flex justify-between items-start mb-6">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-16 h-16 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-2xl flex items-center justify-center text-2xl border border-red-100 dark:border-red-800 shadow-inner shrink-0">
+                                            <i class="fas fa-tools"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="text-xl font-black text-[#003366] dark:text-white uppercase leading-tight">{{ $item->code_name }}</h3>
+                                            <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">{{ $item->type }} • {{ $item->category }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col items-end">
+                                        <span class="bg-red-600 text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-sm">Down</span>
+                                        <p class="text-[9px] font-bold text-slate-400 dark:text-slate-500 mt-2 uppercase">Lapor: {{ $activeLog ? $activeLog->created_at->format('d M Y') : '-' }}</p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-slate-50 dark:bg-slate-800/50 p-5 rounded-3xl border border-slate-100 dark:border-slate-700 mb-6">
+                                    <p class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Detail Kendala</p>
+                                    <p class="text-sm font-bold text-slate-700 dark:text-slate-200 leading-relaxed italic">"{{ $activeLog->issue_detail ?? 'Belum ada detail.' }}"</p>
+                                </div>
+
+                                <!-- STEP PROGRESS VISUAL -->
+                                <div class="relative px-2 mb-8">
+                                    <div class="absolute top-4 left-0 w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full"></div>
+                                    @php
+                                        $statuses = [
+                                            'reported' => ['label' => 'Reported', 'icon' => 'fa-bullhorn'],
+                                            'order_part' => ['label' => 'Order Part', 'icon' => 'fa-shopping-cart'],
+                                            'on_progress' => ['label' => 'Work', 'icon' => 'fa-wrench'],
+                                            'resolved' => ['label' => 'Ready', 'icon' => 'fa-check-circle'],
+                                        ];
+                                        $currentIdx = array_search($activeLog->repair_status ?? 'reported', array_keys($statuses));
+                                    @endphp
+                                    <div class="relative flex justify-between">
+                                        @foreach($statuses as $key => $status)
+                                            @php $isPast = array_search($key, array_keys($statuses)) <= $currentIdx; @endphp
+                                            <div class="flex flex-col items-center">
+                                                <div class="w-9 h-9 rounded-full flex items-center justify-center text-xs transition-all duration-500 z-10 border-4 {{ $isPast ? 'bg-[#0055a4] text-white border-blue-100 dark:border-blue-900' : 'bg-white dark:bg-slate-800 text-slate-300 border-slate-100 dark:border-slate-700' }}">
+                                                    <i class="fas {{ $status['icon'] }}"></i>
+                                                </div>
+                                                <span class="text-[8px] font-black uppercase mt-2 tracking-tighter {{ $isPast ? 'text-[#0055a4] dark:text-blue-400' : 'text-slate-300' }}">{{ $status['label'] }}</span>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    <!-- Dynamic Progress Bar -->
+                                    <div class="absolute top-4 left-0 h-1 bg-[#0055a4] rounded-full transition-all duration-700" style="width: {{ ($currentIdx / (count($statuses)-1)) * 100 }}%"></div>
+                                </div>
+
+                                <div class="flex items-center justify-between gap-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[10px] font-black text-slate-500">
+                                            {{ substr($activeLog->vendor_pic ?? '?', 0, 1) }}
+                                        </div>
+                                        <p class="text-[10px] font-bold text-slate-500 uppercase">{{ $activeLog->vendor_pic ?? 'Belum ada PIC' }}</p>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        @if($activeLog && $activeLog->document_proof)
+                                            <a href="{{ asset('storage/'.$activeLog->document_proof) }}" target="_blank" class="w-10 h-10 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl flex items-center justify-center text-slate-500 hover:text-emerald-500 transition-colors shadow-sm">
+                                                <i class="fas fa-file-download"></i>
+                                            </a>
+                                        @endif
+                                        <button @click="
+                                                selectedAsset = {id: '{{ $item->id }}', code: '{{ $item->code_name }}'}; 
+                                                selectedLogId = '{{ $activeLog->id ?? '' }}'; 
+                                                currentStatus = '{{ $activeLog->repair_status ?? 'reported' }}'; 
+                                                logDates = {
+                                                    troubleshoot_date: '{{ $activeLog->troubleshoot_date ?? '' }}',
+                                                    ba_date: '{{ $activeLog->ba_date ?? '' }}',
+                                                    work_order_date: '{{ $activeLog->work_order_date ?? '' }}',
+                                                    pr_po_date: '{{ $activeLog->pr_po_date ?? '' }}',
+                                                    sparepart_date: '{{ $activeLog->sparepart_date ?? '' }}',
+                                                    start_work_date: '{{ $activeLog->start_work_date ?? '' }}',
+                                                    com_test_date: '{{ $activeLog->com_test_date ?? '' }}',
+                                                    resolved_date: '{{ $activeLog->resolved_date ?? '' }}',
+                                                    vendor_pic: '{{ $activeLog->vendor_pic ?? '' }}'
+                                                };
+                                                showUpdateModal = true;
+                                            " 
+                                            class="bg-[#003366] dark:bg-blue-600 hover:bg-[#001e3c] dark:hover:bg-blue-700 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-900/10 transition-all flex items-center gap-2">
+                                            Update Progres
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="lg:col-span-2 bg-emerald-50/50 dark:bg-emerald-900/10 border-2 border-dashed border-emerald-200 dark:border-emerald-800 p-16 rounded-[3rem] text-center">
+                            <div class="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center text-3xl mx-auto mb-6">
+                                <i class="fas fa-check-double"></i>
+                            </div>
+                            <h3 class="text-xl font-black text-emerald-800 dark:text-emerald-400 uppercase mb-2">Semua Unit Normal</h3>
+                            <p class="text-emerald-600 dark:text-emerald-500 text-sm font-medium">Tidak ada laporan kerusakan aktif untuk wilayah ini.</p>
+                        </div>
+                    @endforelse
                 </div>
-            @endif
+            </div>
 
-            <!-- TABLE CONTAINER -->
-            <div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden flex flex-col animate-fade" style="animation-delay: 100ms;">
-
-                <!-- FILTER BAR (FITUR BARU) -->
-                <div class="bg-slate-50 border-b border-slate-200 px-5 py-4 flex flex-col md:flex-row gap-3">
-                    <!-- Search Input -->
-                    <div class="relative flex-1">
-                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                        <input type="text" x-model="search" placeholder="Cari Kode Alat, Kendala, atau Nama PIC..."
-                               class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded text-xs font-medium text-slate-700 focus:ring-[#0055a4] focus:border-[#0055a4] transition-colors shadow-sm">
-                    </div>
-
-                    <div class="flex flex-col sm:flex-row gap-3 shrink-0">
-                        <!-- Kondisi Fisik Filter -->
-                        <select x-model="filterCondition" class="w-full sm:w-48 px-3 py-2 bg-white border border-slate-300 rounded text-xs font-medium text-slate-700 focus:ring-[#0055a4] focus:border-[#0055a4] transition-colors shadow-sm cursor-pointer">
-                            <option value="all">Semua Kondisi Alat</option>
-                            <option value="ready">Fisik Normal (Ready)</option>
-                            <option value="breakdown">Fisik Rusak (Breakdown)</option>
-                        </select>
-
-                        <!-- Status Progres Filter -->
-                        <select x-model="filterStatus" class="w-full sm:w-56 px-3 py-2 bg-white border border-slate-300 rounded text-xs font-medium text-slate-700 focus:ring-[#0055a4] focus:border-[#0055a4] transition-colors shadow-sm cursor-pointer">
-                            <option value="all">Semua Tahap Progres</option>
-                            <option value="reported">Dilaporkan (Reported)</option>
-                            <option value="troubleshooting">Troubleshooting</option>
-                            <option value="work_order">Berita Acara / WO</option>
-                            <option value="order_part">Menunggu Part (Order Part)</option>
-                            <option value="on_progress">Sedang Dikerjakan</option>
-                            <option value="testing">Com Test (Testing)</option>
-                            <option value="resolved">Selesai (Resolved)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto w-full hide-scrollbar relative z-0">
-                    <table class="w-full text-left border-collapse min-w-[1500px]">
+            <!-- TAB: UNIT SIAP (READY ASSETS) -->
+            <div x-show="activeTab === 'ready'" x-transition class="space-y-4">
+                <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+                    <table class="w-full text-left border-collapse whitespace-nowrap">
                         <thead>
-                            <tr class="bg-white border-b border-slate-200 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
-                                <th class="px-4 py-3.5 w-12 text-center sticky left-0 bg-white z-10 shadow-[1px_0_0_0_#e2e8f0]">No</th>
-                                <th class="px-4 py-3.5 w-32 sticky left-[3rem] bg-white z-10 shadow-[1px_0_0_0_#e2e8f0]">Identitas Alat</th>
-                                <th class="px-4 py-3.5 w-24 text-center">Fisik</th>
-                                <th class="px-4 py-3.5 min-w-[200px]">Deskripsi Kendala</th>
-                                <th class="px-4 py-3.5 w-24 text-center">Tgl BD</th>
-                                <th class="px-4 py-3.5 w-32 text-center">Tahap Progres</th>
-                                <th class="px-4 py-3.5 w-24 text-center">T.Shoot</th>
-                                <th class="px-4 py-3.5 w-24 text-center">B.Acara</th>
-                                <th class="px-4 py-3.5 w-24 text-center">W.Order</th>
-                                <th class="px-4 py-3.5 w-24 text-center">PO Part</th>
-                                <th class="px-4 py-3.5 w-24 text-center">Part Site</th>
-                                <th class="px-4 py-3.5 w-24 text-center">Mulai</th>
-                                <th class="px-4 py-3.5 w-24 text-center">Test</th>
-                                <th class="px-4 py-3.5 w-24 text-center">Selesai</th>
-                                <th class="px-4 py-3.5 w-32">Vendor / PIC</th>
-                                <th class="px-4 py-3.5 w-32 text-center export-ignore">Aksi Data</th>
+                            <tr class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest border-b border-slate-200 dark:border-slate-800">
+                                <th class="px-8 py-6 w-16 text-center">No</th>
+                                <th class="px-8 py-6">Identitas Alat</th>
+                                <th class="px-8 py-6">Tipe & Kategori</th>
+                                <th class="px-8 py-6 text-center">Status</th>
+                                <th class="px-8 py-6 text-right">Tindakan</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100 text-xs text-slate-700">
-                            @foreach($infrastructures as $index => $item)
-                                @php
-                                    $isBroken = $item->status === 'breakdown';
-                                    $activeLog = $isBroken ? ($activeBreakdowns[$item->id] ?? null) : null;
-
-                                    // Variables for Alpine Filtering
-                                    $rowCondition = $isBroken ? 'breakdown' : 'ready';
-                                    $rowStatus = $activeLog ? $activeLog->repair_status : 'none';
-                                    $bgColor = $isBroken ? 'bg-red-50/20' : 'bg-white';
-                                    $stickyBg = $isBroken ? 'bg-[#fff5f5]' : 'bg-white'; // warna solid fallback dari red-50/20
-                                @endphp
-
-                                <tr x-data="{
-                                        rowCode: '{{ strtolower(addslashes($item->code_name ?? '')) }}',
-                                        rowDetail: '{{ strtolower(addslashes($activeLog->issue_detail ?? '')) }}',
-                                        rowPic: '{{ strtolower(addslashes($activeLog->vendor_pic ?? '')) }}',
-                                        rowCondition: '{{ $rowCondition }}',
-                                        rowStatus: '{{ $rowStatus }}'
-                                    }"
-                                    x-show="(filterCondition === 'all' || filterCondition === rowCondition) &&
-                                            (filterStatus === 'all' || filterStatus === rowStatus || (filterStatus==='resolved' && rowStatus==='none')) &&
-                                            (search === '' || rowCode.includes(search.toLowerCase()) || rowDetail.includes(search.toLowerCase()) || rowPic.includes(search.toLowerCase()))"
-                                    class="hover:bg-slate-50/80 transition-colors {{ $bgColor }}">
-
-                                    <td class="px-4 py-3 text-center font-medium text-slate-500 sticky left-0 {{ $stickyBg }} z-10 shadow-[1px_0_0_0_#f1f5f9]">
-                                        {{ $index + 1 }}
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                            @forelse($infrastructures->where('status', 'available') as $index => $item)
+                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                                    <td class="px-8 py-6 text-center text-slate-400 font-bold text-xs">{{ $index + 1 }}</td>
+                                    <td class="px-8 py-6">
+                                        <div class="flex flex-col">
+                                            <span class="font-black text-[#003366] dark:text-blue-400 text-sm uppercase group-hover:text-blue-600 transition-colors">{{ $item->code_name }}</span>
+                                            <span class="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-1">{{ $item->name }}</span>
+                                        </div>
                                     </td>
-
-                                    <td class="px-4 py-3 sticky left-[3rem] {{ $stickyBg }} z-10 shadow-[1px_0_0_0_#f1f5f9]">
-                                        <span class="font-bold text-[#003366] text-xs uppercase">{{ $item->code_name }}</span>
+                                    <td class="px-8 py-6">
+                                        <span class="text-[10px] font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest">{{ $item->type }}</span>
+                                        <span class="text-[9px] font-bold text-slate-400 ml-2">/ {{ $item->category }}</span>
                                     </td>
-
-                                    <td class="px-4 py-3 text-center">
-                                        @if(!$isBroken)
-                                            <span class="inline-flex items-center justify-center bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide border border-emerald-200">Ready</span>
-                                        @else
-                                            <span class="inline-flex items-center justify-center bg-red-100 text-red-700 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide border border-red-200">Down</span>
-                                        @endif
+                                    <td class="px-8 py-6 text-center">
+                                        <span class="bg-emerald-500 text-white px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest shadow-sm">Ready</span>
                                     </td>
-
-                                    <td class="px-4 py-3">
-                                        <p class="text-[10px] font-medium leading-snug {{ $isBroken ? 'text-red-700' : 'text-slate-400 italic' }} line-clamp-2" title="{{ $activeLog->issue_detail ?? '' }}">
-                                            {{ $activeLog ? $activeLog->issue_detail : '-' }}
-                                        </p>
-                                    </td>
-
-                                    <td class="px-4 py-3 text-center text-[10px] font-medium text-slate-600">{{ $activeLog ? $activeLog->created_at->format('d/m/y') : '-' }}</td>
-
-                                    <td class="px-4 py-3 text-center">
-                                        @if($activeLog)
-                                            @php
-                                                $statusConfig = [
-                                                    'reported' => ['bg' => 'bg-red-50', 'text' => 'text-red-700', 'border' => 'border-red-200', 'label' => 'Dilaporkan'],
-                                                    'troubleshooting' => ['bg' => 'bg-orange-50', 'text' => 'text-orange-700', 'border' => 'border-orange-200', 'label' => 'T.Shoot'],
-                                                    'work_order' => ['bg' => 'bg-yellow-50', 'text' => 'text-yellow-700', 'border' => 'border-yellow-200', 'label' => 'WO / BA'],
-                                                    'order_part' => ['bg' => 'bg-purple-50', 'text' => 'text-purple-700', 'border' => 'border-purple-200', 'label' => 'PO Part'],
-                                                    'on_progress' => ['bg' => 'bg-amber-50', 'text' => 'text-amber-700', 'border' => 'border-amber-200', 'label' => 'Progres'],
-                                                    'testing' => ['bg' => 'bg-blue-50', 'text' => 'text-blue-700', 'border' => 'border-blue-200', 'label' => 'Com Test'],
-                                                    'resolved' => ['bg' => 'bg-emerald-50', 'text' => 'text-emerald-700', 'border' => 'border-emerald-200', 'label' => 'Selesai']
-                                                ];
-                                                $conf = $statusConfig[$activeLog->repair_status] ?? $statusConfig['reported'];
-                                            @endphp
-                                            <span class="inline-flex items-center justify-center {{ $conf['bg'] }} {{ $conf['text'] }} border {{ $conf['border'] }} px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wide whitespace-nowrap">
-                                                {{ $conf['label'] }}
-                                            </span>
-                                        @else
-                                            <span class="text-slate-300">-</span>
-                                        @endif
-                                    </td>
-
-                                    <td class="px-4 py-3 text-center text-[10px] font-medium text-slate-600">{{ $activeLog && $activeLog->troubleshoot_date ? \Carbon\Carbon::parse($activeLog->troubleshoot_date)->format('d/m/y') : '-' }}</td>
-                                    <td class="px-4 py-3 text-center text-[10px] font-medium text-slate-600">{{ $activeLog && $activeLog->ba_date ? \Carbon\Carbon::parse($activeLog->ba_date)->format('d/m/y') : '-' }}</td>
-                                    <td class="px-4 py-3 text-center text-[10px] font-medium text-slate-600">{{ $activeLog && $activeLog->work_order_date ? \Carbon\Carbon::parse($activeLog->work_order_date)->format('d/m/y') : '-' }}</td>
-                                    <td class="px-4 py-3 text-center text-[10px] font-medium text-slate-600">{{ $activeLog && $activeLog->pr_po_date ? \Carbon\Carbon::parse($activeLog->pr_po_date)->format('d/m/y') : '-' }}</td>
-                                    <td class="px-4 py-3 text-center text-[10px] font-medium text-slate-600">{{ $activeLog && $activeLog->sparepart_date ? \Carbon\Carbon::parse($activeLog->sparepart_date)->format('d/m/y') : '-' }}</td>
-                                    <td class="px-4 py-3 text-center text-[10px] font-medium text-slate-600">{{ $activeLog && $activeLog->start_work_date ? \Carbon\Carbon::parse($activeLog->start_work_date)->format('d/m/y') : '-' }}</td>
-                                    <td class="px-4 py-3 text-center text-[10px] font-medium text-slate-600">{{ $activeLog && $activeLog->com_test_date ? \Carbon\Carbon::parse($activeLog->com_test_date)->format('d/m/y') : '-' }}</td>
-                                    <td class="px-4 py-3 text-center text-[10px] font-bold text-emerald-600">{{ $activeLog && $activeLog->resolved_date ? \Carbon\Carbon::parse($activeLog->resolved_date)->format('d/m/y') : '-' }}</td>
-
-                                    <td class="px-4 py-3 text-[10px] font-semibold {{ $isBroken ? 'text-[#003366]' : 'text-slate-300 italic' }}">
-                                        {{ $activeLog ? $activeLog->vendor_pic : '-' }}
-                                    </td>
-
-                                    <td class="px-4 py-3 text-center export-ignore">
-                                        @if(!$isBroken)
-                                            <!-- Tombol Lapor (Mode Aman) -->
-                                            <button @click="selectedAsset = {id: '{{ $item->id }}', code: '{{ $item->code_name }}'}; showReportModal = true;"
-                                                    class="inline-flex items-center justify-center bg-white border border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 px-3 py-1.5 rounded text-[10px] font-bold transition-colors shadow-sm gap-1.5 w-full">
-                                                <i class="fas fa-tools"></i> Lapor Rusak
-                                            </button>
-                                        @else
-                                            <!-- Grup Tombol Update & Dokumen (Mode Breakdown) -->
-                                            @if($activeLog)
-                                                <div class="flex items-center justify-center gap-1.5">
-                                                    <button @click="
-                                                            selectedAsset = {id: '{{ $item->id }}', code: '{{ $item->code_name }}'};
-                                                            selectedLogId = '{{ $activeLog->id }}';
-                                                            currentStatus = '{{ $activeLog->repair_status }}';
-                                                            logDates = {
-                                                                troubleshoot_date: '{{ $activeLog->troubleshoot_date }}',
-                                                                ba_date: '{{ $activeLog->ba_date }}',
-                                                                work_order_date: '{{ $activeLog->work_order_date }}',
-                                                                pr_po_date: '{{ $activeLog->pr_po_date }}',
-                                                                sparepart_date: '{{ $activeLog->sparepart_date }}',
-                                                                start_work_date: '{{ $activeLog->start_work_date }}',
-                                                                com_test_date: '{{ $activeLog->com_test_date }}',
-                                                                resolved_date: '{{ $activeLog->resolved_date }}'
-                                                            };
-                                                            showUpdateModal = true;
-                                                        "
-                                                        class="inline-flex items-center justify-center bg-[#0055a4] hover:bg-[#003366] text-white px-2.5 py-1.5 rounded text-[10px] font-bold transition-colors shadow-sm gap-1.5 w-full">
-                                                        <i class="fas fa-edit"></i> Update
-                                                    </button>
-
-                                                    @if($activeLog->document_proof)
-                                                        <a href="{{ asset('storage/'.$activeLog->document_proof) }}" target="_blank" class="w-7 h-7 bg-white text-emerald-600 rounded flex items-center justify-center border border-slate-200 hover:bg-emerald-50 hover:border-emerald-300 transition-colors shrink-0" title="Lampiran Bukti">
-                                                            <i class="fas fa-file-pdf text-xs"></i>
-                                                        </a>
-                                                    @else
-                                                        <!-- Placeholder agar lebar sama rata meskipun tak ada file -->
-                                                        <div class="w-7 h-7 bg-transparent shrink-0"></div>
-                                                    @endif
-                                                </div>
-                                            @endif
-                                        @endif
+                                    <td class="px-8 py-6 text-right">
+                                        <button @click="selectedAsset = {id: '{{ $item->id }}', code: '{{ addslashes($item->code_name) }}'}; showReportModal = true;" 
+                                                class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+                                            Lapor Rusak
+                                        </button>
                                     </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="px-8 py-20 text-center text-slate-400 italic">Data tidak ditemukan.</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
+            </div>
 
-                @if(method_exists($infrastructures, 'links') && $infrastructures->hasPages())
-                <div class="p-5 border-t border-slate-200 bg-slate-50">
-                    {{ $infrastructures->links() }}
-                    <p class="text-[10px] text-slate-500 mt-2 font-medium"><i class="fas fa-info-circle text-blue-400"></i> * Fitur pencarian instan di atas hanya menyaring data yang tampil pada halaman aktif ini.</p>
+            <!-- TAB: RIWAYAT (HISTORY) -->
+            <div x-show="activeTab === 'history'" x-transition class="space-y-4">
+                <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+                    <table class="w-full text-left border-collapse whitespace-nowrap">
+                        <thead>
+                            <tr class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest border-b border-slate-200 dark:border-slate-800">
+                                <th class="px-8 py-6 w-16 text-center">No</th>
+                                <th class="px-8 py-6">Aset</th>
+                                <th class="px-8 py-6">Detail Kendala</th>
+                                <th class="px-8 py-6 text-center">Periode Down</th>
+                                <th class="px-8 py-6 text-center">Status</th>
+                                <th class="px-8 py-6 text-right">Dokumen</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                            @forelse($historyLogs as $index => $log)
+                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                    <td class="px-8 py-6 text-center text-slate-400 font-bold text-xs">{{ $index + 1 }}</td>
+                                    <td class="px-8 py-6">
+                                        <div class="flex flex-col">
+                                            <span class="font-black text-[#003366] dark:text-blue-400 text-sm uppercase">{{ $log->infrastructure->code_name ?? 'UNIT TERHAPUS' }}</span>
+                                            <span class="text-[9px] text-slate-400 font-black uppercase tracking-widest mt-1">{{ $log->infrastructure->type ?? '-' }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="px-8 py-6">
+                                        <p class="text-[11px] font-bold text-slate-600 dark:text-slate-300 max-w-[300px] truncate italic" title="{{ $log->issue_detail }}">"{{ $log->issue_detail }}"</p>
+                                    </td>
+                                    <td class="px-8 py-6 text-center">
+                                        <div class="flex flex-col items-center">
+                                            <span class="text-[10px] font-black text-[#0055a4] dark:text-blue-400">{{ $log->created_at->format('d/m/y') }}</span>
+                                            @if($log->resolved_date)
+                                                <i class="fas fa-arrow-down text-[8px] my-0.5 text-slate-300"></i>
+                                                <span class="text-[10px] font-black text-emerald-600">{{ \Carbon\Carbon::parse($log->resolved_date)->format('d/m/y') }}</span>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td class="px-8 py-6 text-center">
+                                        <span class="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800 px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest">Resolved</span>
+                                    </td>
+                                    <td class="px-8 py-6 text-right">
+                                        @if($log->document_proof)
+                                            <a href="{{ asset('storage/'.$log->document_proof) }}" target="_blank" class="inline-flex items-center gap-2 text-emerald-600 font-black text-[10px] uppercase hover:underline">
+                                                <i class="fas fa-file-alt"></i> Lihat Bukti
+                                            </a>
+                                        @else
+                                            <span class="text-slate-300 text-[10px] font-bold">Tidak ada file</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="6" class="px-8 py-10 text-center text-slate-400 italic font-medium">Belum ada riwayat perbaikan.</td></tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-6">
+                    {{ $historyLogs->links() }}
                 </div>
                 @endif
             </div>
 
-            <div class="flex items-center justify-between text-slate-400 pt-2">
-                <p class="text-[10px] font-semibold uppercase tracking-wider">&copy; {{ date('Y') }} Pelindo Command Center</p>
-            </div>
-
         </div>
+
+        <!-- MODAL: LAPOR KERUSAKAN -->
+        <template x-teleport="body">
+            <div x-show="showReportModal" 
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md" style="display: none;">
+                
+                <div @click.away="showReportModal = false" class="bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl max-w-md w-full overflow-hidden border border-slate-200 dark:border-slate-800">
+                    <div class="bg-red-600 p-8 border-b border-red-700 flex items-center justify-between text-white">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-xl shadow-inner"><i class="fas fa-bolt"></i></div>
+                            <div>
+                                <h2 class="text-xl font-black uppercase tracking-tight leading-none">Lapor Unit Down</h2>
+                                <p class="text-[10px] font-black text-red-100 uppercase tracking-[0.2em] mt-2" x-text="selectedAsset ? selectedAsset.code : ''"></p>
+                            </div>
+                        </div>
+                        <button @click="showReportModal = false" class="text-white/60 hover:text-white transition-colors"><i class="fas fa-times text-2xl"></i></button>
+                    </div>
+                    
+                    <form action="{{ route('admin.breakdowns.store') }}" method="POST" class="p-8 space-y-6">
+                        @csrf
+                        <input type="hidden" name="infrastructure_id" :value="selectedAsset ? selectedAsset.id : ''">
+                        
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">Detail Kendala / Kerusakan</label>
+                            <textarea name="issue_detail" rows="4" placeholder="Jelaskan secara singkat apa yang terjadi pada unit ini..."
+                                      class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-[1.5rem] p-5 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-red-500 transition-all" required></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">PIC / Vendor Penanggung Jawab</label>
+                            <div class="relative">
+                                <i class="fas fa-user-gear absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                <input type="text" name="vendor_pic" placeholder="Nama teknisi atau vendor..." 
+                                       class="w-full pl-12 pr-6 py-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-red-500 transition-all" required>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 flex gap-3">
+                            <button type="button" @click="showReportModal = false" class="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">Batal</button>
+                            <button type="submit" class="flex-2 px-10 py-4 bg-red-600 hover:bg-red-700 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-red-900/20 transition-all">Kirim Laporan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </template>
+
+        <!-- MODAL: UPDATE PROGRES -->
+        <template x-teleport="body">
+            <div x-show="showUpdateModal" 
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md" style="display: none;">
+                
+                <div @click.away="showUpdateModal = false" class="bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-200 dark:border-slate-800 max-h-[90vh] flex flex-col">
+                    <div class="bg-[#003366] dark:bg-slate-950 p-8 border-b border-white/5 flex items-center justify-between text-white shrink-0">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-xl shadow-inner"><i class="fas fa-wrench"></i></div>
+                            <div>
+                                <h2 class="text-xl font-black uppercase tracking-tight leading-none">Update Status Unit</h2>
+                                <p class="text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] mt-2" x-text="selectedAsset ? selectedAsset.code : ''"></p>
+                            </div>
+                        </div>
+                        <button @click="showUpdateModal = false" class="text-white/60 hover:text-white transition-colors"><i class="fas fa-times text-2xl"></i></button>
+                    </div>
+                    
+                    <form :action="`/admin/breakdowns/${selectedLogId}`" method="POST" enctype="multipart/form-data" class="p-8 space-y-8 overflow-y-auto custom-scrollbar">
+                        @csrf @method('PUT')
+                        
+                        <!-- Status Picker -->
+                        <div class="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-3xl border border-blue-100 dark:border-blue-800">
+                            <label class="block text-[10px] font-black text-[#003366] dark:text-blue-400 uppercase tracking-widest mb-4">Ubah Tahap Pekerjaan</label>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                <template x-for="s in ['reported', 'order_part', 'on_progress', 'resolved']">
+                                    <label class="relative cursor-pointer">
+                                        <input type="radio" name="repair_status" :value="s" x-model="currentStatus" class="sr-only">
+                                        <div :class="currentStatus === s ? 'bg-[#003366] text-white shadow-lg scale-105' : 'bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700'"
+                                             class="px-3 py-4 rounded-xl text-[9px] font-black uppercase tracking-tighter text-center transition-all border border-transparent" 
+                                             x-text="s.replace('_', ' ')"></div>
+                                    </label>
+                                </template>
+                            </div>
+                        </div>
+
+                        <!-- Date Section (Dynamic based on logic) -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div x-show="['order_part', 'on_progress', 'resolved'].includes(currentStatus)">
+                                <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Tgl Troubleshoot</label>
+                                <input type="date" name="troubleshoot_date" x-model="logDates.troubleshoot_date" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl py-3 px-4 text-xs font-bold text-slate-700 dark:text-white transition-all">
+                            </div>
+                            <div x-show="['order_part', 'on_progress', 'resolved'].includes(currentStatus)">
+                                <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Tgl PR / PO (Sparepart)</label>
+                                <input type="date" name="pr_po_date" x-model="logDates.pr_po_date" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl py-3 px-4 text-xs font-bold text-slate-700 dark:text-white transition-all">
+                            </div>
+                            <div x-show="['on_progress', 'resolved'].includes(currentStatus)">
+                                <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Tgl Mulai Kerja</label>
+                                <input type="date" name="start_work_date" x-model="logDates.start_work_date" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl py-3 px-4 text-xs font-bold text-slate-700 dark:text-white transition-all">
+                            </div>
+                            <div x-show="currentStatus === 'resolved'">
+                                <label class="block text-[9px] font-black text-emerald-600 uppercase tracking-widest mb-2">Tgl Unit Ready</label>
+                                <input type="date" name="resolved_date" x-model="logDates.resolved_date" class="w-full bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-100 dark:border-emerald-800 rounded-xl py-3 px-4 text-xs font-bold text-emerald-700 dark:text-emerald-400 transition-all">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Update PIC / Vendor Pekerja</label>
+                            <input type="text" name="vendor_pic" x-model="logDates.vendor_pic" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl py-4 px-6 text-sm font-bold text-slate-900 dark:text-white transition-all">
+                        </div>
+
+                        <div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-700">
+                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Lampiran Bukti (Dokumen/Foto)</label>
+                            <input type="file" name="document_proof" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-6 file:rounded-full file:border-0 file:text-[10px] file:font-black file:bg-[#003366] file:text-white hover:file:bg-[#001e3c] transition-all cursor-pointer">
+                        </div>
+
+                        <div class="pt-4 flex gap-4">
+                            <button type="submit" class="w-full py-5 bg-[#003366] dark:bg-blue-600 hover:bg-[#001e3c] dark:hover:bg-blue-700 text-white rounded-[1.5rem] text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-blue-900/20 transition-all">Simpan Perubahan Status</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </template>
+
     </div>
 
     <!-- Export Logic (Hidden Component) -->
     <x-export-report :infrastructures="$allInfrastructures ?? collect()" :recentBreakdowns="$recentBreakdowns ?? collect()" />
     <x-export-filter-modal />
+
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+    </style>
 </x-app-layout>

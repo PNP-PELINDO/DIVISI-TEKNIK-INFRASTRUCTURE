@@ -1,48 +1,31 @@
 <x-app-layout>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        [x-cloak] { display: none !important; }
+    <div class="max-w-3xl mx-auto w-full space-y-6 animate-fade-up">
+        
+        <div class="bg-white dark:bg-slate-900 p-8 md:p-10 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#003366] to-[#0055a4]"></div>
 
-        /* Focus state minimalis korporat */
-        input:focus, select:focus, textarea:focus {
-            box-shadow: 0 0 0 1px #0055a4 !important;
-            border-color: #0055a4 !important;
-        }
-    </style>
-
-    <div class="min-h-screen py-8">
-        <div class="max-w-3xl mx-auto w-full px-4 sm:px-6 lg:px-8 space-y-6 animate-fade">
-
-            <!-- HEADER -->
-            <div class="bg-white p-6 rounded-lg border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative overflow-hidden">
-                <div class="absolute left-0 top-0 h-full w-1.5 bg-[#0055a4]"></div>
-
-                <div>
-                    <h1 class="text-lg font-bold text-[#003366] flex items-center gap-2">
-                        <i class="fas fa-user-pen text-[#0055a4]"></i> Edit Akun Pengguna
-                    </h1>
-                    <p class="text-xs font-medium text-slate-500 mt-1">Perbarui profil otentikasi, kata sandi, dan hak akses personel.</p>
-                </div>
-
-                <div class="shrink-0">
-                    <a href="{{ route('admin.users.index') }}" class="inline-flex items-center gap-2 text-slate-500 hover:text-[#003366] text-xs font-semibold transition-colors">
-                        <i class="fas fa-arrow-left"></i> Kembali ke Daftar
-                    </a>
-                </div>
+            <div class="mb-10 text-center">
+                <h2 class="text-2xl font-black text-[#003366] dark:text-blue-400 uppercase tracking-tight">Edit Akun Operator</h2>
+                <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">Perbarui profil atau hak akses pegawai</p>
             </div>
+            
+            <form action="{{ route('admin.users.update', $user->id) }}" method="POST" class="space-y-6" x-data="{ role: '{{ $user->role }}' }">
+                @csrf
+                @method('PUT')
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Nama Lengkap</label>
+                        <input type="text" name="name" value="{{ $user->name }}" class="w-full border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-sm font-bold p-4 focus:ring-4 focus:ring-blue-50 dark:focus:ring-blue-900/20 focus:border-[#003366] dark:focus:border-blue-400 transition-all text-slate-900 dark:text-slate-100" required>
+                    </div>
 
             <!-- ERROR ALERTS -->
             @if ($errors->any())
                 <div class="bg-red-50 border border-red-200 p-4 rounded-lg flex items-start gap-3 shadow-sm">
                     <i class="fas fa-exclamation-triangle text-red-600 mt-0.5"></i>
                     <div>
-                        <h3 class="text-sm font-bold text-red-800">Gagal Memperbarui Akun</h3>
-                        <ul class="mt-1 space-y-1 text-xs text-red-700">
-                            @foreach ($errors->all() as $error)
-                                <li>• {{ $error }}</li>
-                            @endforeach
-                        </ul>
+                        <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Alamat Email</label>
+                        <input type="email" name="email" value="{{ $user->email }}" class="w-full border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-sm font-bold p-4 focus:ring-4 focus:ring-blue-50 dark:focus:ring-blue-900/20 focus:border-[#003366] dark:focus:border-blue-400 transition-all text-slate-900 dark:text-slate-100" required>
                     </div>
                 </div>
             @endif
@@ -58,81 +41,41 @@
                     @csrf
                     @method('PUT')
 
+                <div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-800">
+                    <p class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-4 italic">Ganti Password (Kosongkan jika tidak ingin ganti)</p>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- NAMA LENGKAP -->
-                        <div class="space-y-1.5">
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">Nama Lengkap <span class="text-red-500">*</span></label>
-                            <input type="text" name="name" value="{{ old('name', $user->name) }}" placeholder="Masukkan nama pengguna"
-                                   class="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-md block p-2.5 transition-colors" required>
-                        </div>
-
-                        <!-- EMAIL -->
-                        <div class="space-y-1.5">
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">Alamat Email <span class="text-red-500">*</span></label>
-                            <input type="email" name="email" value="{{ old('email', $user->email) }}" placeholder="email@pelindo.co.id"
-                                   class="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-md block p-2.5 transition-colors" required>
-                        </div>
+                        <input type="password" name="password" placeholder="Password Baru" class="w-full border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-xl text-sm font-bold p-4 focus:ring-4 focus:ring-blue-50 dark:focus:ring-blue-900/20 focus:border-[#003366] dark:focus:border-blue-400 transition-all text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500">
+                        <input type="password" name="password_confirmation" placeholder="Konfirmasi Password Baru" class="w-full border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-xl text-sm font-bold p-4 focus:ring-4 focus:ring-blue-50 dark:focus:ring-blue-900/20 focus:border-[#003366] dark:focus:border-blue-400 transition-all text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500">
                     </div>
 
-                    <!-- GANTI PASSWORD BOX -->
-                    <div class="bg-slate-50 p-5 rounded-lg border border-slate-200 space-y-4">
-                        <div class="flex items-center gap-2 mb-2">
-                            <i class="fas fa-shield-halved text-slate-400"></i>
-                            <p class="text-xs font-bold text-slate-600 uppercase tracking-wide">Pembaruan Kata Sandi</p>
-                        </div>
-                        <p class="text-[10px] font-medium text-slate-500 mb-4">Kosongkan kedua kolom di bawah ini jika tidak ingin mengubah password saat ini.</p>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div class="space-y-1.5">
-                                <label class="block text-[11px] font-semibold text-slate-600">Password Baru</label>
-                                <input type="password" name="password" placeholder="Ketik kata sandi baru..."
-                                       class="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-md block p-2 transition-colors">
-                            </div>
-                            <div class="space-y-1.5">
-                                <label class="block text-[11px] font-semibold text-slate-600">Konfirmasi Password</label>
-                                <input type="password" name="password_confirmation" placeholder="Ulangi kata sandi baru..."
-                                       class="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-md block p-2 transition-colors">
-                            </div>
-                        </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Hak Akses (Role)</label>
+                        <select name="role" x-model="role" class="w-full border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-sm font-bold p-4 focus:ring-4 focus:ring-blue-50 dark:focus:ring-blue-900/20 focus:border-[#003366] dark:focus:border-blue-400 transition-all uppercase text-slate-900 dark:text-slate-100">
+                            <option value="operator" {{ $user->role == 'operator' ? 'selected' : '' }} class="dark:bg-slate-900">Operator Cabang</option>
+                            <option value="superadmin" {{ $user->role == 'superadmin' ? 'selected' : '' }} class="dark:bg-slate-900">Super Admin Pusat</option>
+                        </select>
                     </div>
 
-                    <!-- ROLE & ENTITAS -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2 border-t border-slate-100">
-                        <div class="space-y-1.5">
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">Hak Akses (Role) <span class="text-red-500">*</span></label>
-                            <select name="role" x-model="role" class="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-md block p-2.5 transition-colors uppercase font-semibold cursor-pointer" required>
-                                <option value="operator" {{ old('role', $user->role) == 'operator' ? 'selected' : '' }}>Operator Terminal</option>
-                                <option value="superadmin" {{ old('role', $user->role) == 'superadmin' ? 'selected' : '' }}>Administrator Pusat</option>
-                            </select>
-                        </div>
-
-                        <!-- DROPDOWN ENTITAS (Muncul Jika Operator) -->
-                        <div x-show="role === 'operator'" x-cloak class="space-y-1.5">
-                            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wide">Penempatan Wilayah <span class="text-red-500">*</span></label>
-                            <select name="entity_id" class="w-full bg-white border border-slate-300 text-slate-900 text-sm rounded-md block p-2.5 transition-colors cursor-pointer" :required="role === 'operator'">
-                                <option value="" disabled selected>-- Pilih Lokasi Tugas --</option>
-                                @foreach($entities as $entity)
-                                    <option value="{{ $entity->id }}" {{ old('entity_id', $user->entity_id) == $entity->id ? 'selected' : '' }}>
-                                        {{ $entity->code }} - {{ $entity->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <p class="text-[10px] text-slate-500 font-medium mt-1">Operator hanya dapat mengakses aset di wilayah ini.</p>
-                        </div>
+                    <div x-show="role === 'operator'" x-transition>
+                        <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 ml-1">Penempatan Bagian</label>
+                        <x-searchable-select 
+                            name="entity_id" 
+                            :value="old('entity_id') ?? $user->entity_id"
+                            placeholder="-- Pilih Lokasi Tugas --"
+                            :options="$entities->map(fn($e) => ['value' => $e->id, 'label' => $e->name . ' (' . $e->code . ')'])->toArray()"
+                        />
                     </div>
 
-                    <!-- ACTION BUTTONS -->
-                    <div class="pt-6 border-t border-slate-200 flex flex-col-reverse sm:flex-row justify-end gap-3">
-                        <a href="{{ route('admin.users.index') }}" class="w-full sm:w-auto px-6 py-2.5 bg-white border border-slate-300 text-slate-700 rounded-md text-sm font-semibold transition-colors hover:bg-slate-50 text-center">
-                            Batal
-                        </a>
-                        <button type="submit" class="w-full sm:w-auto bg-[#0055a4] hover:bg-[#003366] text-white px-6 py-2.5 rounded-md text-sm font-semibold transition-colors shadow-sm flex items-center justify-center gap-2">
-                            <i class="fas fa-save"></i> Perbarui Data Akun
-                        </button>
-                    </div>
-                </form>
-            </div>
-
+                <div class="pt-8 flex flex-col sm:flex-row gap-4">
+                    <button type="submit" class="flex-1 bg-[#003366] dark:bg-blue-600 hover:bg-[#001e3c] dark:hover:bg-blue-700 text-white py-4 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-900/20 transition-all flex items-center justify-center gap-2">
+                        <i class="fas fa-save text-blue-400 dark:text-blue-300"></i> Perbarui Akun
+                    </button>
+                    <a href="{{ route('admin.users.index') }}" class="px-8 py-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 rounded-xl text-xs font-black uppercase tracking-widest transition-all text-center">
+                        Batal
+                    </a>
+                </div>
+            </form>
         </div>
     </div>
 </x-app-layout>

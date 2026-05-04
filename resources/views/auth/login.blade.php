@@ -110,22 +110,22 @@
                 </div>
             </div>
 
-            <div class="w-full max-w-md bg-white p-8 sm:p-10 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 relative z-10">
+            <div class="w-full max-w-md bg-white p-8 sm:p-10 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 relative z-10 animate-fade-up">
                 
-                <div class="animate-fade-up">
-                    <a href="{{ url('/') }}" class="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 hover:text-[#003366] uppercase tracking-widest transition-colors mb-8 group">
+                <div class="mb-8">
+                    <a href="{{ url('/') }}" class="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 hover:text-[#003366] uppercase tracking-widest transition-colors group">
                         <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
                         Kembali ke Portal
                     </a>
                 </div>
 
-                <div class="mb-10 animate-fade-up">
+                <div class="mb-10">
                     <h2 class="text-3xl font-black text-slate-900 tracking-tight leading-none mb-2">Otentikasi Sistem</h2>
                     <p class="text-slate-500 font-medium text-sm">Gunakan kredensial korporat Anda untuk mengakses konsol manajemen.</p>
                 </div>
 
                 @if (session('status'))
-                    <div class="mb-6 flex items-start gap-3 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-sm font-bold shadow-sm animate-fade-up delay-100">
+                    <div class="mb-6 flex items-start gap-3 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-sm font-bold shadow-sm">
                         <i class="fas fa-check-circle text-emerald-600 mt-0.5"></i>
                         <p>{{ session('status') }}</p>
                     </div>
@@ -134,7 +134,7 @@
                 <form method="POST" action="{{ route('login') }}" class="space-y-6">
                     @csrf
 
-                    <div class="animate-fade-up delay-100">
+                    <div>
                         <label for="email" class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Alamat Email</label>
                         <div class="relative group">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -156,7 +156,7 @@
                         @enderror
                     </div>
 
-                    <div class="animate-fade-up delay-200">
+                    <div>
                         <label for="password" class="block text-[11px] font-black text-slate-500 uppercase tracking-widest mb-2 ml-1">Kata Sandi</label>
                         <div class="relative group">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -180,7 +180,7 @@
                         @enderror
                     </div>
 
-                    <div class="flex items-center justify-between animate-fade-up delay-300">
+                    <div class="flex items-center justify-between">
                         <label for="remember_me" class="flex items-center cursor-pointer group">
                             <input id="remember_me" type="checkbox" class="w-4 h-4 rounded border-slate-300 text-[#003366] focus:ring-[#003366] transition-colors cursor-pointer bg-slate-50" name="remember">
                             <span class="ml-2 text-xs font-bold text-slate-600 group-hover:text-[#003366] transition-colors">Ingat Sesi Saya</span>
@@ -193,7 +193,7 @@
                         @endif
                     </div>
 
-                    <div class="pt-2 animate-fade-up delay-300">
+                    <div class="pt-2">
                         <button type="submit" class="w-full flex items-center justify-center gap-3 py-4 px-6 bg-[#003366] hover:bg-[#002244] text-white text-sm font-black rounded-xl shadow-lg shadow-blue-900/20 transition-all hover:-translate-y-1 focus:outline-none focus:ring-4 focus:ring-blue-900/10 uppercase tracking-widest group">
                             Login Portal
                             <i class="fas fa-arrow-right text-blue-400 group-hover:translate-x-1 transition-transform"></i>
@@ -202,7 +202,7 @@
                 </form>
             </div>
             
-            <div class="mt-8 text-center lg:hidden animate-fade-up delay-300">
+            <div class="mt-8 text-center lg:hidden">
                 <h3 class="text-sm font-black text-slate-800 uppercase tracking-widest">Infrastructure Portal</h3>
                 <p class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Regional Hub Management</p>
             </div>

@@ -1,81 +1,78 @@
 <x-app-layout>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        [x-cloak] { display: none !important; }
-
-        /* Custom Scrollbar Korporat */
-        ::-webkit-scrollbar { height: 8px; width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-        /* Styling Form Select Khusus Status */
-        .status-select {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-            background-position: right 0.5rem center;
-            background-repeat: no-repeat;
-            background-size: 1.5em 1.5em;
-            padding-right: 2.5rem;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-        }
-    </style>
-
-    <div class="min-h-screen py-8">
-        <div class="max-w-[1600px] mx-auto w-full px-4 sm:px-6 lg:px-8 space-y-6">
-
-            <!-- HEADER KORPORAT -->
-            <div class="bg-white border border-slate-200 rounded-lg px-6 py-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-sm animate-fade">
-                <div>
-                    <h1 class="text-lg font-bold text-[#003366] flex items-center gap-2">
-                        <i class="fas fa-clipboard-list text-[#0055a4]"></i> Log Insiden & Kerusakan Aset
-                    </h1>
-                    <p class="text-xs font-medium text-slate-500 mt-1">Sistem manajemen tiket perbaikan infrastruktur Pelindo.</p>
+    <div class="max-w-[1600px] mx-auto w-full space-y-6 animate-fade-up">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white dark:bg-slate-900 p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div class="flex items-center gap-5">
+                <div class="w-14 h-14 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-xl flex items-center justify-center text-2xl border border-red-100 dark:border-red-800 shadow-inner">
+                    <i class="fas fa-tools"></i>
                 </div>
-                <div class="shrink-0">
-                    <a href="{{ route('admin.breakdowns.create') }}" class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded text-xs font-semibold shadow-sm transition-colors">
-                        <i class="fas fa-plus"></i> Lapor Insiden Baru
-                    </a>
+                <div>
+                    <h1 class="text-2xl font-black text-[#003366] dark:text-blue-400 uppercase tracking-tight">Log Kerusakan Alat</h1>
+                    <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">Pemantauan progres perbaikan infrastruktur secara real-time</p>
                 </div>
             </div>
 
-            <!-- ALERTS -->
-            @if(session('success'))
-                <div class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-5 py-3 rounded-lg text-xs font-semibold shadow-sm flex items-center gap-3">
-                    <i class="fas fa-check-circle text-emerald-500"></i> {{ session('success') }}
-                </div>
-            @endif
+        @if(session('success'))
+            <div class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-6 py-4 rounded-xl text-sm font-bold shadow-sm flex items-center gap-3 animate-fade-up">
+                <i class="fas fa-check-circle text-emerald-500 text-lg"></i> {{ session('success') }}
+            </div>
+        @endif
 
-            <!-- TABLE CONTAINER -->
-            <div class="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden flex flex-col animate-fade" style="animation-delay: 100ms;">
-
-                <!-- Table Wrapper (Menyelesaikan masalah kepotong) -->
-                <div class="overflow-x-auto w-full">
-                    <table class="w-full text-left border-collapse min-w-[1050px]">
-                        <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 text-[10px] font-bold uppercase tracking-wider">
-                                <th class="px-5 py-3.5 w-12 text-center">No</th>
-                                <th class="px-5 py-3.5 w-40">Kode Aset</th>
-                                <th class="px-5 py-3.5 w-48">Lokasi Entitas</th>
-                                <th class="px-5 py-3.5 min-w-[250px]">Detail Laporan</th>
-                                <th class="px-5 py-3.5 w-48 text-center">Status Perbaikan</th>
-                                <th class="px-5 py-3.5 w-48">PIC / Vendor</th>
-                                <th class="px-5 py-3.5 w-24 text-center">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-slate-100 text-xs text-slate-700">
-                            @forelse($logs as $index => $log)
-                            <tr class="hover:bg-slate-50/70 transition-colors">
-                                <td class="px-5 py-4 text-center font-medium text-slate-500">
-                                    {{ $index + 1 }}
-                                </td>
-
-                                <td class="px-5 py-4">
-                                    <div class="inline-flex items-center gap-2 bg-slate-100 border border-slate-200 px-2 py-1 rounded text-[#003366] font-mono font-bold text-[11px]">
-                                        {{ $log->infrastructure->code_name ?? 'TANPA-KODE' }}
+        <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-[#001e3c] dark:bg-slate-800 text-white text-[10px] font-black uppercase tracking-[0.2em] border-b border-slate-700 dark:border-slate-700">
+                            <th class="px-8 py-6 w-16 text-center">NO</th>
+                            <th class="px-8 py-5">Unit ID</th>
+                            <th class="px-8 py-5">Lokasi Entitas</th>
+                            <th class="px-8 py-5">Detail Kendala</th>
+                            <th class="px-8 py-5 text-center">Status Kerja</th>
+                            <th class="px-8 py-5">PIC/Vendor</th>
+                            <th class="px-8 py-5 text-right">Opsi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                        @forelse($logs as $index => $log)
+                        <tr class="hover:bg-blue-50/30 dark:hover:bg-blue-900/10 transition-colors group">
+                            <td class="px-8 py-6 text-center text-slate-400 dark:text-slate-500 font-bold text-xs">{{ $index + 1 }}</td>
+                            <td class="px-8 py-6">
+                                <span class="font-black text-[#003366] dark:text-blue-400 text-xs uppercase px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                                    {{ $log->infrastructure->code_name ?? '-' }}
+                                </span>
+                            </td>
+                            <td class="px-8 py-6 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-tight">
+                                {{ $log->infrastructure->entity->name ?? '-' }}
+                            </td>
+                            <td class="px-8 py-6">
+                                <p class="text-xs text-slate-600 dark:text-slate-300 font-medium max-w-xs leading-relaxed">{{ $log->issue_detail }}</p>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <i class="far fa-clock text-[10px] text-slate-400 dark:text-slate-500"></i>
+                                    <span class="text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase">{{ $log->created_at->format('d M Y | H:i') }}</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-6 text-center">
+                                <form action="{{ route('admin.breakdowns.update', $log->id) }}" method="POST" class="inline-flex">
+                                    @csrf @method('PUT')
+                                    <select name="repair_status" onchange="this.form.submit()" 
+                                        class="text-[9px] font-black uppercase tracking-widest rounded-lg border-slate-200 dark:border-slate-700 py-1.5 px-3 focus:ring-2 focus:ring-[#003366] cursor-pointer transition-all
+                                        {{ $log->repair_status == 'resolved' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800' : 'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800' }}">
+                                        <option value="reported" {{ $log->repair_status == 'reported' ? 'selected' : '' }}>Reported</option>
+                                        <option value="order_part" {{ $log->repair_status == 'order_part' ? 'selected' : '' }}>Order Part</option>
+                                        <option value="on_progress" {{ $log->repair_status == 'on_progress' ? 'selected' : '' }}>On Progress</option>
+                                        <option value="resolved" {{ $log->repair_status == 'resolved' ? 'selected' : '' }}>Resolved</option>
+                                    </select>
+                                </form>
+                            </td>
+                            <td class="px-8 py-6">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-slate-500"></div>
+                                    <span class="text-xs font-black text-slate-700 dark:text-slate-200 uppercase">{{ $log->vendor_pic ?? 'Internal' }}</span>
+                                </div>
+                                @if($log->updated_by)
+                                    <div class="flex items-center gap-1.5 mt-2 opacity-60">
+                                        <i class="fas fa-user-edit text-[8px] text-slate-400 dark:text-slate-500"></i>
+                                        <p class="text-[8px] font-black tracking-widest text-slate-400 dark:text-slate-500 uppercase">{{ $log->updatedBy->name ?? 'System' }}</p>
                                     </div>
                                 </td>
 
@@ -111,49 +108,31 @@
                                     </form>
                                 </td>
 
-                                <td class="px-5 py-4">
-                                    <p class="font-semibold text-slate-800">{{ $log->vendor_pic ?? 'Tim Internal' }}</p>
-                                    @if($log->updated_by)
-                                        <p class="text-[10px] text-slate-500 mt-1 flex items-center gap-1">
-                                            <i class="fas fa-user-edit text-slate-400"></i> Update: {{ $log->updatedBy->name ?? 'System' }}
-                                        </p>
-                                    @endif
-                                </td>
-
-                                <td class="px-5 py-4 text-center">
-                                    <div class="flex items-center justify-center gap-2">
-                                        <a href="{{ route('admin.breakdowns.edit', $log->id) }}"
-                                           class="w-7 h-7 inline-flex items-center justify-center bg-white border border-slate-300 text-slate-500 hover:bg-slate-50 hover:text-[#0055a4] rounded transition-colors"
-                                           title="Edit Laporan">
-                                            <i class="fas fa-pen text-[10px]"></i>
-                                        </a>
-
-                                        <form action="{{ route('admin.breakdowns.destroy', $log->id) }}" method="POST" class="inline"
-                                              onsubmit="return confirm('Peringatan: Menghapus log ini secara otomatis akan mengembalikan status aset menjadi Ready jika tidak ada laporan aktif lain. Lanjutkan?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                    class="w-7 h-7 inline-flex items-center justify-center bg-white border border-slate-300 text-slate-500 hover:bg-red-50 hover:text-red-600 hover:border-red-200 rounded transition-colors"
-                                                    title="Hapus Laporan">
-                                                <i class="fas fa-trash-alt text-[10px]"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                            @empty
-                            <tr>
-                                <td colspan="7" class="px-5 py-16 text-center">
-                                    <div class="w-12 h-12 bg-slate-50 border border-slate-200 rounded-full flex items-center justify-center mx-auto mb-3">
-                                        <i class="fas fa-clipboard-check text-xl text-slate-300"></i>
-                                    </div>
-                                    <p class="text-sm font-semibold text-slate-700">Tidak Ada Log Insiden</p>
-                                    <p class="text-xs text-slate-500 mt-1">Saat ini tidak ada laporan kerusakan alat yang tercatat di sistem.</p>
-                                </td>
-                            </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="7" class="px-8 py-24 text-center bg-slate-50/50 dark:bg-slate-800/20">
+                                <div class="flex flex-col items-center justify-center opacity-30">
+                                    <i class="fas fa-clipboard-check text-6xl mb-4 text-slate-400 dark:text-slate-500"></i>
+                                    <p class="font-black uppercase tracking-[0.3em] text-sm text-slate-800 dark:text-slate-200">No Active Incident Reports</p>
+                                    <p class="text-[10px] mt-2 font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">Seluruh alat saat ini beroperasi secara normal</p>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="flex items-center justify-between px-4 text-slate-400">
+            <p class="text-[9px] font-bold uppercase tracking-widest">&copy; 2026 Pelindo Regional Group</p>
+            <div class="flex gap-4">
+                <div class="flex items-center gap-1.5">
+                    <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                    <span class="text-[9px] font-bold uppercase">Breakdown</span>
                 </div>
 
                 <!-- Pagination Section (Jika data sangat banyak) -->

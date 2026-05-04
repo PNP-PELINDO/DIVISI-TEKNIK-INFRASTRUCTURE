@@ -7,29 +7,61 @@ use App\Models\Entity;
 use App\Http\Requests\StoreInfrastructureRequest;
 use App\Http\Requests\UpdateInfrastructureRequest;
 use App\Helpers\ResponseMessage;
+use App\Helpers\ImageHelper;
 use Illuminate\Support\Facades\Storage;
 
 class InfrastructureController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', Infrastructure::class);
         $user = auth()->user();
 
-        // Tampilkan semua untuk superadmin, filter berdasarkan cabang untuk operator
-        if ($user->role === 'superadmin') {
-            $infrastructures = Infrastructure::with('entity')->latest()->get();
-        } else {
-            $infrastructures = Infrastructure::with('entity')
-                ->where('entity_id', $user->entity_id)
-                ->latest()
-                ->get();
+        $query = Infrastructure::with(['entity', 'createdBy', 'updatedBy']);
+
+        // Filter berdasarkan peran
+        if ($user->role !== 'superadmin') {
+            $query->where('entity_id', $user->entity_id);
         }
 
-        return view('admin.infrastructures.index', compact('infrastructures'));
+        // Search Logic
+        if (request('search')) {
+            $search = request('search');
+            $query->where(function($q) use ($search) {
+                $q->where('code_name', 'like', "%{$search}%")
+                  ->orWhere('type', 'like', "%{$search}%")
+                  ->orWhere('category', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter Logic
+        if (request('entity_id') && request('entity_id') !== 'all') {
+            $query->where('entity_id', request('entity_id'));
+        }
+
+        if (request('category') && request('category') !== 'all') {
+            $query->where('category', request('category'));
+        }
+
+        if (request('status') && request('status') !== 'all') {
+            $query->where('status', request('status'));
+        }
+
+        $infrastructures = $query->latest()->get();
+
+        // Ambil data unik untuk filter dropdown
+        if ($user->role === 'superadmin') {
+            $allEntities = Entity::orderBy('name')->get();
+        } else {
+            $allEntities = collect();
+        }
+
+        return view('admin.infrastructures.index', compact('infrastructures', 'allEntities'));
     }
 
     public function create()
     {
+        $this->authorize('create', Infrastructure::class);
         $user = auth()->user();
 
         // JIKA SUPERADMIN: Bisa pilih semua cabang. JIKA OPERATOR: Hanya cabang dia sendiri.
@@ -50,6 +82,7 @@ class InfrastructureController extends Controller
 
     public function store(StoreInfrastructureRequest $request)
     {
+        $this->authorize('create', Infrastructure::class);
         $user = auth()->user();
 
         $validated = $request->validated();
@@ -74,7 +107,7 @@ class InfrastructureController extends Controller
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $filename = 'infra_' . preg_replace('/[^A-Za-z0-9\-]/', '', $validated['code_name']) . '_' . time() . '.' . $file->getClientOriginalExtension();
-            $imagePath = $file->storeAs('assets/infrastructures', $filename, 'public');
+            $imagePath = ImageHelper::compressAndSave($file, 'assets/infrastructures', $filename, 60);
         }
 
         // 5. Simpan ke Database dengan audit trail
@@ -94,14 +127,16 @@ class InfrastructureController extends Controller
             ->with('success', ResponseMessage::INFRASTRUCTURE_CREATED);
     }
 
+    public function show(Infrastructure $infrastructure)
+    {
+        // Redirect ke halaman Log Kerusakan dengan parameter filter agar user bisa langsung mengupdate status perbaikannya
+        return redirect()->route('admin.breakdowns.index', ['infrastructure_id' => $infrastructure->id]);
+    }
+
     public function edit(Infrastructure $infrastructure)
     {
+        $this->authorize('update', $infrastructure);
         $user = auth()->user();
-
-        // Proteksi: Operator tidak boleh edit alat dari cabang lain
-        if ($user->role !== 'superadmin' && $infrastructure->entity_id !== $user->entity_id) {
-            return redirect()->route('admin.infrastructures.index')->with('error', ResponseMessage::UNAUTHORIZED_OTHER_BRANCH);
-        }
 
         if ($user->role === 'superadmin') {
             $entities = Entity::all();
@@ -119,12 +154,8 @@ class InfrastructureController extends Controller
 
     public function update(UpdateInfrastructureRequest $request, Infrastructure $infrastructure)
     {
+        $this->authorize('update', $infrastructure);
         $user = auth()->user();
-
-        // Proteksi keamanan di backend
-        if ($user->role !== 'superadmin' && $infrastructure->entity_id !== $user->entity_id) {
-            abort(403, 'Unauthorized action.');
-        }
 
         $validated = $request->validated();
 
@@ -160,10 +191,10 @@ class InfrastructureController extends Controller
             if ($infrastructure->image && Storage::disk('public')->exists($infrastructure->image)) {
                 Storage::disk('public')->delete($infrastructure->image);
             }
-            // Simpan foto baru dengan format nama unik
+            // Simpan foto baru dengan kompresi
             $file = $request->file('image');
             $filename = 'infra_' . preg_replace('/[^A-Za-z0-9\-]/', '', $validated['code_name']) . '_' . time() . '.' . $file->getClientOriginalExtension();
-            $dataToUpdate['image'] = $file->storeAs('assets/infrastructures', $filename, 'public');
+            $dataToUpdate['image'] = ImageHelper::compressAndSave($file, 'assets/infrastructures', $filename, 60);
         }
 
         // Add audit trail
@@ -178,12 +209,7 @@ class InfrastructureController extends Controller
 
     public function destroy(Infrastructure $infrastructure)
     {
-        $user = auth()->user();
-
-        // Proteksi Hapus
-        if ($user->role !== 'superadmin' && $infrastructure->entity_id !== $user->entity_id) {
-            return redirect()->route('admin.infrastructures.index')->with('error', ResponseMessage::UNAUTHORIZED_OTHER_BRANCH);
-        }
+        $this->authorize('delete', $infrastructure);
 
         // (Soft Deletes: File bukti fisik gambar tidak dihapus dari storage agar tetap tersedia jika data di-restore)
 

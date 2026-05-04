@@ -75,6 +75,12 @@
                 <i class="fas fa-clipboard-list text-sm w-6 text-center {{ request()->routeIs('admin.breakdowns.*') ? '' : 'text-slate-500 group-hover:text-slate-300' }}"></i>
                 <span class="text-xs font-semibold tracking-wide uppercase">Log Kerusakan</span>
             </a>
+
+            <a href="{{ route('admin.maintenance.index') }}" 
+               class="group flex items-center gap-4 px-8 py-3.5 transition-all duration-300 {{ request()->routeIs('admin.maintenance.*') ? 'sidebar-link-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
+                <i class="fas fa-calendar-check text-sm w-5 text-center {{ request()->routeIs('admin.maintenance.*') ? 'text-[#0055a4]' : 'text-slate-500 group-hover:text-slate-300' }}"></i>
+                <span class="text-xs font-bold tracking-wide uppercase">Jadwal Maintenance</span>
+            </a>
         </nav>
 
         @if(auth()->check() && auth()->user()->role === 'superadmin')

@@ -1,40 +1,38 @@
 <x-app-layout>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-        [x-cloak] { display: none !important; }
+    <div class="max-w-4xl mx-auto w-full space-y-6 animate-fade-up">
+        
+        <div class="bg-white dark:bg-slate-900 p-8 md:p-10 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-600 to-red-800"></div>
 
-        /* Focus state minimalis korporat */
-        input:focus, select:focus, textarea:focus {
-            box-shadow: 0 0 0 1px #dc2626 !important; /* Warna merah untuk form insiden */
-            border-color: #dc2626 !important;
-        }
-
-        /* Custom scrollbar untuk dropdown */
-        .dropdown-scroll::-webkit-scrollbar { width: 4px; }
-        .dropdown-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
-        .dropdown-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-    </style>
-
-    <div class="min-h-screen py-8">
-        <div class="max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 space-y-6 animate-fade">
-
-            <!-- HEADER KORPORAT (Aksen Merah untuk Urgensi) -->
-            <div class="bg-white p-6 rounded-lg border border-slate-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 relative overflow-hidden">
-                <!-- Aksen Garis Kiri Merah -->
-                <div class="absolute left-0 top-0 h-full w-1.5 bg-red-600 rounded-l-lg"></div>
-
+            <div class="mb-8 flex items-center gap-4">
+                <div class="w-12 h-12 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 flex items-center justify-center rounded-xl border border-red-100 dark:border-red-800">
+                    <i class="fas fa-triangle-exclamation text-xl"></i>
+                </div>
                 <div>
-                    <h1 class="text-lg font-bold text-[#003366] flex items-center gap-2">
-                        <i class="fas fa-triangle-exclamation text-red-600"></i> Registrasi Laporan Insiden
-                    </h1>
-                    <p class="text-xs font-medium text-slate-500 mt-1">Registrasi kerusakan aset. Status alat akan otomatis berubah menjadi <span class="font-bold text-red-500">"Down"</span>.</p>
+                    <h2 class="text-2xl font-black text-[#003366] dark:text-blue-400 uppercase tracking-tight">Pelaporan Kerusakan Baru</h2>
+                    <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">Status aset akan otomatis berubah menjadi "Down"</p>
+                </div>
+            </div>
+            
+            <form action="{{ route('admin.breakdowns.store') }}" method="POST" class="space-y-6">
+                @csrf
+                
+                <div>
+                    <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Pilih Aset Bermasalah</label>
+                    <x-searchable-select 
+                        name="infrastructure_id" 
+                        :value="old('infrastructure_id')"
+                        placeholder="-- Pilih Alat yang Saat Ini Beroperasi (Available) --"
+                        :options="$infrastructures->map(fn($i) => ['value' => $i->id, 'label' => $i->code_name . ' - ' . $i->type . ' (' . ($i->entity->name ?? 'N/A') . ')'])->toArray()"
+                        required
+                    />
+                    @error('infrastructure_id') <p class="text-red-500 text-xs mt-2 font-bold ml-1">{{ $message }}</p> @enderror
                 </div>
 
-                <div class="shrink-0">
-                    <a href="{{ route('admin.breakdowns.index') }}" class="inline-flex items-center gap-2 text-slate-500 hover:text-red-600 text-xs font-semibold transition-colors">
-                        <i class="fas fa-arrow-left"></i> Batal & Kembali
-                    </a>
+                <div>
+                    <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Deskripsi Kendala Teknis</label>
+                    <textarea name="issue_detail" rows="4" class="w-full border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-sm font-medium p-4 focus:ring-4 focus:ring-red-50 dark:focus:ring-red-900/20 focus:border-red-600 dark:focus:border-red-400 transition-all text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500" placeholder="Jelaskan secara detail kerusakan atau anomali yang terjadi pada alat..." required>{{ old('issue_detail') }}</textarea>
+                    @error('issue_detail') <p class="text-red-500 dark:text-red-400 text-xs mt-2 font-bold ml-1">{{ $message }}</p> @enderror
                 </div>
             </div>
 
@@ -43,22 +41,29 @@
                 <div class="bg-red-50 border border-red-200 p-4 rounded-lg flex items-start gap-3 shadow-sm">
                     <i class="fas fa-exclamation-triangle text-red-600 mt-0.5"></i>
                     <div>
-                        <h3 class="text-sm font-bold text-red-800">Gagal Mengirim Laporan</h3>
-                        <ul class="mt-1 space-y-1 text-xs text-red-700">
-                            @foreach ($errors->all() as $error)
-                                <li>• {{ $error }}</li>
-                            @endforeach
-                        </ul>
+                        <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">PIC / Vendor Perbaikan</label>
+                        <input type="text" name="vendor_pic" value="{{ old('vendor_pic') }}" class="w-full border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-sm font-bold p-4 focus:ring-4 focus:ring-red-50 dark:focus:ring-red-900/20 focus:border-red-600 dark:focus:border-red-400 transition-all uppercase text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500" placeholder="Contoh: PT. BIMA / TIM INTERNAL">
+                        @error('vendor_pic') <p class="text-red-500 dark:text-red-400 text-xs mt-2 font-bold ml-1">{{ $message }}</p> @enderror
+                    </div>
+                    
+                    <div>
+                        <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Status Laporan Awal</label>
+                        <select name="repair_status" class="w-full border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-sm font-bold p-4 focus:ring-4 focus:ring-red-50 dark:focus:ring-red-900/20 focus:border-red-600 dark:focus:border-red-400 transition-all uppercase text-slate-900 dark:text-slate-100" required>
+                            <option value="reported" {{ old('repair_status') == 'reported' ? 'selected' : '' }}>Reported (Baru Dilaporkan)</option>
+                            <option value="order_part" {{ old('repair_status') == 'order_part' ? 'selected' : '' }}>Order Part (Menunggu Suku Cadang)</option>
+                        </select>
+                        @error('repair_status') <p class="text-red-500 dark:text-red-400 text-xs mt-2 font-bold ml-1">{{ $message }}</p> @enderror
                     </div>
                 </div>
             @endif
 
-            <!-- MAIN FORM CARD -->
-            <div class="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
-
-                <div class="bg-[#00152b] px-6 py-4 border-b border-slate-700 flex items-center gap-3">
-                    <i class="fas fa-clipboard-list text-red-400"></i>
-                    <h2 class="text-xs font-bold text-white uppercase tracking-widest">Formulir Detail Kerusakan</h2>
+                <div class="pt-8 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row gap-4">
+                    <button type="submit" class="flex-1 bg-red-600 dark:bg-red-700 hover:bg-red-700 dark:hover:bg-red-800 text-white py-4 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-red-900/20 transition-all flex items-center justify-center gap-2">
+                        <i class="fas fa-save"></i> Simpan Laporan & Update Aset
+                    </button>
+                    <a href="{{ route('admin.breakdowns.index') }}" class="px-8 py-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-400 rounded-xl text-xs font-black uppercase tracking-widest transition-all text-center">
+                        Batal
+                    </a>
                 </div>
 
                 <form action="{{ route('admin.breakdowns.store') }}" method="POST" class="p-6 md:p-8 space-y-6">
