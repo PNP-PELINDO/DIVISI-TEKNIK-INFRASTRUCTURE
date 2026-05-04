@@ -34,6 +34,7 @@ return new class extends Migration
             $table->foreignId('updated_by')->nullable()->constrained('users');
             
             $table->timestamps();
+            $table->softDeletes();
 
             // Indexes
             $table->index(['repair_status', 'infrastructure_id'], 'log_status_idx');
