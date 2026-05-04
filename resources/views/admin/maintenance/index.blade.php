@@ -1,29 +1,44 @@
 <x-app-layout>
     <div class="max-w-[1600px] mx-auto w-full space-y-6 animate-fade-up">
         
-        <div class="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm relative flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden transition-colors duration-300">
+        <!-- HEADER SECTION -->
+        <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm space-y-10 relative overflow-hidden mb-8">
             <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-600 to-blue-400"></div>
-            
-            <div class="flex items-center gap-5">
-                <div class="w-14 h-14 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center text-2xl border border-blue-100 dark:border-blue-800 shadow-inner">
-                    <i class="fas fa-calendar-check"></i>
+
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+                <div class="flex items-center gap-6">
+                    <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-[1.5rem] flex items-center justify-center text-3xl border border-blue-100 dark:border-blue-800 shadow-inner">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-black text-[#003366] dark:text-white uppercase tracking-tight">Maintenance Terjadwal</h1>
+                        <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full"></span> 
+                            Pemeliharaan Preventif Infrastruktur Pelindo
+                        </p>
+                    </div>
                 </div>
-                <div>
-                    <h1 class="text-2xl font-black text-[#003366] dark:text-blue-400 uppercase tracking-tight">Maintenance Terjadwal</h1>
-                    <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">Pemeliharaan Preventif Infrastruktur Pelindo</p>
-                </div>
+                
+                <a href="{{ route('admin.maintenance.create') }}" 
+                   class="bg-[#003366] hover:bg-[#001e3c] dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-lg shadow-blue-900/20 active:scale-95">
+                    <i class="fas fa-plus text-xs"></i> Tambah Jadwal Baru
+                </a>
             </div>
-            
-            <a href="{{ route('admin.maintenance.create') }}" class="bg-[#003366] dark:bg-blue-600 hover:bg-[#002244] dark:hover:bg-blue-700 text-white px-8 py-3.5 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-900/20 transition-all flex items-center gap-2">
-                <i class="fas fa-plus"></i> Tambah Jadwal
-            </a>
         </div>
 
+        <!-- ALERTS -->
         @if(session('success'))
-            <div class="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 px-6 py-4 rounded-xl text-sm font-bold shadow-sm flex items-center gap-3 animate-fade-in">
-                <i class="fas fa-check-circle text-emerald-500"></i> {{ session('success') }}
+            <div class="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 p-5 rounded-3xl flex items-start gap-4 shadow-sm animate-fade-in mb-8">
+                <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+                    <i class="fas fa-check-circle text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-black text-emerald-800 dark:text-emerald-400 uppercase tracking-tight">Berhasil</h3>
+                    <p class="text-xs text-emerald-700 dark:text-emerald-300 mt-1 font-medium leading-relaxed">{{ session('success') }}</p>
+                </div>
             </div>
         @endif
+
 
         <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
             <div class="overflow-x-auto">

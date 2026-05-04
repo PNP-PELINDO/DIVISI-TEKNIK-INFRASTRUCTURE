@@ -4,24 +4,16 @@
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         
         body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: #f4f7fa; 
+            font-family: 'Inter', sans-serif; 
         }
 
-        .dark body {
-            background-color: #0f172a;
-        }
-        
         /* Pelindo Blue Theme */
         .bg-pelindo { background-color: #0055a4; }
-        .dark .bg-pelindo { background-color: #1e293b; }
         .text-pelindo { color: #0055a4; }
         .dark .text-pelindo { color: #60a5fa; }
-        .border-pelindo { border-color: #0055a4; }
-        .dark .border-pelindo { border-color: #334155; }
         
         .animate-fade-in { animation: fadeIn 0.8s ease-out forwards; opacity: 0; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
@@ -30,56 +22,70 @@
         .card-stats {
             background: white;
             border: 1px solid #e2e8f0;
-            border-radius: 1.5rem;
-            transition: all 0.3s ease;
+            border-radius: 2rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
         .dark .card-stats {
             background: #1e293b;
             border-color: #334155;
         }
-        .card-stats:hover { transform: translateY(-5px); border-color: #0055a4; box-shadow: 0 15px 30px -10px rgba(0,85,164,0.1); }
-        .dark .card-stats:hover { border-color: #3b82f6; box-shadow: 0 15px 30px -10px rgba(0,0,0,0.3); }
+        .card-stats:hover { 
+            transform: translateY(-5px); 
+            border-color: #0055a4; 
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); 
+        }
+        .dark .card-stats:hover { 
+            border-color: #3b82f6; 
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3); 
+        }
 
         #hiddenExportTable { display: none; background: white; }
     </style>
 
+
     <div id="main-ui" class="max-w-[1600px] mx-auto w-full space-y-6 animate-fade-up">
 
-        <div class="bg-pelindo rounded-[2rem] p-8 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 relative z-[60]">
-            <div class="absolute inset-0 overflow-hidden rounded-[2rem] pointer-events-none">
-                <div class="absolute right-0 top-0 opacity-10 -mr-10 -mt-10">
-                    <i class="fas fa-chart-line text-[15rem] text-white"></i>
-                </div>
-            </div>
-            
-            <div class="flex flex-col sm:flex-row items-center text-center sm:text-left gap-4 md:gap-6 relative z-10">
-                <div class="w-16 h-16 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center text-3xl text-white border border-white/30 shrink-0">
-                    <i class="fas fa-analytics"></i>
-                </div>
-                <div>
-                    <h1 class="text-2xl md:text-3xl font-black text-white uppercase tracking-tight">Pusat Analitik</h1>
-                    <p class="text-blue-100 text-xs font-bold uppercase tracking-widest mt-1">
-                        {{ $user->role === 'superadmin' ? 'Monitoring Performa Seluruh Cabang' : 'Statistik Detail ' . $chartData['entity_name'] }}
-                    </p>
-                </div>
-            </div>
+        <!-- HEADER SECTION -->
+        <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm space-y-8 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#003366] to-[#0055a4]"></div>
 
-            <div class="flex flex-col sm:flex-row items-center gap-4 relative z-10 w-full md:w-auto">
-                <div x-data="{ open: false }" class="relative w-full sm:w-auto">
-                    <button @click="open = !open" @click.away="open = false" class="w-full sm:w-auto justify-center bg-white dark:bg-slate-800 text-pelindo dark:text-blue-400 px-6 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg transition-all hover:bg-blue-50 dark:hover:bg-slate-700 flex items-center gap-3">
-                        <i class="fas fa-file-export"></i> Unduh Laporan <i class="fas fa-chevron-down opacity-50"></i>
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+                <div class="flex items-center gap-6">
+                    <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 text-[#0055a4] dark:text-blue-400 rounded-[1.5rem] flex items-center justify-center text-3xl border border-blue-100 dark:border-blue-800 shadow-inner">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-black text-[#003366] dark:text-white uppercase tracking-tight">Pusat Analitik</h1>
+                        <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full"></span> 
+                            {{ $user->role === 'superadmin' ? 'Monitoring Performa Seluruh Cabang' : 'Statistik Detail ' . $chartData['entity_name'] }}
+                        </p>
+                    </div>
+                </div>
+                
+                <div x-data="{ open: false }" class="relative w-full lg:w-auto">
+                    <button @click="open = !open" @click.away="open = false" 
+                            class="w-full lg:w-auto justify-center bg-white dark:bg-slate-800 text-[#003366] dark:text-blue-400 px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-3 border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 active:scale-95">
+                        <i class="fas fa-file-export text-xs"></i> Unduh Laporan <i class="fas fa-chevron-down text-[8px] opacity-60 ml-2"></i>
                     </button>
-                    <div x-show="open" x-transition class="absolute left-0 right-0 sm:left-auto sm:right-0 mt-2 w-full sm:w-56 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl z-50 overflow-hidden">
-                        <button onclick="exportToExcel()" class="w-full text-left px-5 py-4 text-[10px] font-black uppercase text-slate-600 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-3">
-                            <i class="fas fa-file-excel text-emerald-500"></i> Format Excel
+                    <div x-show="open" x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 translate-y-2"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         class="absolute right-0 mt-3 w-full lg:w-64 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl z-[100] overflow-hidden">
+                        <button onclick="exportToExcel()" class="w-full text-left px-6 py-4 text-[10px] font-black uppercase text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors flex items-center gap-4">
+                            <i class="fas fa-file-excel text-emerald-500 text-sm"></i> Format Excel (.xlsx)
                         </button>
-                        <button onclick="exportToPDF()" class="w-full text-left px-5 py-4 text-[10px] font-black uppercase text-slate-600 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-3 border-t border-slate-50 dark:border-slate-700">
-                            <i class="fas fa-file-pdf text-red-500"></i> Format PDF
+                        <button onclick="exportToPDF()" class="w-full text-left px-6 py-4 text-[10px] font-black uppercase text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors flex items-center gap-4 border-t border-slate-100 dark:border-slate-700">
+                            <i class="fas fa-file-pdf text-red-500 text-sm"></i> Format PDF (.pdf)
                         </button>
                     </div>
                 </div>
+
             </div>
         </div>
+
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 " >
             

@@ -6,98 +6,88 @@
             entityName: '' 
          }">
 
-        <!-- MODAL DELETE (Enterprise Style) -->
+        <!-- MODAL DELETE (Clean Enterprise Style) -->
         <template x-teleport="body">
-            <div x-show="showDeleteModal" 
+            <div x-show="showDeleteModal" x-cloak
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0"
                  x-transition:enter-end="opacity-100"
-                 x-transition:leave="transition ease-in duration-200"
-                 x-transition:leave-start="opacity-100"
-                 x-transition:leave-end="opacity-0"
-                 class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm"
-                 style="display: none;">
-                
-                <div @click.away="showDeleteModal = false" 
-                     class="bg-white dark:bg-slate-900 rounded-[2rem] shadow-xl max-w-sm w-full overflow-hidden border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-300">
-                    
-                    <div class="p-8 text-center">
-                        <div class="w-20 h-20 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center text-4xl mx-auto mb-6 border border-red-100 dark:border-red-800">
+                 class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+                <div @click.away="showDeleteModal = false"
+                     x-show="showDeleteModal"
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 scale-95"
+                     x-transition:enter-end="opacity-100 scale-100"
+                     class="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl max-w-sm w-full border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <div class="p-10 text-center">
+                        <div class="w-20 h-20 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center text-4xl mx-auto mb-6 border border-red-100 dark:border-red-800 shadow-inner">
                             <i class="fas fa-building-circle-xmark"></i>
                         </div>
-                        
-                        <h2 class="text-xl font-black text-[#003366] dark:text-blue-400 uppercase tracking-tight mb-2">Hapus Entitas?</h2>
-                        <p class="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed mb-6">
-                            Anda yakin ingin menghapus terminal <br>
-                            <strong class="text-red-600 dark:text-red-400 text-base" x-text="entityName"></strong>? <br>
-                            <span class="text-xs">Pastikan tidak ada alat yang terikat ke area ini.</span>
+                        <h3 class="text-2xl font-black text-[#003366] dark:text-white uppercase tracking-tight mb-2">Hapus Entitas?</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed mb-8">
+                            Anda yakin ingin menghapus data <strong class="text-red-600 dark:text-red-400" x-text="entityName"></strong>? <br>
+                            Pastikan tidak ada aset atau user yang terikat ke area ini.
                         </p>
-
-                        <div class="flex gap-3">
-                            <button type="button" @click="showDeleteModal = false" 
-                                    class="flex-1 py-3 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-black uppercase tracking-widest transition-all">
-                                Batal
-                            </button>
-                            
+                        <div class="flex gap-4">
+                            <button @click="showDeleteModal = false" class="flex-1 py-4 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">Batal</button>
                             <form :action="deleteUrl" method="POST" class="flex-1">
                                 @csrf @method('DELETE')
-                                <button type="submit" 
-                                        class="w-full py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-md shadow-red-600/20">
-                                    Hapus
-                                </button>
+                                <button type="submit" class="w-full py-4 bg-red-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-red-900/20 hover:bg-red-700 transition-all">Hapus</button>
                             </form>
                         </div>
-                    </div>
-                    <div class="bg-slate-50 px-6 py-3 border-t border-slate-200 flex justify-end gap-2">
-                        <button @click="showDeleteModal = false" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded text-xs font-semibold hover:bg-slate-50 transition-colors">Batal</button>
-                        <form :action="deleteUrl" method="POST">
-                            @csrf @method('DELETE')
-                            <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded text-xs font-semibold hover:bg-red-700 transition-colors shadow-sm">Hapus Entitas</button>
-                        </form>
                     </div>
                 </div>
             </div>
         </template>
 
-        <div class="bg-white dark:bg-slate-900 p-8 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
-            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#003366] to-[#0055a4]"></div>
-            
-            <div class="flex items-center gap-5">
-                <div class="w-14 h-14 bg-blue-50 dark:bg-blue-900/30 text-[#0055a4] dark:text-blue-400 rounded-2xl flex items-center justify-center text-2xl border border-blue-100 dark:border-blue-800 shadow-inner">
-                    <i class="fas fa-building"></i>
-                </div>
-                <div>
-                    <h1 class="text-2xl font-black text-[#003366] dark:text-blue-400 uppercase tracking-tight">Manajemen Entitas</h1>
-                    <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-1">Daftar Cabang & Anak Perusahaan</p>
-                </div>
 
-        <!-- Search Form -->
-        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-            <form action="{{ route('admin.entities.index') }}" method="GET" class="flex gap-4">
-                <div class="relative flex-1">
-                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-xs"></i>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari Nama Entitas atau Kode..." 
-                           class="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-[#0055a4] focus:border-[#0055a4] transition-all">
+        <!-- HEADER SECTION -->
+        <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm space-y-10 relative overflow-hidden mb-8">
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#003366] to-[#0055a4]"></div>
+
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+                <div class="flex items-center gap-6">
+                    <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 text-[#0055a4] dark:text-blue-400 rounded-[1.5rem] flex items-center justify-center text-3xl border border-blue-100 dark:border-blue-800 shadow-inner">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-black text-[#003366] dark:text-white uppercase tracking-tight">Manajemen Entitas</h1>
+                        <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full"></span> 
+                            Daftar Cabang & Anak Perusahaan Pelindo
+                        </p>
+                    </div>
                 </div>
-                <button type="submit" class="bg-[#003366] hover:bg-[#001e3c] text-white px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-md shadow-blue-900/10">
-                    Cari
+                
+                <a href="{{ route('admin.entities.create') }}" 
+                   class="bg-[#003366] hover:bg-[#001e3c] dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-lg shadow-blue-900/20 active:scale-95">
+                    <i class="fas fa-plus text-xs"></i> Tambah Entitas Baru
+                </a>
+            </div>
+
+            <!-- Server-side Filter Form -->
+            <form action="{{ route('admin.entities.index') }}" method="GET" class="flex flex-col md:flex-row gap-4 pt-8 border-t border-slate-100 dark:border-slate-800/50">
+                <div class="relative flex-1">
+                    <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-xs"></i>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari Nama Entitas atau Kode..." 
+                           class="w-full pl-12 pr-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-[#0055a4] transition-all">
+                </div>
+                <button type="submit" class="bg-[#003366] hover:bg-[#001e3c] dark:bg-slate-800 dark:hover:bg-slate-700 text-white px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 border border-transparent dark:border-slate-700 shadow-lg">
+                    Cari Data
                 </button>
-                @if(request('search'))
-                    <a href="{{ route('admin.entities.index') }}" class="px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-xl flex items-center justify-center transition-all">
-                        <i class="fas fa-times"></i>
-                    </a>
-                @endif
             </form>
         </div>
 
+        <!-- ALERTS -->
         @if(session('success'))
-            <div class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-6 py-4 rounded-xl text-sm font-bold shadow-sm flex items-center gap-3 animate-fade-in">
-                <i class="fas fa-check-circle text-emerald-500 text-lg"></i> {{ session('success') }}
-            </div>
-
-        @if(session('error'))
-            <div class="bg-red-50 text-red-700 border border-red-200 px-6 py-4 rounded-xl text-sm font-bold shadow-sm flex items-center gap-3 animate-fade-in">
-                <i class="fas fa-exclamation-triangle text-red-500 text-lg"></i> {{ session('error') }}
+            <div class="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 p-5 rounded-3xl flex items-start gap-4 shadow-sm animate-fade-in mb-8">
+                <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
+                    <i class="fas fa-check-circle text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-black text-emerald-800 dark:text-emerald-400 uppercase tracking-tight">Berhasil</h3>
+                    <p class="text-xs text-emerald-700 dark:text-emerald-300 mt-1 font-medium leading-relaxed">{{ session('success') }}</p>
+                </div>
             </div>
         @endif
 

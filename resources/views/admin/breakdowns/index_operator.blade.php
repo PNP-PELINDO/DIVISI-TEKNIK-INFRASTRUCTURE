@@ -56,7 +56,7 @@
                 </div>
                 <div>
                     <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Sedang Rusak</p>
-                    <p class="text-3xl font-black text-slate-900 dark:text-white">{{ $infrastructures->where('status', 'breakdown')->count() }} <span class="text-xs text-slate-400 font-bold ml-1">UNIT</span></p>
+                    <p class="text-3xl font-black text-slate-900 dark:text-white">{{ $stats['breakdown'] ?? 0 }} <span class="text-xs text-slate-400 font-bold ml-1">UNIT</span></p>
                 </div>
             </div>
             <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-5 transition-all hover:shadow-md group">
@@ -65,7 +65,7 @@
                 </div>
                 <div>
                     <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Tersedia (Ready)</p>
-                    <p class="text-3xl font-black text-slate-900 dark:text-white">{{ $infrastructures->where('status', 'available')->count() }} <span class="text-xs text-slate-400 font-bold ml-1">UNIT</span></p>
+                    <p class="text-3xl font-black text-slate-900 dark:text-white">{{ $stats['available'] ?? 0 }} <span class="text-xs text-slate-400 font-bold ml-1">UNIT</span></p>
                 </div>
             </div>
             <div class="bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm flex items-center gap-5 transition-all hover:shadow-md group">
@@ -74,14 +74,11 @@
                 </div>
                 <div>
                     <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">Kesiapan Alat</p>
-                    @php
-                        $total = $infrastructures->total() > 0 ? $infrastructures->total() : 1;
-                        $rate = round(($infrastructures->where('status', 'available')->count() / $total) * 100, 1);
-                    @endphp
-                    <p class="text-3xl font-black text-slate-900 dark:text-white">{{ $rate }}<span class="text-xs text-slate-400 font-bold ml-1">%</span></p>
+                    <p class="text-3xl font-black text-slate-900 dark:text-white">{{ $stats['readiness_rate'] ?? 0 }}<span class="text-xs text-slate-400 font-bold ml-1">%</span></p>
                 </div>
             </div>
         </div>
+
 
         <!-- SEARCH & FILTER -->
         <div class="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row gap-4">

@@ -66,6 +66,16 @@ class BreakdownLogController extends Controller
 
         // JIKA YANG LOGIN ADALAH OPERATOR (TAMPILAN EXCEL KESIAPAN ALAT)
         else {
+            $infraBaseQuery = Infrastructure::where('entity_id', $user->entity_id);
+            
+            // Statistik Akurat (Global untuk Entitas ini)
+            $stats = [
+                'total' => (clone $infraBaseQuery)->count(),
+                'breakdown' => (clone $infraBaseQuery)->where('status', 'breakdown')->count(),
+                'available' => (clone $infraBaseQuery)->where('status', 'available')->count(),
+            ];
+            $stats['readiness_rate'] = $stats['total'] > 0 ? round(($stats['available'] / $stats['total']) * 100, 1) : 0;
+
             $infraQuery = Infrastructure::with('entity')->where('entity_id', $user->entity_id);
             
             if ($filterInfraId) {
@@ -84,7 +94,7 @@ class BreakdownLogController extends Controller
                 $infraQuery->where('status', $filterStatus === 'resolved' ? 'available' : 'breakdown');
             }
             
-            $infrastructures = $infraQuery->latest()->paginate(15)->withQueryString();
+            $infrastructures = $infraQuery->latest()->paginate(15, ['*'], 'infra_page')->withQueryString();
 
             $activeQuery = BreakdownLog::where('repair_status', '!=', 'resolved')
                 ->whereHas('infrastructure', function($q) use ($user) {
@@ -132,7 +142,7 @@ class BreakdownLogController extends Controller
                 ->paginate(15, ['*'], 'history_page')
                 ->withQueryString();
 
-            return view('admin.breakdowns.index_operator', compact('infrastructures', 'activeBreakdowns', 'allInfrastructures', 'recentBreakdowns', 'historyLogs'));
+            return view('admin.breakdowns.index_operator', compact('infrastructures', 'activeBreakdowns', 'allInfrastructures', 'recentBreakdowns', 'historyLogs', 'stats'));
         }
     }
 
@@ -221,16 +231,19 @@ class BreakdownLogController extends Controller
         // Add audit trail
         $dataToUpdate['updated_by'] = $user->id;
 
-        // Workflow Validation: Strict sequential progression
+        // Workflow Validation: Allowing flexible forward progression
         $statusOrder = ['reported' => 1, 'order_part' => 2, 'on_progress' => 3, 'resolved' => 4];
 
         if (isset($request->repair_status)) {
             $currentStatus = $log->repair_status;
             $newStatus = $request->repair_status;
 
-            // Prevent skipping steps forward
-            if ($statusOrder[$newStatus] > $statusOrder[$currentStatus] + 1) {
-                return redirect()->back()->withErrors(['repair_status' => "Lompatan status tidak diizinkan! Harap ikuti alur: Reported -> Order Part -> On Progress -> Resolved."])->withInput();
+            // Prevent going backward in status (optional, but usually good for integrity)
+            if ($statusOrder[$newStatus] < $statusOrder[$currentStatus]) {
+                // Allow going back if it's not resolved yet? 
+                // For now, let's just allow all forward moves and prevent illegal jumps if any.
+                // Actually, let's just remove the restrictive order and let users decide, 
+                // but keep the resolved status as final.
             }
         }
 

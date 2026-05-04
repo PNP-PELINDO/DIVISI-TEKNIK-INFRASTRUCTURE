@@ -47,52 +47,89 @@
             .dark ::-webkit-scrollbar-thumb:hover { background: #0055a4; }
         </style>
     </head>
-    <body class="font-sans antialiased flex h-screen overflow-hidden bg-[#f4f7fa] dark:bg-[#000d1a] transition-colors duration-300">
+    <body class="font-sans antialiased flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-500">
         
-        <div id="mobile-overlay" class="fixed inset-0 bg-slate-900/60 z-[80] hidden lg:hidden opacity-0 transition-opacity duration-300" onclick="toggleSidebar()"></div>
+        <!-- MOBILE OVERLAY -->
+        <div id="mobile-overlay" 
+             class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[80] hidden lg:hidden opacity-0 transition-all duration-300" 
+             onclick="toggleSidebar()"></div>
 
         @include('layouts.sidebar')
 
-        <div class="flex-1 flex flex-col h-screen overflow-y-auto relative z-10 sidebar-transition">
-            <header class="bg-white/80 dark:bg-[#001e3c]/80 backdrop-blur-md sticky top-0 z-[70] px-6 py-4 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 transition-colors duration-300">
-                <div class="flex items-center gap-4">
-                    <button onclick="toggleSidebar()" class="w-10 h-10 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-all">
-                        <i id="toggle-icon" class="fas fa-bars-staggered"></i>
+        <!-- MAIN CONTENT WRAPPER -->
+        <div class="flex-1 flex flex-col h-screen overflow-hidden relative z-10">
+            
+            <!-- HEADER / NAVBAR -->
+            <header class="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl sticky top-0 z-[70] px-8 py-5 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 transition-all duration-300">
+                <div class="flex items-center gap-5">
+                    <button onclick="toggleSidebar()" 
+                            class="w-11 h-11 flex items-center justify-center rounded-2xl bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-all shadow-sm group">
+                        <i id="toggle-icon" class="fas fa-bars-staggered group-hover:scale-110 transition-transform"></i>
                     </button>
                     
-                    <!-- Dark Mode Toggle -->
-                    <button onclick="toggleDarkMode()" class="w-10 h-10 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-amber-400 hover:bg-white dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-all">
-                        <i id="dark-icon" class="fas fa-moon dark:fa-sun"></i>
-                    </button>
-                </div>
+                    <div class="h-8 w-[1px] bg-slate-200 dark:bg-slate-800 hidden sm:block"></div>
 
-                <div class="flex items-center gap-4 bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 shadow-inner transition-colors duration-300">
-                    <span class="text-[10px] font-black text-blue-700 dark:text-blue-400 uppercase tracking-widest">{{ now()->format('d-m-Y H:i') }}</span>
+                    <!-- Dark Mode Toggle -->
+                    <button onclick="toggleDarkMode()" 
+                            class="w-11 h-11 flex items-center justify-center rounded-2xl bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-amber-400 hover:bg-white dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-all shadow-sm group">
+                        <i id="dark-icon" class="fas fa-moon dark:fa-sun group-hover:rotate-12 transition-transform text-lg"></i>
+                    </button>
                 </div>
 
                 <!-- REAL-TIME CLOCK ENTERPRISE STYLE -->
-                <div class="flex items-center bg-white border border-slate-200 rounded-lg shadow-sm p-1.5 select-none">
-                    <div class="flex items-center gap-2 px-3 border-r border-slate-200 hidden sm:flex">
-                        <div class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_5px_rgba(16,185,129,0.5)]"></div>
-                        <span id="realtime-date" class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Memuat...</span>
+                <div class="flex items-center bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-inner p-1.5 select-none transition-all duration-300">
+                    <div class="flex items-center gap-3 px-4 border-r border-slate-200 dark:border-slate-700 hidden lg:flex">
+                        <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]"></div>
+                        <span id="realtime-date" class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">Memuat...</span>
                     </div>
-                    <div class="flex items-center gap-2 px-3">
-                        <i class="far fa-clock text-[#0055a4]"></i>
-                        <span id="realtime-time" class="text-sm font-black text-[#003366] tracking-widest font-mono">00:00:00</span>
-                        <span class="text-[9px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">WIB</span>
+                    <div class="flex items-center gap-3 px-4">
+                        <i class="far fa-clock text-[#0055a4] dark:text-blue-400 animate-pulse"></i>
+                        <span id="realtime-time" class="text-sm font-black text-[#003366] dark:text-blue-400 tracking-widest font-mono">00:00:00</span>
+                        <span class="text-[8px] font-black text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 px-2 py-1 rounded-lg uppercase tracking-widest ml-2">WIB</span>
                     </div>
                 </div>
-
             </header>
 
-            <main class="flex-1 w-full p-4 sm:p-6 lg:p-8 overflow-x-hidden">
-                {{ $slot }}
-            </main>
+            <!-- MAIN CONTENT AREA -->
+            <div class="flex-1 overflow-y-auto custom-scrollbar bg-slate-50 dark:bg-slate-950 transition-colors duration-500">
+                <main class="w-full max-w-[1600px] mx-auto p-6 sm:p-8 lg:p-10 min-h-[calc(100vh-140px)]">
+                    {{ $slot }}
+                </main>
+
+                <!-- STANDARDIZED FOOTER -->
+                <footer class="w-full border-t border-slate-200 dark:border-slate-800 py-8 px-10 bg-white dark:bg-slate-900/50 transition-all duration-300 mt-auto">
+                    <div class="max-w-[1600px] mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div class="flex items-center gap-4">
+                            <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-6 opacity-40 grayscale group-hover:grayscale-0 transition-all">
+                            <div class="h-4 w-[1px] bg-slate-200 dark:bg-slate-700"></div>
+                            <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+                                &copy; {{ date('Y') }} PT Pelabuhan Indonesia (Persero). All Rights Reserved.
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-6">
+                            <div class="flex items-center gap-2 px-4 py-2 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
+                                <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                                <span class="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Sistem Aktif</span>
+                            </div>
+                            <p class="text-[9px] font-black text-slate-300 dark:text-slate-600 uppercase tracking-widest">V 2.0.1 - PRODUCTION</p>
+                        </div>
+                    </div>
+                </footer>
+            </div>
         </div>
+
+        <style>
+            .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+            .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+            .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+            .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #1e293b; }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        </style>
 
         <script>
             function updateDarkIcon() {
                 const darkIcon = document.getElementById('dark-icon');
+                if (!darkIcon) return;
                 if (document.documentElement.classList.contains('dark')) {
                     darkIcon.classList.remove('fa-moon');
                     darkIcon.classList.add('fa-sun');
@@ -114,6 +151,8 @@
             function toggleSidebar() {
                 const sidebar = document.getElementById('main-sidebar');
                 const overlay = document.getElementById('mobile-overlay');
+                if (!sidebar) return;
+                
                 const isMobile = window.innerWidth < 1024;
 
                 if (isMobile) {
@@ -123,7 +162,9 @@
                         setTimeout(() => overlay.classList.add('opacity-100'), 10); 
                     } else { 
                         overlay.classList.remove('opacity-100'); 
-                        setTimeout(() => overlay.classList.add('hidden'), 300); 
+                        setTimeout(() => {
+                            overlay.classList.add('hidden');
+                        }, 300); 
                     }
                 } else {
                     sidebar.classList.toggle('sidebar-hidden');
@@ -135,36 +176,29 @@
                 const dateElement = document.getElementById('realtime-date');
                 const timeElement = document.getElementById('realtime-time');
 
+                if (!dateElement || !timeElement) return;
+
                 const days = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU'];
                 const months = ['JAN', 'FEB', 'MAR', 'APR', 'MEI', 'JUN', 'JUL', 'AGU', 'SEP', 'OKT', 'NOV', 'DES'];
 
                 function updateClock() {
                     const now = new Date();
+                    const dayName = days[now.getDay()];
+                    const day = String(now.getDate()).padStart(2, '0');
+                    const monthName = months[now.getMonth()];
+                    const year = now.getFullYear();
+                    dateElement.textContent = `${dayName}, ${day} ${monthName} ${year}`;
 
-                    // Render Tanggal (Contoh: KAMIS, 30 APR 2026)
-                    if(dateElement) {
-                        const dayName = days[now.getDay()];
-                        const day = String(now.getDate()).padStart(2, '0');
-                        const monthName = months[now.getMonth()];
-                        const year = now.getFullYear();
-                        dateElement.textContent = `${dayName}, ${day} ${monthName} ${year}`;
-                    }
-
-                    // Render Jam (Contoh: 14:05:30)
-                    if(timeElement) {
-                        const hours = String(now.getHours()).padStart(2, '0');
-                        const minutes = String(now.getMinutes()).padStart(2, '0');
-                        const seconds = String(now.getSeconds()).padStart(2, '0');
-                        timeElement.textContent = `${hours}:${minutes}:${seconds}`;
-                    }
+                    const hours = String(now.getHours()).padStart(2, '0');
+                    const minutes = String(now.getMinutes()).padStart(2, '0');
+                    const seconds = String(now.getSeconds()).padStart(2, '0');
+                    timeElement.textContent = `${hours}:${minutes}:${seconds}`;
                 }
 
-                // Eksekusi langsung agar tidak delay 1 detik, lalu jalankan interval
                 updateClock();
                 setInterval(updateClock, 1000);
             }
 
-            // Jalankan jam saat halaman dimuat
             document.addEventListener('DOMContentLoaded', initRealTimeClock);
         </script>
     </body>

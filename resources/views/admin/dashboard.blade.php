@@ -5,106 +5,67 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
-        /* Menggunakan font Inter yang merupakan standar de-facto UI Enterprise */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f1f5f9;
+            background-color: #f8fafc;
             color: #334155;
+            transition: background-color 0.3s ease;
         }
 
         .dark body {
             background-color: #0f172a;
+            color: #f1f5f9;
         }
 
         [x-cloak] { display: none !important; }
 
-        .animate-fade-in {
-            animation: fadeIn 0.6s ease-out forwards;
+        .animate-fade-up {
+            animation: fadeUp 0.6s ease-out forwards;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Card Enterprise Style: Sudut lebih tajam, shadow tipis, border tegas */
+        /* Enterprise Card System */
         .ent-card {
             background-color: #ffffff;
             border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 10px;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
 
-        .dark .asset-card {
+        .dark .ent-card {
             background-color: #1e293b;
             border-color: #334155;
         }
 
-        .asset-card:hover {
-            box-shadow: 0 12px 20px -5px rgba(0, 51, 102, 0.1);
-            border-color: #0055a4;
+        .ent-card:hover {
             transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+            border-color: #3b82f6;
         }
 
-        .asset-img-box {
-            width: 100%;
-            aspect-ratio: 16/9;
-            background-color: #f8fafc;
-            border: 1px solid #f1f5f9;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 8px;
-            overflow: hidden;
+        .dark .ent-card:hover {
+            border-color: #60a5fa;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
         }
 
-        .dark .asset-img-box {
-            background-color: #0f172a;
-            border-color: #1e293b;
+        .stat-badge {
+            font-[900] text-[10px] uppercase tracking-widest px-3 py-1.5 rounded-lg border shadow-sm;
         }
-
-        .asset-title-wrapper {
-            min-height: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 8px;
-        }
-
-        .stat-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 8px;
-            border-radius: 6px;
-            margin-top: 6px;
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 12px 16px;
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        .stat-available { background-color: #ecfdf5; border: 1px solid #d1fae5; color: #065f46; }
-        .dark .stat-available { background-color: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2); color: #34d399; }
-        .stat-available .badge { background-color: #10b981; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; }
-
-        .stat-breakdown { background-color: #fef2f2; border: 1px solid #fee2e2; color: #991b1b; }
-        .dark .stat-breakdown { background-color: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); color: #f87171; }
-        .stat-breakdown .badge { background-color: #ef4444; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; }
 
         ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
+
 
     @php
         // LOGIKA & RUMUS BARU UNTUK ENTERPRISE DASHBOARD
@@ -127,87 +88,97 @@
 
     <div id="main-ui" class="max-w-[1600px] mx-auto w-full space-y-6 animate-fade-up" x-data="{ showDetailModal: false, infraData: null, openDetailModal(data) { this.infraData = data; this.showDetailModal = true; } }">
 
-        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-8 shadow-sm flex flex-col xl:flex-row items-center justify-between gap-6 relative z-[60]">
-            <div class="flex flex-col sm:flex-row items-center text-center sm:text-left gap-6 w-full xl:w-auto">
-                <div class="flex items-center justify-center gap-3 sm:gap-4 bg-slate-50 dark:bg-slate-800 p-3 sm:p-4 rounded-2xl border border-slate-100 dark:border-slate-700 w-full sm:w-auto">
-                    <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-7 sm:h-10 md:h-12 object-contain">
-                    <div class="w-px h-8 sm:h-10 bg-slate-300"></div>
-                    <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-7 sm:h-10 md:h-12 object-contain">
-                </div>
-            </div>
+    <div id="main-ui" class="max-w-[1600px] mx-auto w-full space-y-8 animate-fade-up" x-data="{ showDetailModal: false, infraData: null, openDetailModal(data) { this.infraData = data; this.showDetailModal = true; } }">
 
-            <div class="grid grid-cols-1 min-[450px]:grid-cols-2 sm:flex sm:flex-row sm:flex-wrap justify-center gap-3 w-full xl:w-auto">
-                <div class="relative group z-50 w-full sm:w-auto">
-                    <button class="w-full sm:w-auto justify-center bg-[#003366] hover:bg-[#002244] text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-900/20 transition-all flex items-center gap-2">
-                        <i class="fas fa-file-export"></i> Export Laporan <i class="fas fa-chevron-down ml-1"></i>
-                    </button>
-                    <div class="absolute left-0 right-0 sm:right-auto xl:right-0 xl:left-auto top-full mt-2 w-full sm:w-48 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top xl:origin-top-right scale-95 group-hover:scale-100 flex flex-col overflow-hidden">
-                        <button onclick="openExportModal('pdf')" class="flex items-center gap-3 px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-[10px] font-black uppercase tracking-widest transition-colors border-b border-slate-50 dark:border-slate-700">
-                            <i class="fas fa-file-pdf text-red-500 text-sm"></i> Format PDF
-                        </button>
-                        <button onclick="openExportModal('excel')" class="flex items-center gap-3 px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-[10px] font-black uppercase tracking-widest transition-colors">
-                            <i class="fas fa-file-excel text-emerald-500 text-sm"></i> Format Excel
-                        </button>
+        <!-- HEADER & FILTER SECTION -->
+        <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm space-y-10 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#003366] to-[#0055a4]"></div>
+
+            <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-8">
+                <div class="flex items-center gap-6">
+                    <div class="flex items-center justify-center gap-4 bg-slate-50 dark:bg-slate-800 p-4 rounded-[1.5rem] border border-slate-100 dark:border-slate-700 shadow-inner">
+                        <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-8 md:h-10 object-contain dark:invert transition-all duration-300">
+                        <div class="w-px h-8 bg-slate-300 dark:bg-slate-600"></div>
+                        <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-8 md:h-10 object-contain transition-all duration-300">
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-black text-[#003366] dark:text-white uppercase tracking-tight">Command Center</h1>
+                        <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
+                            <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span> 
+                            Monitoring Dashboard Operasional Regional 2
+                        </p>
                     </div>
                 </div>
+                
+                <div class="flex flex-wrap items-center gap-3">
+                    <div x-data="{ open: false }" class="relative w-full sm:w-auto">
+                        <button @click="open = !open" @click.away="open = false" 
+                                class="w-full sm:w-auto justify-center bg-white dark:bg-slate-800 text-[#003366] dark:text-blue-400 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-3 border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700">
+                            <i class="fas fa-file-export text-xs"></i> Export Laporan <i class="fas fa-chevron-down text-[8px] opacity-60 ml-2"></i>
+                        </button>
+                        <div x-show="open" x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 translate-y-2"
+                             x-transition:enter-end="opacity-100 translate-y-0"
+                             class="absolute right-0 mt-3 w-full sm:w-56 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl z-[100] overflow-hidden">
+                            <button onclick="openExportModal('pdf')" class="w-full text-left px-6 py-4 text-[10px] font-black uppercase text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors flex items-center gap-4">
+                                <i class="fas fa-file-pdf text-red-500 text-sm"></i> Format PDF (.pdf)
+                            </button>
+                            <button onclick="openExportModal('excel')" class="w-full text-left px-6 py-4 text-[10px] font-black uppercase text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors flex items-center gap-4 border-t border-slate-100 dark:border-slate-700">
+                                <i class="fas fa-file-excel text-emerald-500 text-sm"></i> Format Excel (.xlsx)
+                            </button>
+                        </div>
+                    </div>
 
-                <a href="{{ url('/') }}" class="w-full sm:w-auto justify-center bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[#003366] dark:text-blue-400 px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm transition-all flex items-center gap-2 border border-slate-200 dark:border-slate-700">
-                    <i class="fas fa-globe"></i> Portal Publik
-                </a>
-                <a href="{{ route('admin.infrastructures.create') }}" class="w-full sm:w-auto justify-center bg-[#003366] hover:bg-[#001e3c] text-white px-5 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-900/20 transition-all flex items-center gap-2">
-                    <i class="fas fa-plus"></i> Aset Baru
-                </a>
-                <a href="{{ route('admin.infrastructures.create') }}" class="bg-[#0055a4] hover:bg-[#004380] text-white px-4 py-2 rounded text-xs font-semibold transition-colors flex items-center gap-2 shadow-sm">
-                    <i class="fas fa-plus"></i> Register Aset
-                </a>
+                    <a href="{{ url('/') }}" target="_blank" class="w-full sm:w-auto justify-center bg-slate-50 dark:bg-slate-800/50 text-[#003366] dark:text-blue-400 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-3 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700">
+                        <i class="fas fa-external-link-alt text-xs"></i> Portal Publik
+                    </a>
+                    
+                    <a href="{{ route('admin.infrastructures.create') }}" 
+                       class="w-full sm:w-auto justify-center bg-[#003366] hover:bg-[#001e3c] dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-3 shadow-lg shadow-blue-900/20 active:scale-95">
+                        <i class="fas fa-plus text-xs"></i> Registrasi Aset
+                    </a>
+                </div>
             </div>
-        </div>
 
-        <!-- FILTER PANEL -->
-        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm relative z-[50]" >
-            <form action="{{ route('dashboard') }}" method="GET" class="flex flex-col md:flex-row items-end gap-4">
+            <!-- Dashboard Filters -->
+            <form action="{{ route('dashboard') }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-8 border-t border-slate-100 dark:border-slate-800/50">
                 @if(auth()->user()->role === 'superadmin')
-                <div class="w-full md:w-1/3">
-                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Pilih Terminal / Bagian</label>
-                    <div class="relative">
-                        <select name="entity_id" class="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-[#003366] focus:border-[#003366] transition-all appearance-none cursor-pointer" onchange="this.form.submit()">
-                            <option value="">-- Semua Area (Pusat) --</option>
-                            @foreach($allEntities ?? [] as $entity)
-                                <option value="{{ $entity->id }}" {{ ($filterEntity ?? '') == $entity->id ? 'selected' : '' }}>{{ $entity->name }}</option>
-                            @endforeach
-                        </select>
-                        <i class="fas fa-map-marker-alt absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                        <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
-                    </div>
+                <div class="relative lg:col-span-1">
+                    <i class="fas fa-map-marker-alt absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-xs"></i>
+                    <select name="entity_id" onchange="this.form.submit()" class="w-full pl-12 pr-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-black text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-[#003366] uppercase transition-all appearance-none cursor-pointer">
+                        <option value="">Semua Area (Pusat)</option>
+                        @foreach($allEntities ?? [] as $entity)
+                            <option value="{{ $entity->id }}" {{ ($filterEntity ?? '') == $entity->id ? 'selected' : '' }}>{{ $entity->name }}</option>
+                        @endforeach
+                    </select>
+                    <i class="fas fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[10px]"></i>
                 </div>
                 @endif
                 
-                <div class="w-full md:w-1/3">
-                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Kategori Aset</label>
-                    <div class="relative">
-                        <select name="category" class="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-[#003366] focus:border-[#003366] transition-all appearance-none cursor-pointer" onchange="this.form.submit()">
-                            <option value="">-- Semua Kategori --</option>
-                            <option value="equipment" {{ ($filterCategory ?? '') == 'equipment' ? 'selected' : '' }}>Peralatan (Equipment)</option>
-                            <option value="facility" {{ ($filterCategory ?? '') == 'facility' ? 'selected' : '' }}>Fasilitas (Facility)</option>
-                            <option value="utility" {{ ($filterCategory ?? '') == 'utility' ? 'selected' : '' }}>Utilitas (Utility)</option>
-                        </select>
-                        <i class="fas fa-layer-group absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                        <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
-                    </div>
+                <div class="relative {{ auth()->user()->role === 'superadmin' ? 'lg:col-span-1' : 'lg:col-span-2' }}">
+                    <i class="fas fa-layer-group absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-xs"></i>
+                    <select name="category" onchange="this.form.submit()" class="w-full pl-12 pr-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-black text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-[#003366] uppercase transition-all appearance-none cursor-pointer">
+                        <option value="">Semua Kategori Aset</option>
+                        <option value="equipment" {{ ($filterCategory ?? '') == 'equipment' ? 'selected' : '' }}>Peralatan (Equipment)</option>
+                        <option value="facility" {{ ($filterCategory ?? '') == 'facility' ? 'selected' : '' }}>Fasilitas (Facility)</option>
+                        <option value="utility" {{ ($filterCategory ?? '') == 'utility' ? 'selected' : '' }}>Utilitas (Utility)</option>
+                    </select>
+                    <i class="fas fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[10px]"></i>
                 </div>
 
-                <div class="w-full md:w-auto flex items-center gap-3 h-[46px]">
-                    <button type="submit" class="h-full px-6 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40 hover:text-blue-700 rounded-xl text-[10px] font-black uppercase tracking-widest border border-blue-200 dark:border-blue-800 transition-colors flex items-center justify-center">
-                        <i class="fas fa-filter mr-2"></i> Terapkan
+                <div class="flex gap-2 {{ auth()->user()->role === 'superadmin' ? 'lg:col-span-2' : 'lg:col-span-2' }}">
+                    <button type="submit" class="flex-1 bg-[#003366] hover:bg-[#001e3c] dark:bg-slate-800 dark:hover:bg-slate-700 text-white px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 border border-transparent dark:border-slate-700 shadow-lg active:scale-95">
+                        <i class="fas fa-filter"></i> Terapkan Filter
                     </button>
                     @if(($filterEntity ?? false) || ($filterCategory ?? false))
-                        <a href="{{ route('dashboard') }}" class="h-full px-6 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-800 dark:hover:text-slate-200 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-200 dark:border-slate-700 transition-colors flex items-center justify-center">
-                            Reset
+                        <a href="{{ route('dashboard') }}" class="px-6 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-2xl flex items-center justify-center transition-all border border-transparent dark:border-slate-700">
+                            <i class="fas fa-undo"></i>
                         </a>
                     @endif
                 </div>
             </form>
         </div>
+
 
         <!-- KPI STATS -->
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 " >
