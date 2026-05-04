@@ -66,14 +66,14 @@
             </div>
 
             <!-- Server-side Filter Form -->
-            <form action="{{ route('admin.entities.index') }}" method="GET" class="flex flex-col md:flex-row gap-4 pt-8 border-t border-slate-100 dark:border-slate-800/50">
-                <div class="relative flex-1">
+            <form action="{{ route('admin.entities.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-8 border-t border-slate-100 dark:border-slate-800/50">
+                <div class="relative lg:col-span-3">
                     <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-xs"></i>
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari Nama Entitas atau Kode..." 
                            class="w-full pl-12 pr-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-[#0055a4] transition-all">
                 </div>
-                <button type="submit" class="bg-[#003366] hover:bg-[#001e3c] dark:bg-slate-800 dark:hover:bg-slate-700 text-white px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 border border-transparent dark:border-slate-700 shadow-lg">
-                    Cari Data
+                <button type="submit" class="bg-[#003366] hover:bg-[#001e3c] dark:bg-slate-800 dark:hover:bg-slate-700 text-white px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 border border-transparent dark:border-slate-700 shadow-lg active:scale-95">
+                    <i class="fas fa-filter"></i> Cari Data
                 </button>
             </form>
         </div>
@@ -162,8 +162,11 @@
             </div>
 
             <!-- FOOTER INFO -->
-            <div class="flex items-center justify-between text-slate-400 pt-2">
-                <p class="text-[10px] font-semibold uppercase tracking-wider">&copy; {{ date('Y') }} Pelindo Command Center</p>
+            <div class="px-8 py-6 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="w-full md:w-auto">
+                    {{ $entities->links() }}
+                </div>
+                <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-400">&copy; {{ date('Y') }} Pelindo Command Center</p>
             </div>
 
         </div>

@@ -99,11 +99,13 @@
                 <!-- STANDARDIZED FOOTER -->
                 <footer class="w-full border-t border-slate-200 dark:border-slate-800 py-8 px-10 bg-white dark:bg-slate-900/50 transition-all duration-300 mt-auto">
                     <div class="max-w-[1600px] mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-                        <div class="flex items-center gap-4">
-                            <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-6 opacity-40 grayscale group-hover:grayscale-0 transition-all">
+                        <div class="flex items-center gap-4 group">
+                            <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-5 brightness-0 dark:brightness-100 opacity-40 group-hover:opacity-100 transition-all">
+                            <div class="w-[1px] h-4 bg-slate-200 dark:bg-slate-700"></div>
+                            <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-5 brightness-0 dark:brightness-100 opacity-40 group-hover:opacity-100 transition-all">
                             <div class="h-4 w-[1px] bg-slate-200 dark:bg-slate-700"></div>
                             <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
-                                &copy; {{ date('Y') }} PT Pelabuhan Indonesia (Persero). All Rights Reserved.
+                                &copy; {{ date('Y') }} PT Pelabuhan Indonesia (Persero).
                             </p>
                         </div>
                         <div class="flex items-center gap-6">

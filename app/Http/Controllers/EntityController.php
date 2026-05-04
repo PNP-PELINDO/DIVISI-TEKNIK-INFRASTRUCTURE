@@ -22,7 +22,7 @@ class EntityController extends Controller
             });
         }
 
-        $entities = $query->latest()->get();
+        $entities = $query->latest()->paginate(15)->withQueryString();
         return view('admin.entities.index', compact('entities'));
     }
 

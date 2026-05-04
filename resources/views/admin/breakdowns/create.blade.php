@@ -17,17 +17,26 @@
             <form action="{{ route('admin.breakdowns.store') }}" method="POST" class="space-y-6">
                 @csrf
 
-                <!-- ERROR ALERTS -->
-                @if ($errors->any())
-                    <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-4 rounded-xl flex items-start gap-3 shadow-sm mb-6">
-                        <i class="fas fa-exclamation-triangle text-red-600 dark:text-red-400 mt-0.5"></i>
-                        <div>
-                            <p class="text-xs font-bold text-red-700 dark:text-red-400 uppercase tracking-widest">Terjadi Kesalahan Input</p>
-                            <ul class="mt-1 list-disc list-inside text-[10px] text-red-600 dark:text-red-300 font-medium">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
+                <!-- NOTIFICATION ALERTS -->
+                @if(session('error') || $errors->any())
+                    <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-600 p-6 rounded-2xl shadow-sm flex items-start gap-5 mb-6">
+                        <div class="w-12 h-12 bg-red-600 text-white rounded-xl flex items-center justify-center text-xl shrink-0 shadow-lg shadow-red-600/20">
+                            <i class="fas fa-triangle-exclamation"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-sm font-black text-red-800 dark:text-red-400 uppercase tracking-widest">Terjadi Kesalahan!</h4>
+                            @if(session('error'))
+                                <p class="text-xs font-bold text-red-600 dark:text-red-500 mt-1">{{ session('error') }}</p>
+                            @endif
+                            @if($errors->any())
+                                <ul class="mt-2 space-y-1">
+                                    @foreach($errors->all() as $error)
+                                        <li class="text-[10px] font-bold text-red-600/80 dark:text-red-500/80 flex items-center gap-2 uppercase tracking-tight">
+                                            <span class="w-1.5 h-1.5 bg-red-600 rounded-full"></span> {{ $error }}
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
                         </div>
                     </div>
                 @endif

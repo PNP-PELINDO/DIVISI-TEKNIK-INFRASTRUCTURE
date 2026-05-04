@@ -71,7 +71,7 @@
                     </div>
                 </div>
                 
-                <a href="{{ route('register') }}" 
+                <a href="{{ route('admin.users.create') }}" 
                    class="bg-[#003366] hover:bg-[#001e3c] dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-lg shadow-blue-900/20 active:scale-95">
                     <i class="fas fa-user-plus text-xs"></i> Tambah Pengguna Baru
                 </a>
@@ -125,7 +125,8 @@
 
 
         @php
-            $groupedUsers = collect($users)->groupBy('role');
+            // Ambil underlying collection dari paginator sebelum di-grouping
+            $groupedUsers = $users->getCollection()->groupBy('role');
         @endphp
 
         <div class="space-y-8">
@@ -233,6 +234,12 @@
                 </div>
             @endforelse
         </div>
+
+        @if($users->hasPages())
+            <div class="px-8 py-6 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm mt-8">
+                {{ $users->links() }}
+            </div>
+        @endif
     </div>
 </x-app-layout>
 

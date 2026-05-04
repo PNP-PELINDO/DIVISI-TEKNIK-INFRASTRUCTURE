@@ -9,6 +9,14 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <script>
+        if (localStorage.getItem('dark-mode') === 'true' || (!('dark-mode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap');
 
@@ -106,12 +114,16 @@
 </head>
 <body class="min-h-screen flex flex-col animate-fade-up" x-data="{ filter: 'all', showTypeModal: false, selectedTypeTitle: '', selectedTypeEntity: '', selectedTypeItems: [] }">
 
-    <nav class="bg-white/90 backdrop-blur-md sticky top-0 z-[70] border-b border-slate-200 shadow-sm">
+    <nav class="bg-white/90 dark:bg-[#001e3c]/90 backdrop-blur-md sticky top-0 z-[70] border-b border-slate-200 dark:border-slate-800 shadow-sm transition-colors duration-300">
         <div class="max-w-[1600px] mx-auto px-4 md:px-10 h-16 md:h-20 flex items-center justify-between">
             <div class="flex items-center gap-3 md:gap-6">
-                <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-6 md:h-10 object-contain">
-                <div class="w-px h-6 md:h-10 bg-slate-200"></div>
-                <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-6 md:h-10 object-contain">
+                <!-- Logo Danantara: Black in Light Mode, White in Dark Mode -->
+                <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-6 md:h-10 object-contain brightness-0 dark:brightness-100 transition-all duration-300">
+                
+                <div class="w-px h-6 md:h-10 bg-slate-200 dark:bg-slate-700"></div>
+                
+                <!-- Logo Pelindo: Black in Light Mode, White in Dark Mode -->
+                <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-6 md:h-10 object-contain brightness-0 dark:brightness-100 transition-all duration-300">
             </div>
             <div>
                 @auth

@@ -127,41 +127,59 @@
         @endforeach
 
         <div style="background-color: #00e5ff; color: black; padding: 8px 15px; font-weight: bold; font-size: 14px; margin-top: 30px; margin-bottom: 10px; font-family: Arial, sans-serif;">
-            RINCIAN LOG INSIDEN AKTIF
+            LAPORAN KESIAPAN ALAT PELABUHAN (DETAIL LOG TEKNIS)
         </div>
-        <table style="width: 100%; border-collapse: collapse; text-align: center; border: 1px solid #1e293b; font-size: 11px; font-family: Arial, sans-serif;">
-            <tr style="background-color: #f8fafc; color: #0f172a;">
-                <th style="padding: 10px; border: 1px solid #1e293b;">NO</th>
-                <th style="padding: 10px; border: 1px solid #1e293b;">ENTITAS PELABUHAN</th>
-                <th style="padding: 10px; border: 1px solid #1e293b;">IDENTITAS ALAT</th>
-                <th style="padding: 10px; text-align: left; border: 1px solid #1e293b;">RINGKASAN KENDALA</th>
-                <th style="padding: 10px; border: 1px solid #1e293b;">STATUS AKHIR</th>
-                <th style="padding: 10px; border: 1px solid #1e293b;">PIC/VENDOR</th>
+        <table style="width: 100%; border-collapse: collapse; text-align: center; border: 1px solid #000; font-size: 9px; font-family: Arial, sans-serif;">
+            <tr style="background-color: #f1f5f9; font-weight: bold;">
+                <th style="padding: 5px; border: 1px solid #000;">NO</th>
+                <th style="padding: 5px; border: 1px solid #000;">NAMA ALAT</th>
+                <th style="padding: 5px; border: 1px solid #000;">JENIS ALAT</th>
+                <th style="padding: 5px; border: 1px solid #000;">ENTITAS</th>
+                <th style="padding: 5px; border: 1px solid #000;">STATUS</th>
+                <th style="padding: 5px; border: 1px solid #000;">DETAIL KERUSAKAN</th>
+                <th style="padding: 5px; border: 1px solid #000;">TGL MULAI BD</th>
+                <th style="padding: 5px; border: 1px solid #000;">STATUS KESIAPAN</th>
+                <th style="padding: 5px; border: 1px solid #000;">TROUBLESHOOT</th>
+                <th style="padding: 5px; border: 1px solid #000;">BA</th>
+                <th style="padding: 5px; border: 1px solid #000;">WO</th>
+                <th style="padding: 5px; border: 1px solid #000;">PR / PO</th>
+                <th style="padding: 5px; border: 1px solid #000;">SPAREPART ON SITE</th>
+                <th style="padding: 5px; border: 1px solid #000;">MULAI KERJA</th>
+                <th style="padding: 5px; border: 1px solid #000;">COM TEST</th>
+                <th style="padding: 5px; border: 1px solid #000;">SELESAI KERJA</th>
+                <th style="padding: 5px; border: 1px solid #000;">PIC</th>
             </tr>
-            @foreach($recentBreakdowns ?? [] as $index => $log)
+            @foreach($infrastructures as $index => $item)
+                @php 
+                    // Cari log aktif untuk item ini, jika tidak ada cari log terakhir yang resolved
+                    $activeLog = $recentBreakdowns->where('infrastructure_id', $item->id)->first();
+                @endphp
                 <tr>
-                    <td style="padding: 10px; border: 1px solid #1e293b;">{{ $index + 1 }}</td>
-                    <td style="padding: 10px; border: 1px solid #1e293b; font-weight: bold;">{{ optional(optional($log->infrastructure)->entity)->name ?? "-" }}</td>
-                    <td style="padding: 10px; border: 1px solid #1e293b;">{{ optional($log->infrastructure)->code_name ?? "-" }}</td>
-                    <td style="padding: 10px; text-align: left; border: 1px solid #1e293b; line-height: 1.4;">{{ $log->issue_detail }}</td>
-                    <td style="padding: 10px; border: 1px solid #1e293b; font-weight: bold;">
-                        @php
-                            $statusConfig = [
-                                'reported' => 'Dilaporkan',
-                                'order_part' => 'Menunggu Suku Cadang',
-                                'on_progress' => 'Sedang Diperbaiki',
-                                'resolved' => 'Selesai'
-                            ];
-                            $label = $statusConfig[$log->repair_status] ?? $log->repair_status;
-                        @endphp
-                        {{ strtoupper($label) }}
+                    <td style="padding: 5px; border: 1px solid #000;">{{ $index + 1 }}</td>
+                    <td style="padding: 5px; border: 1px solid #000; font-weight: bold;">{{ $item->code_name }}</td>
+                    <td style="padding: 5px; border: 1px solid #000;">{{ $item->type }}</td>
+                    <td style="padding: 5px; border: 1px solid #000;">{{ optional($item->entity)->name ?? "-" }}</td>
+                    <td style="padding: 5px; border: 1px solid #000;">
+                        @if($item->status == 'available')
+                            <span style="color: green; font-weight: bold;">READY</span>
+                        @else
+                            <span style="color: red; font-weight: bold;">BREAKDOWN</span>
+                        @endif
                     </td>
-                    <td style="padding: 10px; border: 1px solid #1e293b;">{{ $log->vendor_pic ?? "Internal" }}</td>
+                    <td style="padding: 5px; border: 1px solid #000; text-align: left;">{{ $activeLog ? ($activeLog->issue_detail ?? "-") : "-" }}</td>
+                    <td style="padding: 5px; border: 1px solid #000;">{{ $activeLog ? $activeLog->created_at->format('d/m/Y') : "-" }}</td>
+                    <td style="padding: 5px; border: 1px solid #000;">{{ $activeLog ? strtoupper(str_replace('_', ' ', $activeLog->repair_status)) : "-" }}</td>
+                    <td style="padding: 5px; border: 1px solid #000;">{{ $activeLog && $activeLog->troubleshoot_date ? \Carbon\Carbon::parse($activeLog->troubleshoot_date)->format('d/m/Y') : "-" }}</td>
+                    <td style="padding: 5px; border: 1px solid #000;">{{ $activeLog && $activeLog->ba_date ? \Carbon\Carbon::parse($activeLog->ba_date)->format('d/m/Y') : "-" }}</td>
+                    <td style="padding: 5px; border: 1px solid #000;">{{ $activeLog && $activeLog->work_order_date ? \Carbon\Carbon::parse($activeLog->work_order_date)->format('d/m/Y') : "-" }}</td>
+                    <td style="padding: 5px; border: 1px solid #000;">{{ $activeLog && $activeLog->pr_po_date ? \Carbon\Carbon::parse($activeLog->pr_po_date)->format('d/m/Y') : "-" }}</td>
+                    <td style="padding: 5px; border: 1px solid #000;">{{ $activeLog && $activeLog->sparepart_date ? \Carbon\Carbon::parse($activeLog->sparepart_date)->format('d/m/Y') : "-" }}</td>
+                    <td style="padding: 5px; border: 1px solid #000;">{{ $activeLog && $activeLog->start_work_date ? \Carbon\Carbon::parse($activeLog->start_work_date)->format('d/m/Y') : "-" }}</td>
+                    <td style="padding: 5px; border: 1px solid #000;">{{ $activeLog && $activeLog->com_test_date ? \Carbon\Carbon::parse($activeLog->com_test_date)->format('d/m/Y') : "-" }}</td>
+                    <td style="padding: 5px; border: 1px solid #000;">{{ $activeLog && $activeLog->resolved_date ? \Carbon\Carbon::parse($activeLog->resolved_date)->format('d/m/Y') : "-" }}</td>
+                    <td style="padding: 5px; border: 1px solid #000;">{{ $activeLog ? ($activeLog->vendor_pic ?? "-") : "-" }}</td>
                 </tr>
             @endforeach
-            @if(empty($recentBreakdowns) || count($recentBreakdowns) == 0)
-                <tr><td colspan="6" style="padding: 15px; color: #94a3b8; border: 1px solid #000;">Tidak ada kerusakan alat saat ini</td></tr>
-            @endif
         </table>
     </div>
 </div>

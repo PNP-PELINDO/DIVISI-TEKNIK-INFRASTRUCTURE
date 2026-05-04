@@ -86,8 +86,6 @@
         $topBrokenEntities = $entityBreakdowns->map->count()->sortByDesc(fn($c) => $c)->take(5);
     @endphp
 
-    <div id="main-ui" class="max-w-[1600px] mx-auto w-full space-y-6 animate-fade-up" x-data="{ showDetailModal: false, infraData: null, openDetailModal(data) { this.infraData = data; this.showDetailModal = true; } }">
-
     <div id="main-ui" class="max-w-[1600px] mx-auto w-full space-y-8 animate-fade-up" x-data="{ showDetailModal: false, infraData: null, openDetailModal(data) { this.infraData = data; this.showDetailModal = true; } }">
 
         <!-- HEADER & FILTER SECTION -->
@@ -97,7 +95,7 @@
             <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-8">
                 <div class="flex items-center gap-6">
                     <div class="flex items-center justify-center gap-4 bg-slate-50 dark:bg-slate-800 p-4 rounded-[1.5rem] border border-slate-100 dark:border-slate-700 shadow-inner">
-                        <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-8 md:h-10 object-contain dark:invert transition-all duration-300">
+                        <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-8 md:h-10 object-contain brightness-0 dark:brightness-100 transition-all duration-300">
                         <div class="w-px h-8 bg-slate-300 dark:bg-slate-600"></div>
                         <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-8 md:h-10 object-contain transition-all duration-300">
                     </div>
@@ -110,16 +108,16 @@
                     </div>
                 </div>
                 
-                <div class="flex flex-wrap items-center gap-3">
-                    <div x-data="{ open: false }" class="relative w-full sm:w-auto">
+                <div class="flex flex-wrap items-center gap-3 w-full xl:w-auto">
+                    <div x-data="{ open: false }" class="relative flex-1 sm:flex-none">
                         <button @click="open = !open" @click.away="open = false" 
-                                class="w-full sm:w-auto justify-center bg-white dark:bg-slate-800 text-[#003366] dark:text-blue-400 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-3 border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700">
-                            <i class="fas fa-file-export text-xs"></i> Export Laporan <i class="fas fa-chevron-down text-[8px] opacity-60 ml-2"></i>
+                                class="w-full justify-center bg-white dark:bg-slate-800 text-[#003366] dark:text-blue-400 px-5 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-3 border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700">
+                            <i class="fas fa-file-export text-xs"></i> <span class="hidden xs:inline">Export Laporan</span> <i class="fas fa-chevron-down text-[8px] opacity-60 ml-1"></i>
                         </button>
                         <div x-show="open" x-transition:enter="transition ease-out duration-200"
                              x-transition:enter-start="opacity-0 translate-y-2"
                              x-transition:enter-end="opacity-100 translate-y-0"
-                             class="absolute right-0 mt-3 w-full sm:w-56 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl z-[100] overflow-hidden">
+                             class="absolute right-0 mt-3 w-56 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl z-[100] overflow-hidden">
                             <button onclick="openExportModal('pdf')" class="w-full text-left px-6 py-4 text-[10px] font-black uppercase text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors flex items-center gap-4">
                                 <i class="fas fa-file-pdf text-red-500 text-sm"></i> Format PDF (.pdf)
                             </button>
@@ -129,19 +127,19 @@
                         </div>
                     </div>
 
-                    <a href="{{ url('/') }}" target="_blank" class="w-full sm:w-auto justify-center bg-slate-50 dark:bg-slate-800/50 text-[#003366] dark:text-blue-400 px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-3 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700">
-                        <i class="fas fa-external-link-alt text-xs"></i> Portal Publik
+                    <a href="{{ url('/') }}" target="_blank" class="flex-1 sm:flex-none justify-center bg-slate-50 dark:bg-slate-800/50 text-[#003366] dark:text-blue-400 px-5 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-3 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700">
+                        <i class="fas fa-external-link-alt text-xs"></i> <span class="hidden xs:inline">Portal Publik</span>
                     </a>
                     
                     <a href="{{ route('admin.infrastructures.create') }}" 
-                       class="w-full sm:w-auto justify-center bg-[#003366] hover:bg-[#001e3c] dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-3 shadow-lg shadow-blue-900/20 active:scale-95">
-                        <i class="fas fa-plus text-xs"></i> Registrasi Aset
+                       class="flex-1 sm:flex-none justify-center bg-[#003366] hover:bg-[#001e3c] dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-3 shadow-lg shadow-blue-900/20 active:scale-95">
+                        <i class="fas fa-plus text-xs"></i> <span class="hidden xs:inline">Registrasi Aset</span>
                     </a>
                 </div>
             </div>
 
             <!-- Dashboard Filters -->
-            <form action="{{ route('dashboard') }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-8 border-t border-slate-100 dark:border-slate-800/50">
+            <form action="{{ route('admin.dashboard') }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-8 border-t border-slate-100 dark:border-slate-800/50">
                 @if(auth()->user()->role === 'superadmin')
                 <div class="relative lg:col-span-1">
                     <i class="fas fa-map-marker-alt absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-xs"></i>
@@ -171,8 +169,8 @@
                         <i class="fas fa-filter"></i> Terapkan Filter
                     </button>
                     @if(($filterEntity ?? false) || ($filterCategory ?? false))
-                        <a href="{{ route('dashboard') }}" class="px-6 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-2xl flex items-center justify-center transition-all border border-transparent dark:border-slate-700">
-                            <i class="fas fa-undo"></i>
+                        <a href="{{ route('admin.dashboard') }}" class="px-6 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-2xl flex items-center justify-center transition-all border border-transparent dark:border-slate-700">
+                            <i class="fas fa-undo text-xs"></i>
                         </a>
                     @endif
                 </div>
@@ -269,25 +267,35 @@
         </div>
 
         <!-- ANALYTICS CHARTS -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 " >
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
             
-            <!-- Tren Chart (Lebar 2 Kolom) -->
-            <div class="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-sm flex flex-col">
+            <!-- Tren Chart (Lebar 2/3 Kolom) -->
+            <div class="lg:col-span-8 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-sm flex flex-col">
                 <h3 class="text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-widest mb-4 flex items-center gap-2">
-                    <i class="fas fa-chart-line text-[#0055a4]"></i> Tren Laporan Kerusakan (30 Hari Terakhir)
+                    <i class="fas fa-chart-line text-[#0055a4]"></i> Tren Insiden (30 Hari Terakhir)
                 </h3>
                 <div class="relative h-64 w-full mt-auto">
                     <canvas id="trendChart"></canvas>
                 </div>
             </div>
 
-            <!-- Distribusi Kerusakan (1 Kolom) -->
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-sm flex flex-col justify-between">
+            <!-- Distribusi Kerusakan (Lebar 1/3 Kolom) -->
+            <div class="lg:col-span-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-sm flex flex-col justify-between">
                 <h3 class="text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-widest text-center mb-4 flex items-center justify-center gap-2">
                     <i class="fas fa-chart-pie text-amber-500"></i> Kerusakan per Kategori
                 </h3>
                 <div class="relative h-48 w-full flex items-center justify-center mt-auto">
                     <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Top 5 Entitas Bermasalah (Baru - Full Width Row) -->
+            <div class="lg:col-span-12 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-sm flex flex-col">
+                <h3 class="text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <i class="fas fa-city text-red-500"></i> Sebaran Kerusakan per Cabang (Top 5)
+                </h3>
+                <div class="relative h-40 w-full mt-auto">
+                    <canvas id="topEntityChart"></canvas>
                 </div>
             </div>
 
@@ -397,41 +405,66 @@
                 </a>
             </div>
             <div class="overflow-x-auto w-full">
-                <table class="w-full text-left border-collapse ent-table min-w-[900px]">
+                <table class="w-full text-left border-collapse ent-table min-w-[1000px]">
                     <thead>
                         <tr class="bg-[#002244] dark:bg-slate-800 text-slate-300 dark:text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">
-                            <th class="px-8 py-5 w-16 text-center">NO</th>
+                            <th class="px-8 py-5 w-16 text-center border-r border-white/5">NO</th>
                             <th class="px-8 py-5">Entitas Pelabuhan</th>
                             <th class="px-8 py-5">Identitas Alat</th>
                             <th class="px-8 py-5">Ringkasan Kendala</th>
-                            <th class="px-8 py-5 text-center">Status</th>
-                            <th class="px-8 py-5">PIC</th>
+                            <th class="px-8 py-5 text-center">Status Tahapan</th>
+                            <th class="px-8 py-5">PIC / Vendor</th>
+                            <th class="px-8 py-5 text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 dark:divide-slate-800 text-xs font-medium">
                         @forelse($recentLogs ?? [] as $index => $log)
-                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                            <td class="px-8 py-5 text-center text-slate-400 font-bold">{{ $index + 1 }}</td>
-                            <td class="px-8 py-5 text-slate-600 dark:text-slate-400 uppercase font-bold">{{ $log->infrastructure->entity->name ?? '-' }}</td>
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all group">
+                            <td class="px-8 py-5 text-center text-slate-400 font-black border-r border-slate-50 dark:border-slate-800">{{ $index + 1 }}</td>
                             <td class="px-8 py-5">
-                                <span class="text-[#003366] dark:text-blue-400 font-black uppercase bg-blue-50 dark:bg-blue-900/30 px-3 py-1.5 rounded border border-blue-100 dark:border-blue-800">{{ $log->infrastructure->code_name ?? '-' }}</span>
+                                <div class="flex flex-col">
+                                    <span class="text-slate-800 dark:text-slate-200 uppercase font-black tracking-tight">{{ $log->infrastructure->entity->name ?? '-' }}</span>
+                                    <span class="text-[9px] text-slate-400 uppercase font-bold mt-0.5">Terminal Area</span>
+                                </div>
                             </td>
-                            <td class="px-8 py-5 text-slate-600 dark:text-slate-400 max-w-[200px] truncate" title="{{ $log->issue_detail }}">{{ $log->issue_detail }}</td>
+                            <td class="px-8 py-5">
+                                <span class="text-[#003366] dark:text-blue-400 font-black uppercase bg-blue-50 dark:bg-blue-900/30 px-3 py-1.5 rounded-lg border border-blue-100 dark:border-blue-800 shadow-sm group-hover:bg-blue-100 transition-colors">{{ $log->infrastructure->code_name ?? '-' }}</span>
+                            </td>
+                            <td class="px-8 py-5">
+                                <p class="text-slate-600 dark:text-slate-400 max-w-[250px] truncate leading-relaxed italic" title="{{ $log->issue_detail }}">"{{ $log->issue_detail }}"</p>
+                            </td>
                             <td class="px-8 py-5 text-center">
                                 @if($log->repair_status == 'order_part')
-                                    <span class="bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800 text-[9px] font-black px-3 py-1.5 rounded-md uppercase tracking-widest shadow-sm">Menunggu Suku Cadang</span>
+                                    <span class="bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800 text-[9px] font-black px-3 py-1.5 rounded-md uppercase tracking-widest shadow-sm">Waiting Part</span>
                                 @elseif($log->repair_status == 'on_progress')
-                                    <span class="bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 text-[9px] font-black px-3 py-1.5 rounded-md uppercase tracking-widest shadow-sm">Sedang Diperbaiki</span>
+                                    <span class="bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 text-[9px] font-black px-3 py-1.5 rounded-md uppercase tracking-widest shadow-sm">On Repair</span>
                                 @elseif($log->repair_status == 'reported')
-                                    <span class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 text-[9px] font-black px-3 py-1.5 rounded-md uppercase tracking-widest shadow-sm">Dilaporkan</span>
+                                    <span class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 text-[9px] font-black px-3 py-1.5 rounded-md uppercase tracking-widest shadow-sm">Reported</span>
                                 @else
-                                    <span class="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-[9px] font-black px-3 py-1.5 rounded-md uppercase tracking-widest shadow-sm">Selesai</span>
+                                    <span class="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-[9px] font-black px-3 py-1.5 rounded-md uppercase tracking-widest shadow-sm">Resolved</span>
                                 @endif
                             </td>
-                            <td class="text-xs font-medium">{{ $log->vendor_pic ?? 'Internal' }}</td>
+                            <td class="px-8 py-5">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] text-slate-500"><i class="fas fa-user"></i></div>
+                                    <span class="text-slate-600 dark:text-slate-300 font-bold uppercase">{{ $log->vendor_pic ?? 'Internal' }}</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-5 text-center">
+                                <button @click="openDetailModal({{ json_encode($log->infrastructure) }})" class="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-800 transition-all shadow-sm">
+                                    <i class="fas fa-eye text-xs"></i>
+                                </button>
+                            </td>
                         </tr>
                         @empty
-                        <tr><td colspan="6" class="px-8 py-16 text-center text-slate-400 dark:text-slate-500">Tidak ada laporan kerusakan alat saat ini.</td></tr>
+                        <tr>
+                            <td colspan="7" class="px-8 py-20 text-center">
+                                <div class="flex flex-col items-center opacity-40">
+                                    <i class="fas fa-search text-4xl mb-4"></i>
+                                    <p class="text-xs font-black uppercase tracking-widest">Tidak ada data yang ditemukan</p>
+                                </div>
+                            </td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -682,47 +715,7 @@
                 }
             });
 
-            // 3. Category Bar Chart
-            new Chart(document.getElementById('categoryChart').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: ['Peralatan', 'Fasilitas', 'Utilitas'],
-                    datasets: [
-                        {
-                            label: 'Ready',
-                            data: [
-                                {{ $equipment->where('status', 'available')->count() }},
-                                {{ $facility->where('status', 'available')->count() }},
-                                {{ $utility->where('status', 'available')->count() }}
-                            ],
-                            backgroundColor: '#10b981',
-                            borderRadius: 2,
-                            barPercentage: 0.5
-                        },
-                        {
-                            label: 'Down',
-                            data: [
-                                {{ $equipment->where('status', 'breakdown')->count() }},
-                                {{ $facility->where('status', 'breakdown')->count() }},
-                                {{ $utility->where('status', 'breakdown')->count() }}
-                            ],
-                            backgroundColor: '#ef4444',
-                            borderRadius: 2,
-                            barPercentage: 0.5
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    scales: {
-                        x: { stacked: true, grid: { display: false }, ticks: { font: { size: 11, weight: '500' } } },
-                        y: { stacked: true, beginAtZero: true, border: { display: false }, grid: { color: '#f1f5f9' } }
-                    },
-                    plugins: { legend: { position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 8, font: {size: 11} } } }
-                }
-            });
-
-            // 4. CHART BARU: Horizontal Bar untuk Top 5 Entitas Bermasalah
+            // 3. CHART BARU: Horizontal Bar untuk Top 5 Entitas Bermasalah
             new Chart(document.getElementById('topEntityChart').getContext('2d'), {
                 type: 'bar',
                 data: {
@@ -738,10 +731,19 @@
                 options: {
                     indexAxis: 'y', // Horizontal Bar Chart
                     responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0f172a',
+                            titleFont: { size: 10, weight: 'bold' },
+                            bodyFont: { size: 10 },
+                            padding: 10,
+                            displayColors: false
+                        }
+                    },
                     scales: {
                         x: { beginAtZero: true, grid: { color: '#f1f5f9' }, border: { display: false }, ticks: { stepSize: 1, font: {size: 10} } },
-                        y: { grid: { display: false }, ticks: { font: { size: 10, weight: '500' } } }
+                        y: { grid: { display: false }, border: { display: false }, ticks: { font: { size: 10, weight: '700' } } }
                     }
                 }
             });

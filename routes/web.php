@@ -68,7 +68,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Alias untuk memudahkan jika ada yang mengetik /dashboard secara manual
     Route::get('/dashboard', function() {
-        return redirect()->route('admin.dashboard');
+        return redirect()->route('admin.dashboard', request()->query());
     })->name('dashboard');
 
     // 4. Manajemen Profil Pengguna

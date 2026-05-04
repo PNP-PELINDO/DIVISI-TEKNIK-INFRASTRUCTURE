@@ -54,14 +54,15 @@ class BreakdownLogController extends Controller
             $logs = $query->latest()->paginate(20)->withQueryString();
             
             $allInfrastructures = Infrastructure::with('entity')->get();
-            $recentBreakdowns = BreakdownLog::with(['infrastructure' => fn($q) => $q->withTrashed()->with('entity')])
+            $activeBreakdowns = BreakdownLog::with(['infrastructure' => fn($q) => $q->withTrashed()->with('entity')])
                 ->where('repair_status', '!=', 'resolved')
                 ->latest()
-                ->get();
+                ->get()
+                ->keyBy('infrastructure_id');
             
             $allEntities = Entity::orderBy('name')->get();
                 
-            return view('admin.breakdowns.index_admin', compact('logs', 'allInfrastructures', 'recentBreakdowns', 'allEntities'));
+            return view('admin.breakdowns.index_admin', compact('logs', 'allInfrastructures', 'activeBreakdowns', 'allEntities'));
         }
 
         // JIKA YANG LOGIN ADALAH OPERATOR (TAMPILAN EXCEL KESIAPAN ALAT)

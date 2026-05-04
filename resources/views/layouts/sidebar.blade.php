@@ -46,9 +46,9 @@
 
         <nav class="space-y-1.5 px-4">
             <!-- Menu Dashboard -->
-            <a href="{{ route('dashboard') }}"
-               class="nav-item group flex items-center gap-4 px-4 py-3 rounded-xl {{ request()->routeIs('dashboard') ? 'sidebar-link-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
-                <i class="fas fa-desktop text-sm w-6 text-center {{ request()->routeIs('dashboard') ? '' : 'text-slate-500 group-hover:text-slate-300' }}"></i>
+            <a href="{{ route('admin.dashboard') }}"
+               class="nav-item group flex items-center gap-4 px-4 py-3 rounded-xl {{ request()->routeIs('admin.dashboard') ? 'sidebar-link-active' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
+                <i class="fas fa-desktop text-sm w-6 text-center {{ request()->routeIs('admin.dashboard') ? '' : 'text-slate-500 group-hover:text-slate-300' }}"></i>
                 <span class="text-xs font-semibold tracking-wide uppercase">Dashboard Utama</span>
             </a>
 

@@ -344,6 +344,11 @@
                         @endforelse
                     </table>
                 </div>
+                @if($infrastructures->hasPages())
+                    <div class="px-8 py-6 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-800">
+                        {{ $infrastructures->links() }}
+                    </div>
+                @endif
             </div>
     </div>
 </x-app-layout>

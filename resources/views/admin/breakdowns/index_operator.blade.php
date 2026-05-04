@@ -39,6 +39,11 @@
                             class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
                         <i class="fas fa-check-circle"></i> Unit Siap
                     </button>
+                    <button @click="activeTab = 'excel'" 
+                            :class="activeTab === 'excel' ? 'bg-white dark:bg-slate-700 text-[#003366] dark:text-blue-400 shadow-md scale-100' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 scale-95'"
+                            class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
+                        <i class="fas fa-file-excel"></i> Live Excel
+                    </button>
                     <button @click="activeTab = 'history'" 
                             :class="activeTab === 'history' ? 'bg-white dark:bg-slate-700 text-[#003366] dark:text-blue-400 shadow-md scale-100' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 scale-95'"
                             class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
@@ -47,6 +52,46 @@
                 </div>
             </div>
         </div>
+
+        <!-- NOTIFICATION ALERTS -->
+        @if(session('success') || session('error') || $errors->any())
+        <div class="space-y-4 animate-fade-down">
+            @if(session('success'))
+                <div class="bg-emerald-50 dark:bg-emerald-900/20 border-l-4 border-emerald-500 p-6 rounded-2xl shadow-sm flex items-center gap-5">
+                    <div class="w-12 h-12 bg-emerald-500 text-white rounded-xl flex items-center justify-center text-xl shrink-0 shadow-lg shadow-emerald-500/20">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-black text-emerald-800 dark:text-emerald-400 uppercase tracking-widest">Berhasil!</h4>
+                        <p class="text-xs font-bold text-emerald-600 dark:text-emerald-500 mt-1">{{ session('success') }}</p>
+                    </div>
+                </div>
+            @endif
+
+            @if(session('error') || $errors->any())
+                <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-600 p-6 rounded-2xl shadow-sm flex items-start gap-5">
+                    <div class="w-12 h-12 bg-red-600 text-white rounded-xl flex items-center justify-center text-xl shrink-0 shadow-lg shadow-red-600/20">
+                        <i class="fas fa-triangle-exclamation"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="text-sm font-black text-red-800 dark:text-red-400 uppercase tracking-widest">Terjadi Kesalahan!</h4>
+                        @if(session('error'))
+                            <p class="text-xs font-bold text-red-600 dark:text-red-500 mt-1">{{ session('error') }}</p>
+                        @endif
+                        @if($errors->any())
+                            <ul class="mt-2 space-y-1">
+                                @foreach($errors->all() as $error)
+                                    <li class="text-[10px] font-bold text-red-600/80 dark:text-red-500/80 flex items-center gap-2 uppercase tracking-tight">
+                                        <span class="w-1.5 h-1.5 bg-red-600 rounded-full"></span> {{ $error }}
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @endif
+                    </div>
+                </div>
+            @endif
+        </div>
+        @endif
 
         <!-- STATS CARDS -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -81,33 +126,33 @@
 
 
         <!-- SEARCH & FILTER -->
-        <div class="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row gap-4">
-            <div class="relative flex-1">
-                <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                <form action="{{ route('admin.breakdowns.index') }}" method="GET">
+        <div class="bg-white dark:bg-slate-900 p-4 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm">
+            <form action="{{ route('admin.breakdowns.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="relative lg:col-span-2">
+                    <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"></i>
                     <input type="text" name="search" value="{{ request('search') }}" 
                            placeholder="Cari berdasarkan kode alat atau detail kerusakan..." 
                            class="w-full pl-12 pr-6 py-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl text-sm font-bold placeholder-slate-400 focus:ring-2 focus:ring-[#0055a4] dark:text-white transition-all">
-                </form>
-            </div>
-            <div class="flex items-center gap-2">
-                <button class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center gap-2">
+                </div>
+                
+                <button type="button" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2">
                     <i class="fas fa-filter"></i> Filter
                 </button>
+
                 <div class="relative group">
-                    <button class="bg-[#003366] dark:bg-blue-600 hover:bg-[#002244] dark:hover:bg-blue-700 text-white px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-900/20 transition-all flex items-center gap-2">
-                        <i class="fas fa-file-export"></i> Export Laporan
+                    <button type="button" class="w-full h-full bg-[#003366] dark:bg-blue-600 hover:bg-[#002244] dark:hover:bg-blue-700 text-white px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-900/20 transition-all flex items-center justify-center gap-2">
+                        <i class="fas fa-file-export"></i> Export
                     </button>
-                    <div class="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right scale-95 group-hover:scale-100 flex flex-col overflow-hidden z-50">
-                        <button onclick="openExportModal('pdf')" class="flex items-center gap-3 px-6 py-4 text-left hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px] font-black uppercase tracking-widest transition-colors border-b border-slate-50 dark:border-slate-700">
+                    <div class="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-800 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all transform origin-top-right scale-95 group-hover:scale-100 flex flex-col overflow-hidden z-50">
+                        <button type="button" onclick="openExportModal('pdf')" class="flex items-center gap-3 px-6 py-4 text-left hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-black uppercase tracking-widest transition-colors border-b border-slate-50 dark:border-slate-800">
                             <i class="fas fa-file-pdf text-red-500 text-base"></i> PDF Document
                         </button>
-                        <button onclick="openExportModal('excel')" class="flex items-center gap-3 px-6 py-4 text-left hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px] font-black uppercase tracking-widest transition-colors">
+                        <button type="button" onclick="openExportModal('excel')" class="flex items-center gap-3 px-6 py-4 text-left hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px] font-black uppercase tracking-widest transition-colors">
                             <i class="fas fa-file-excel text-emerald-500 text-base"></i> Excel Sheet
                         </button>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
 
         <!-- MAIN CONTENT AREA -->
@@ -138,7 +183,7 @@
 
                                 <div class="bg-slate-50 dark:bg-slate-800/50 p-5 rounded-3xl border border-slate-100 dark:border-slate-700 mb-6">
                                     <p class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Detail Kendala</p>
-                                    <p class="text-sm font-bold text-slate-700 dark:text-slate-200 leading-relaxed italic">"{{ $activeLog->issue_detail ?? 'Belum ada detail.' }}"</p>
+                                    <p class="text-sm font-bold text-slate-700 dark:text-slate-200 leading-relaxed italic">"{{ $activeLog ? ($activeLog->issue_detail ?? 'Belum ada detail.') : 'Data log tidak ditemukan.' }}"</p>
                                 </div>
 
                                 <!-- STEP PROGRESS VISUAL -->
@@ -171,9 +216,9 @@
                                 <div class="flex items-center justify-between gap-4">
                                     <div class="flex items-center gap-3">
                                         <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[10px] font-black text-slate-500">
-                                            {{ substr($activeLog->vendor_pic ?? '?', 0, 1) }}
+                                            {{ $activeLog ? substr($activeLog->vendor_pic ?? '?', 0, 1) : '?' }}
                                         </div>
-                                        <p class="text-[10px] font-bold text-slate-500 uppercase">{{ $activeLog->vendor_pic ?? 'Belum ada PIC' }}</p>
+                                        <p class="text-[10px] font-bold text-slate-500 uppercase">{{ $activeLog ? ($activeLog->vendor_pic ?? 'Belum ada PIC') : '-' }}</p>
                                     </div>
                                     <div class="flex gap-2">
                                         @if($activeLog && $activeLog->document_proof)
@@ -194,7 +239,7 @@
                                                     start_work_date: '{{ $activeLog->start_work_date ?? '' }}',
                                                     com_test_date: '{{ $activeLog->com_test_date ?? '' }}',
                                                     resolved_date: '{{ $activeLog->resolved_date ?? '' }}',
-                                                    vendor_pic: '{{ $activeLog->vendor_pic ?? '' }}'
+                                                    vendor_pic: '{{ addslashes($activeLog->vendor_pic ?? '') }}'
                                                 };
                                                 showUpdateModal = true;
                                             " 
@@ -264,6 +309,124 @@
                 </div>
             </div>
 
+            <!-- TAB: LIVE EXCEL (GOOGLE SHEETS STYLE) -->
+            <div x-show="activeTab === 'excel'" x-transition class="space-y-4">
+                <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col">
+                    <div class="bg-amber-50 dark:bg-amber-900/10 p-4 border-b border-amber-100 dark:border-amber-800/50 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-table text-amber-600 dark:text-amber-400"></i>
+                            <span class="text-[10px] font-black uppercase tracking-widest text-amber-800 dark:text-amber-300">Laporan Kesiapan Alat Pelabuhan (Format Excel)</span>
+                        </div>
+                        <span class="text-[8px] font-black text-amber-600/50 uppercase italic">Sinkronisasi Real-time</span>
+                    </div>
+
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-[10px] border-collapse min-w-[2000px]">
+                            <thead>
+                                <tr class="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-black uppercase tracking-widest border-b border-slate-200 dark:border-slate-800">
+                                    <th class="px-4 py-4 border-r border-slate-200 dark:border-slate-800 w-12 text-center">NO</th>
+                                    <th class="px-6 py-4 border-r border-slate-200 dark:border-slate-800">NAMA ALAT</th>
+                                    <th class="px-6 py-4 border-r border-slate-200 dark:border-slate-800">JENIS ALAT</th>
+                                    <th class="px-6 py-4 border-r border-slate-200 dark:border-slate-800">ENTITAS</th>
+                                    <th class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center">STATUS</th>
+                                    <th class="px-6 py-4 border-r border-slate-200 dark:border-slate-800">DETAIL KERUSAKAN</th>
+                                    <th class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center">TGL BREAK DOWN</th>
+                                    <th class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center">STATUS KESIAPAN</th>
+                                    <th class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center">TROUBLE SHOOT</th>
+                                    <th class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center">BERITA ACARA</th>
+                                    <th class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center">WORK ORDER</th>
+                                    <th class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center">PR / PO</th>
+                                    <th class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center">SPAREPART ON SITE</th>
+                                    <th class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center">MULAI KERJA</th>
+                                    <th class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center">COM TEST</th>
+                                    <th class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center">SELESAI KERJA</th>
+                                    <th class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center">PIC</th>
+                                    <th class="px-6 py-4 text-center">OPSI</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                                @foreach($infrastructures as $index => $item)
+                                    @php $activeLog = $activeBreakdowns[$item->id] ?? null; @endphp
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors font-bold text-slate-700 dark:text-slate-300">
+                                        <td class="px-4 py-4 border-r border-slate-200 dark:border-slate-800 text-center text-slate-400">{{ $index + 1 }}</td>
+                                        <td class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 uppercase text-blue-600 dark:text-blue-400 font-black">{{ $item->code_name }}</td>
+                                        <td class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 uppercase">{{ $item->type }}</td>
+                                        <td class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 uppercase italic">{{ $item->entity->name ?? '-' }}</td>
+                                        <td class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center">
+                                            @if($item->status === 'available')
+                                                <span class="bg-emerald-500 text-white px-3 py-1 rounded-full text-[8px] font-black uppercase">Ready</span>
+                                            @else
+                                                <span class="bg-red-600 text-white px-3 py-1 rounded-full text-[8px] font-black uppercase">Breakdown</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 max-w-xs truncate italic">
+                                            {{ $activeLog ? ($activeLog->issue_detail ?? '-') : '-' }}
+                                        </td>
+                                        <td class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center">
+                                            {{ $activeLog ? $activeLog->created_at->format('d/m/Y') : '-' }}
+                                        </td>
+                                        <td class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center uppercase">
+                                            @if($activeLog)
+                                                <span class="px-2 py-1 rounded border {{ 
+                                                    $activeLog->repair_status === 'order_part' ? 'bg-amber-50 text-amber-600 border-amber-200' : 
+                                                    ($activeLog->repair_status === 'on_progress' ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-slate-100 text-slate-600')
+                                                }}">
+                                                    {{ str_replace('_', ' ', $activeLog->repair_status) }}
+                                                </span>
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center">{{ $activeLog && $activeLog->troubleshoot_date ? \Carbon\Carbon::parse($activeLog->troubleshoot_date)->format('d/m/Y') : '-' }}</td>
+                                        <td class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center">{{ $activeLog && $activeLog->ba_date ? \Carbon\Carbon::parse($activeLog->ba_date)->format('d/m/Y') : '-' }}</td>
+                                        <td class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center">{{ $activeLog && $activeLog->work_order_date ? \Carbon\Carbon::parse($activeLog->work_order_date)->format('d/m/Y') : '-' }}</td>
+                                        <td class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center">{{ $activeLog && $activeLog->pr_po_date ? \Carbon\Carbon::parse($activeLog->pr_po_date)->format('d/m/Y') : '-' }}</td>
+                                        <td class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center">{{ $activeLog && $activeLog->sparepart_date ? \Carbon\Carbon::parse($activeLog->sparepart_date)->format('d/m/Y') : '-' }}</td>
+                                        <td class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center">{{ $activeLog && $activeLog->start_work_date ? \Carbon\Carbon::parse($activeLog->start_work_date)->format('d/m/Y') : '-' }}</td>
+                                        <td class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center">{{ $activeLog && $activeLog->com_test_date ? \Carbon\Carbon::parse($activeLog->com_test_date)->format('d/m/Y') : '-' }}</td>
+                                        <td class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center">{{ $activeLog && $activeLog->resolved_date ? \Carbon\Carbon::parse($activeLog->resolved_date)->format('d/m/Y') : '-' }}</td>
+                                        <td class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center">
+                                            @if($activeLog)
+                                                <span class="bg-blue-900 text-white px-2 py-0.5 rounded text-[8px] font-black">{{ $activeLog->vendor_pic ?? 'N/A' }}</span>
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4 text-center">
+                                            @if($activeLog)
+                                                <button @click="
+                                                    selectedAsset = {id: '{{ $item->id }}', code: '{{ $item->code_name }}'}; 
+                                                    selectedLogId = '{{ $activeLog->id }}'; 
+                                                    currentStatus = '{{ $activeLog->repair_status }}'; 
+                                                    logDates = {
+                                                        troubleshoot_date: '{{ $activeLog->troubleshoot_date ?? '' }}',
+                                                        ba_date: '{{ $activeLog->ba_date ?? '' }}',
+                                                        work_order_date: '{{ $activeLog->work_order_date ?? '' }}',
+                                                        pr_po_date: '{{ $activeLog->pr_po_date ?? '' }}',
+                                                        sparepart_date: '{{ $activeLog->sparepart_date ?? '' }}',
+                                                        start_work_date: '{{ $activeLog->start_work_date ?? '' }}',
+                                                        com_test_date: '{{ $activeLog->com_test_date ?? '' }}',
+                                                        resolved_date: '{{ $activeLog->resolved_date ?? '' }}',
+                                                        vendor_pic: '{{ $activeLog->vendor_pic ?? '' }}'
+                                                    };
+                                                    showUpdateModal = true;
+                                                " class="text-blue-600 hover:text-blue-800 transition-colors">
+                                                    <i class="fas fa-edit"></i> Update
+                                                </button>
+                                            @else
+                                                <button @click="selectedAsset = {id: '{{ $item->id }}', code: '{{ addslashes($item->code_name) }}'}; showReportModal = true;" class="text-red-600 hover:text-red-800 transition-colors">
+                                                    <i class="fas fa-plus-circle"></i> Lapor
+                                                </button>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <!-- TAB: RIWAYAT (HISTORY) -->
             <div x-show="activeTab === 'history'" x-transition class="space-y-4">
                 <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
@@ -322,7 +485,6 @@
                 <div class="mt-6">
                     {{ $historyLogs->links() }}
                 </div>
-                @endif
             </div>
 
         </div>
@@ -420,12 +582,28 @@
                                 <input type="date" name="troubleshoot_date" x-model="logDates.troubleshoot_date" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl py-3 px-4 text-xs font-bold text-slate-700 dark:text-white transition-all">
                             </div>
                             <div x-show="['order_part', 'on_progress', 'resolved'].includes(currentStatus)">
+                                <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Tgl Berita Acara (BA)</label>
+                                <input type="date" name="ba_date" x-model="logDates.ba_date" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl py-3 px-4 text-xs font-bold text-slate-700 dark:text-white transition-all">
+                            </div>
+                            <div x-show="['order_part', 'on_progress', 'resolved'].includes(currentStatus)">
+                                <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Tgl Work Order (WO)</label>
+                                <input type="date" name="work_order_date" x-model="logDates.work_order_date" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl py-3 px-4 text-xs font-bold text-slate-700 dark:text-white transition-all">
+                            </div>
+                            <div x-show="['order_part', 'on_progress', 'resolved'].includes(currentStatus)">
                                 <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Tgl PR / PO (Sparepart)</label>
                                 <input type="date" name="pr_po_date" x-model="logDates.pr_po_date" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl py-3 px-4 text-xs font-bold text-slate-700 dark:text-white transition-all">
+                            </div>
+                            <div x-show="['order_part', 'on_progress', 'resolved'].includes(currentStatus)">
+                                <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Tgl Sparepart On Site</label>
+                                <input type="date" name="sparepart_date" x-model="logDates.sparepart_date" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl py-3 px-4 text-xs font-bold text-slate-700 dark:text-white transition-all">
                             </div>
                             <div x-show="['on_progress', 'resolved'].includes(currentStatus)">
                                 <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Tgl Mulai Kerja</label>
                                 <input type="date" name="start_work_date" x-model="logDates.start_work_date" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl py-3 px-4 text-xs font-bold text-slate-700 dark:text-white transition-all">
+                            </div>
+                            <div x-show="['on_progress', 'resolved'].includes(currentStatus)">
+                                <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Tgl Com Test</label>
+                                <input type="date" name="com_test_date" x-model="logDates.com_test_date" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl py-3 px-4 text-xs font-bold text-slate-700 dark:text-white transition-all">
                             </div>
                             <div x-show="currentStatus === 'resolved'">
                                 <label class="block text-[9px] font-black text-emerald-600 uppercase tracking-widest mb-2">Tgl Unit Ready</label>

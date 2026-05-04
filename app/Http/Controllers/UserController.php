@@ -32,7 +32,7 @@ class UserController extends Controller
             $query->where('entity_id', request('entity_id'));
         }
 
-        $users = $query->latest()->get();
+        $users = $query->latest()->paginate(15)->withQueryString();
         $entities = Entity::orderBy('name')->get();
 
         return view('admin.users.index', compact('users', 'entities'));

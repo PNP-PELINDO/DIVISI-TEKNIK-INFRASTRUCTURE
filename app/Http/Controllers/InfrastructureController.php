@@ -47,7 +47,7 @@ class InfrastructureController extends Controller
             $query->where('status', request('status'));
         }
 
-        $infrastructures = $query->latest()->get();
+        $infrastructures = $query->latest()->paginate(20)->withQueryString();
 
         // Ambil data unik untuk filter dropdown
         if ($user->role === 'superadmin') {
