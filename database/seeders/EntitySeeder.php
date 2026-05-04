@@ -13,17 +13,18 @@ class EntitySeeder extends Seeder
     public function run(): void
     {
         $entities = [
-            ['name' => 'PT Pelabuhan Tanjung Priok', 'code' => 'PTP'],
-            ['name' => 'PT Terminal Petikemas Surabaya', 'code' => 'TPS'],
-            ['name' => 'PT Berlian Jasa Terminal Indonesia', 'code' => 'BJTI'],
-            ['name' => 'PT Pelindo Jasa Maritim', 'code' => 'PJM'],
-            ['name' => 'PT Pelindo Multi Terminal', 'code' => 'SPMT'],
-            ['name' => 'Pelabuhan Belawan', 'code' => 'BLW'],
-            ['name' => 'Pelabuhan Makassar', 'code' => 'MKS'],
+            ['name' => 'TPK TANJUNG PRIOK', 'code' => 'PTP'],
+            ['name' => 'TPK SURABAYA (TPS)', 'code' => 'TPS'],
+            ['name' => 'TPK BELAWAN (BICT)', 'code' => 'BICT'],
+            ['name' => 'TPK SEMARANG (TPKS)', 'code' => 'TPKS'],
+            ['name' => 'TPK MAKASSAR', 'code' => 'TPKM'],
+            ['name' => 'REGIONAL 2 PANJANG', 'code' => 'PANJ'],
+            ['name' => 'REGIONAL 2 PALEMBANG', 'code' => 'PLM'],
+            ['name' => 'REGIONAL 2 PONTIANAK', 'code' => 'PTN'],
         ];
 
         foreach ($entities as $entity) {
-            Entity::create($entity);
+            \App\Models\Entity::create($entity);
         }
     }
 }

@@ -13,12 +13,30 @@ return new class extends Migration
     {
         Schema::create('breakdown_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('infrastructure_id')->constrained()->cascadeOnDelete();
-            $table->text('issue_detail'); // Contoh: MOTOR GANTRY RUSAK
-            $table->string('vendor_pic')->nullable(); // Contoh: PT. BIMA
-            $table->enum('repair_status', ['reported', 'order_part', 'on_progress', 'resolved'])->default('reported');
-            $table->timestamp('resolved_at')->nullable();
+            $table->foreignId('infrastructure_id')->constrained()->onDelete('cascade');
+            $table->text('issue_detail');
+            $table->string('repair_status')->default('reported'); // reported, order_part, on_progress, resolved
+            $table->string('vendor_pic')->nullable();
+            $table->string('proof_image')->nullable();
+            
+            // Technical Timestamps (17+ Dates)
+            $table->dateTime('troubleshoot_date')->nullable();
+            $table->dateTime('ba_date')->nullable();
+            $table->dateTime('work_order_date')->nullable();
+            $table->dateTime('pr_po_date')->nullable();
+            $table->dateTime('sparepart_date')->nullable();
+            $table->dateTime('start_work_date')->nullable();
+            $table->dateTime('com_test_date')->nullable();
+            $table->dateTime('resolved_date')->nullable();
+
+            // Audit Trail
+            $table->foreignId('created_by')->nullable()->constrained('users');
+            $table->foreignId('updated_by')->nullable()->constrained('users');
+            
             $table->timestamps();
+
+            // Indexes
+            $table->index(['repair_status', 'infrastructure_id'], 'log_status_idx');
         });
     }
 

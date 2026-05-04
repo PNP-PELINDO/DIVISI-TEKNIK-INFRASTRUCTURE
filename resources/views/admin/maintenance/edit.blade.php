@@ -41,7 +41,7 @@
                         <div class="relative">
                             <i class="fas fa-calendar absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
                             <input type="date" name="scheduled_date" required min="{{ date('Y-m-d') }}"
-                                   value="{{ $maintenanceSchedule->scheduled_date }}"
+                                   value="{{ $maintenanceSchedule->scheduled_date ? $maintenanceSchedule->scheduled_date->format('Y-m-d') : '' }}"
                                    class="w-full pl-10 pr-4 py-3.5 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-blue-500 transition-all">
                         </div>
                         @error('scheduled_date') <p class="text-red-500 dark:text-red-400 text-[10px] font-bold mt-1 uppercase">{{ $message }}</p> @enderror

@@ -35,25 +35,26 @@ class InfrastructureSeeder extends Seeder
         $infrastructures = [];
 
         foreach ($entities as $entity) {
-            // Berikan 10-25 aset per entitas
-            $assetCount = rand(10, 25);
+            // Berikan 15-30 aset per entitas untuk data yang lebih padat
+            $assetCount = rand(15, 30);
 
             for ($i = 0; $i < $assetCount; $i++) {
                 $category = $faker->randomElement(array_keys($categories));
                 $type = $faker->randomElement($categories[$category]);
 
-                // Buat kode unik
+                // Buat kode unik sesuai standar
                 $prefix = strtoupper(substr(str_replace(' ', '', $type), 0, 3));
                 $codeName = $prefix . '-' . $entity->code . '-' . str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT);
 
                 // 15% kemungkinan rusak
                 $status = (rand(1, 100) <= 15) ? 'breakdown' : 'available';
 
+                // Jumlah unit (variatif)
+                $quantity = ($category === 'equipment') ? 1 : rand(1, 10);
+
                 // Generate Dummy Image URL
-                // Format parameter text: "Nama Alat | Kode Unik"
                 $imageText = urlencode($type . ' | ' . $codeName);
-                // Menggunakan background biru laut dengan text putih
-                $imageUrl = "https://placehold.co/600x400/0284c7/ffffff?text=" . $imageText;
+                $imageUrl = "https://placehold.co/600x400/003366/ffffff?text=" . $imageText;
 
                 $infrastructures[] = [
                     'entity_id'  => $entity->id,
@@ -61,8 +62,10 @@ class InfrastructureSeeder extends Seeder
                     'type'       => $type,
                     'code_name'  => $codeName,
                     'status'     => $status,
-                    'image'      => $imageUrl, // Data gambar ditambahkan di sini
-                    'created_at' => now(),
+                    'quantity'   => $quantity,
+                    'image'      => $imageUrl,
+                    'created_by' => 1, // Admin Pusat
+                    'created_at' => now()->subMonths(rand(1, 12)),
                     'updated_at' => now(),
                 ];
             }

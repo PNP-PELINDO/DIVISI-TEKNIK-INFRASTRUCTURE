@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\MaintenanceSchedule;
 use App\Models\Infrastructure;
 use Illuminate\Http\Request;
+use App\Helpers\ResponseMessage;
 
 class MaintenanceScheduleController extends Controller
 {
@@ -69,7 +70,8 @@ class MaintenanceScheduleController extends Controller
             return $q->where('entity_id', $user->entity_id);
         })->get();
 
-        return view('admin.maintenance.edit', compact('maintenance', 'infrastructures'));
+        $maintenanceSchedule = $maintenance;
+        return view('admin.maintenance.edit', compact('maintenanceSchedule', 'infrastructures'));
     }
 
     public function store(Request $request)
@@ -146,10 +148,10 @@ class MaintenanceScheduleController extends Controller
         return redirect()->route('admin.maintenance.index')->with('success', ResponseMessage::MAINTENANCE_UPDATED);
     }
 
-    public function destroy(MaintenanceSchedule $maintenanceSchedule)
+    public function destroy(MaintenanceSchedule $maintenance)
     {
-        $this->authorize('delete', $maintenanceSchedule);
-        $maintenanceSchedule->delete();
+        $this->authorize('delete', $maintenance);
+        $maintenance->delete();
         return back()->with('success', ResponseMessage::MAINTENANCE_DELETED);
     }
 }

@@ -11,18 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // 1. Add Indexes and Unique Constraint to Infrastructures
-        Schema::table('infrastructures', function (Blueprint $table) {
-            $table->index(['code_name', 'type', 'status', 'entity_id'], 'infra_search_idx');
-            $table->unique(['code_name', 'entity_id'], 'infra_code_entity_unique');
-        });
-
-        // 2. Add Indexes to Breakdown Logs
-        Schema::table('breakdown_logs', function (Blueprint $table) {
-            $table->index(['repair_status', 'infrastructure_id'], 'log_status_idx');
-        });
-
-        // 3. Create Maintenance Schedules table (Preventive Maintenance)
+        // 1. Create Maintenance Schedules table (Preventive Maintenance)
         Schema::create('maintenance_schedules', function (Blueprint $table) {
             $table->id();
             $table->foreignId('infrastructure_id')->constrained()->onDelete('cascade');
@@ -55,14 +44,5 @@ return new class extends Migration
     {
         Schema::dropIfExists('status_histories');
         Schema::dropIfExists('maintenance_schedules');
-        
-        Schema::table('breakdown_logs', function (Blueprint $table) {
-            $table->dropIndex('log_status_idx');
-        });
-
-        Schema::table('infrastructures', function (Blueprint $table) {
-            $table->dropUnique('infra_code_entity_unique');
-            $table->dropIndex('infra_search_idx');
-        });
     }
 };

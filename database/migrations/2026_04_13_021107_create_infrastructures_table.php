@@ -13,12 +13,24 @@ return new class extends Migration
     {
         Schema::create('infrastructures', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('entity_id')->constrained()->cascadeOnDelete();
-            $table->enum('category', ['equipment', 'facility', 'utility']); // Pemisah Kategori
-            $table->string('type'); // Contoh: Gantry Luffing Crane, Reach Stacker
-            $table->string('code_name')->unique(); // Contoh: GLC-01, GLC-02
-            $table->enum('status', ['available', 'breakdown'])->default('available');
+            $table->foreignId('entity_id')->constrained()->onDelete('cascade');
+            $table->string('category'); // equipment, facility, utility
+            $table->string('type'); // e.g., 'Gantry Crane', 'Genset'
+            $table->string('code_name');
+            $table->string('status')->default('available'); // available, breakdown, maintenance
+            $table->integer('quantity')->default(1);
+            $table->string('image')->nullable();
+            
+            // Audit Trail
+            $table->foreignId('created_by')->nullable()->constrained('users');
+            $table->foreignId('updated_by')->nullable()->constrained('users');
+            
             $table->timestamps();
+            $table->softDeletes();
+
+            // Indexes for Performance & Data Integrity
+            $table->index(['code_name', 'type', 'status', 'entity_id'], 'infra_search_idx');
+            $table->unique(['code_name', 'entity_id'], 'infra_code_entity_unique');
         });
     }
 
