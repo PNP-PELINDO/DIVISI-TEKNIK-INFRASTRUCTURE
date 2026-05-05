@@ -154,6 +154,33 @@
                     </div>
                 </div>
 
+                <!-- STATUS OPERASIONAL -->
+                <div x-data="{ assetStatus: '{{ old('status', 'available') }}' }">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-3 ml-1">Status Operasional Awal</label>
+                            <div class="relative">
+                                <select name="status" x-model="assetStatus" class="w-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-2xl text-sm font-black p-5 focus:ring-4 focus:ring-sky-50 dark:focus:ring-sky-900/20 focus:border-pelindo-blue dark:focus:border-pelindo-cyan transition-all uppercase appearance-none cursor-pointer text-slate-700 dark:text-slate-200" required>
+                                    <option value="available" {{ old('status', 'available') == 'available' ? 'selected' : '' }}>Available (Siap Pakai)</option>
+                                    <option value="breakdown" {{ old('status') == 'breakdown' ? 'selected' : '' }}>Breakdown (Terkendala)</option>
+                                </select>
+                                <i class="fas fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xs"></i>
+                            </div>
+                            @error('status') <p class="text-red-500 text-[10px] mt-2 font-bold ml-1 uppercase">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div x-show="assetStatus === 'breakdown'" x-cloak x-transition class="space-y-3">
+                            <label class="block text-[11px] font-black text-red-600 dark:text-red-400 uppercase tracking-[0.2em] mb-3 ml-1">Detail Kerusakan / Kendala</label>
+                            <div class="relative">
+                                <i class="fas fa-tools absolute left-5 top-5 text-red-400"></i>
+                                <textarea name="issue_detail" placeholder="Jelaskan detail kerusakan alat saat ini..." 
+                                          class="w-full border border-red-200 dark:border-red-900/30 bg-red-50/30 dark:bg-red-900/10 rounded-2xl text-sm font-bold p-5 pl-12 focus:ring-4 focus:ring-red-50 focus:border-red-500 transition-all text-slate-700 dark:text-slate-200">{{ old('issue_detail') }}</textarea>
+                            </div>
+                            @error('issue_detail') <p class="text-red-500 text-[10px] font-bold ml-1 uppercase">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
+                </div>
+
                 <!-- SUBMIT BUTTONS -->
                 <div class="pt-10 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row gap-4">
                     <button type="submit" class="flex-1 bg-pelindo-blue dark:bg-pelindo-blue hover:bg-pelindo-navy dark:hover:bg-pelindo-navy text-white py-5 rounded-2xl text-xs font-black uppercase tracking-[0.2em] shadow-2xl shadow-blue-900/20 transition-all flex items-center justify-center gap-3 active:scale-[0.98]">

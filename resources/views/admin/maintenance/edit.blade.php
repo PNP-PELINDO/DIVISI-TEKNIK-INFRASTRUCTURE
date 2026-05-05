@@ -31,7 +31,7 @@
                             name="infrastructure_id" 
                             :options="$infrastructures->map(fn($i) => ['value' => $i->id, 'label' => $i->code_name . ' - ' . $i->type . ' (' . $i->entity->name . ')'])"
                             placeholder="Cari Alat..."
-                            :selected="$maintenanceSchedule->infrastructure_id"
+                            :value="old('infrastructure_id', $maintenanceSchedule->infrastructure_id)"
                         />
                         @error('infrastructure_id') <p class="text-red-500 dark:text-red-400 text-[10px] font-bold mt-1 uppercase">{{ $message }}</p> @enderror
                     </div>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Infrastructure;
 use App\Models\Entity;
+use App\Models\BreakdownLog;
 use App\Http\Requests\StoreInfrastructureRequest;
 use App\Http\Requests\UpdateInfrastructureRequest;
 use App\Helpers\ResponseMessage;
@@ -30,7 +31,10 @@ class InfrastructureController extends Controller
             $query->where(function($q) use ($search) {
                 $q->where('code_name', 'like', "%{$search}%")
                   ->orWhere('type', 'like', "%{$search}%")
-                  ->orWhere('category', 'like', "%{$search}%");
+                  ->orWhere('category', 'like', "%{$search}%")
+                  ->orWhereHas('entity', function($sq) use ($search) {
+                      $sq->where('name', 'like', "%{$search}%");
+                  });
             });
         }
 
@@ -111,7 +115,7 @@ class InfrastructureController extends Controller
         }
 
         // 5. Simpan ke Database dengan audit trail
-        Infrastructure::create([
+        $infra = Infrastructure::create([
             'entity_id' => $targetEntityId,
             'category'  => $validated['category'],
             'type'      => $finalType,
@@ -123,12 +127,24 @@ class InfrastructureController extends Controller
             'updated_by' => $user->id,
         ]);
 
+        // 6. Otomatis buat Log Kerusakan jika didaftarkan sebagai Breakdown
+        if ($validated['status'] === 'breakdown') {
+            BreakdownLog::create([
+                'infrastructure_id' => $infra->id,
+                'issue_detail'      => $request->issue_detail,
+                'repair_status'     => 'reported',
+                'created_by'        => $user->id,
+                'updated_by'        => $user->id,
+            ]);
+        }
+
         return redirect()->route('admin.infrastructures.index')
             ->with('success', ResponseMessage::INFRASTRUCTURE_CREATED);
     }
 
     public function show(Infrastructure $infrastructure)
     {
+        $this->authorize('view', $infrastructure);
         // Redirect ke halaman Log Kerusakan dengan parameter filter agar user bisa langsung mengupdate status perbaikannya
         return redirect()->route('admin.breakdowns.index', ['infrastructure_id' => $infrastructure->id]);
     }
@@ -201,7 +217,19 @@ class InfrastructureController extends Controller
         $dataToUpdate['updated_by'] = $user->id;
 
         // 6. Eksekusi Update
+        $oldStatus = $infrastructure->status;
         $infrastructure->update($dataToUpdate);
+
+        // 7. Jika status berubah dari Available ke Breakdown via Edit, otomatis buat log
+        if ($validated['status'] === 'breakdown' && $oldStatus === 'available') {
+            BreakdownLog::create([
+                'infrastructure_id' => $infrastructure->id,
+                'issue_detail'      => $request->issue_detail,
+                'repair_status'     => 'reported',
+                'created_by'        => $user->id,
+                'updated_by'        => $user->id,
+            ]);
+        }
 
         return redirect()->route('admin.infrastructures.index')
             ->with('success', ResponseMessage::INFRASTRUCTURE_UPDATED);

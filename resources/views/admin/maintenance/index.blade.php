@@ -1,5 +1,5 @@
 <x-app-layout>
-    <div class="max-w-[1600px] mx-auto w-full space-y-6 animate-fade-up">
+    <div class="max-w-[1600px] mx-auto w-full space-y-6 animate-fade-up" x-data="{ showDeleteModal: false, deleteUrl: '', assetCode: '' }">
         
         <!-- HEADER SECTION -->
         <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm space-y-10 relative overflow-hidden mb-8">
@@ -59,22 +59,6 @@
                     <i class="fas fa-filter"></i> Apply Filter
                 </button>
             </form>
-        </div>
-
-        <!-- ALERTS -->
-        @if(session('success'))
-            <div class="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 p-5 rounded-3xl flex items-start gap-4 shadow-sm animate-fade-in mb-8">
-                <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
-                    <i class="fas fa-check-circle text-xl"></i>
-                </div>
-                <div>
-                    <h3 class="text-sm font-black text-emerald-800 dark:text-emerald-400 uppercase tracking-tight">Berhasil</h3>
-                    <p class="text-xs text-emerald-700 dark:text-emerald-300 mt-1 font-medium leading-relaxed">{{ session('success') }}</p>
-                </div>
-            </div>
-        @endif
-
-
         <div class="bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors duration-300">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -136,12 +120,9 @@
                                     <a href="{{ route('admin.maintenance.edit', $item->id) }}" class="text-blue-400 hover:text-blue-600 transition-colors">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <form action="{{ route('admin.maintenance.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Hapus jadwal ini?')">
-                                        @csrf @method('DELETE')
-                                        <button type="submit" class="text-red-400 hover:text-red-600 transition-colors">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </form>
+                                    <button type="button" @click="deleteUrl = '{{ route('admin.maintenance.destroy', $item->id) }}'; assetCode = '{{ $item->infrastructure->code_name }}'; showDeleteModal = true;" class="text-red-400 hover:text-red-600 transition-colors">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -164,5 +145,10 @@
                 </div>
             @endif
         </div>
+    <x-confirm-modal 
+        name="delete" 
+        title="Hapus Jadwal?" 
+        message="Anda yakin ingin menghapus jadwal maintenance untuk <strong class='text-red-600' x-text='assetCode'></strong>? Data yang dihapus tidak dapat dikembalikan."
+    />
     </div>
 </x-app-layout>

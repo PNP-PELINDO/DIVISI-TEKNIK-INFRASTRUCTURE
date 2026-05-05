@@ -25,6 +25,7 @@ class StoreBreakdownLogRequest extends FormRequest
         return [
             'infrastructure_id' => 'required|integer|exists:infrastructures,id',
             'issue_detail' => 'required|string|max:500|min:5',
+            'repair_status' => 'required|in:reported,order_part,on_progress',
             'vendor_pic' => 'nullable|string|max:255|min:2',
         ];
     }
@@ -40,7 +41,8 @@ class StoreBreakdownLogRequest extends FormRequest
             'issue_detail.required' => 'Deskripsi kerusakan harus diisi',
             'issue_detail.max' => 'Deskripsi kerusakan maksimal 500 karakter',
             'issue_detail.min' => 'Deskripsi kerusakan minimal 5 karakter',
-            'vendor_pic.required' => 'Nama vendor/PIC harus diisi',
+            'repair_status.required' => 'Status laporan awal harus dipilih',
+            'repair_status.in' => 'Status laporan awal tidak valid',
             'vendor_pic.max' => 'Nama vendor/PIC maksimal 255 karakter',
             'vendor_pic.min' => 'Nama vendor/PIC minimal 2 karakter',
         ];

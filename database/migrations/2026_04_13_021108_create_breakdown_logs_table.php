@@ -17,8 +17,8 @@ return new class extends Migration
             $table->text('issue_detail');
             $table->string('repair_status')->default('reported'); // reported, order_part, on_progress, resolved
             $table->string('vendor_pic')->nullable();
-            $table->string('proof_image')->nullable();
-            
+            $table->string('document_proof')->nullable();
+
             // Technical Timestamps (17+ Dates)
             $table->dateTime('troubleshoot_date')->nullable();
             $table->dateTime('ba_date')->nullable();
@@ -32,7 +32,7 @@ return new class extends Migration
             // Audit Trail
             $table->foreignId('created_by')->nullable()->constrained('users');
             $table->foreignId('updated_by')->nullable()->constrained('users');
-            
+
             $table->timestamps();
             $table->softDeletes();
 

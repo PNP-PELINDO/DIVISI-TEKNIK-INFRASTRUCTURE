@@ -43,7 +43,7 @@ class DashboardController extends Controller
 
         // Siapkan Query Dasar
         $infraQuery = Infrastructure::with('entity');
-        $logQuery = BreakdownLog::with(['infrastructure' => fn($q) => $q->withTrashed()->with('entity')])->where('repair_status', '!=', 'resolved');
+        $logQuery = BreakdownLog::with(['infrastructure.entity', 'infrastructure.breakdownLogs'])->where('repair_status', '!=', 'resolved');
 
         // Apply Filters to Base Queries
         if ($filterEntity) {

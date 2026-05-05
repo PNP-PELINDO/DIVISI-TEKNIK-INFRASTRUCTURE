@@ -27,6 +27,7 @@ class UpdateInfrastructureRequest extends FormRequest
             'category' => 'required|in:equipment,facility,utility',
             'code_name' => 'required|string|max:50|unique:infrastructures,code_name,' . $infrastructureId,
             'status' => 'required|in:available,breakdown',
+            'issue_detail' => 'required_if:status,breakdown|nullable|string|max:500',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ];
 
@@ -51,6 +52,7 @@ class UpdateInfrastructureRequest extends FormRequest
             'code_name.max' => 'Kode nama aset maksimal 50 karakter',
             'status.required' => 'Status aset harus dipilih',
             'status.in' => 'Status aset tidak valid. Pilih: available atau breakdown',
+            'issue_detail.required_if' => 'Detail kerusakan wajib diisi jika status aset Breakdown',
             'entity_id.required' => 'Entitas/Cabang harus dipilih (Superadmin)',
             'entity_id.exists' => 'Entitas/Cabang yang dipilih tidak ditemukan',
             'image.image' => 'File harus berupa gambar',

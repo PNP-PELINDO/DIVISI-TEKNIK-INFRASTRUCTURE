@@ -86,7 +86,17 @@
         $topBrokenEntities = $entityBreakdowns->map->count()->sortByDesc(fn($c) => $c)->take(5);
     @endphp
 
-    <div id="main-ui" class="max-w-[1600px] mx-auto w-full space-y-8 animate-fade-up" x-data="{ showDetailModal: false, infraData: null, openDetailModal(data) { this.infraData = data; this.showDetailModal = true; } }">
+    <div id="main-ui" class="max-w-[1600px] mx-auto w-full space-y-8 animate-fade-up"
+        x-data="{ 
+            showDetailModal: false, 
+            infraData: null, 
+            activeLog: null,
+            openDetailModal(infra, log = null) { 
+                this.infraData = infra; 
+                this.activeLog = log;
+                this.showDetailModal = true; 
+            } 
+        }">
 
         <!-- HEADER & FILTER SECTION -->
         <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm space-y-10 relative overflow-hidden">
@@ -199,8 +209,12 @@
                         <span class="text-slate-500 dark:text-slate-400">Readiness Rate</span>
                         <span class="text-blue-600 dark:text-blue-400">{{ $stats['readiness_rate'] }}%</span>
                     </div>
-                    <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5">
+                    <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 mt-1.5">
                         <div class="bg-pelindo-blue h-1.5 rounded-full" style="width: {{ $stats['readiness_rate'] }}%"></div>
+                    </div>
+                    <div class="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                        <span class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Avg. Repair Time (MTTR)</span>
+                        <span class="text-[10px] font-black text-slate-700 dark:text-slate-300">{{ $stats['mttr'] ?? 0 }} <span class="text-[8px] text-slate-400">Hari</span></span>
                     </div>
                 </div>
             </div>
@@ -344,7 +358,7 @@
                 <div class="p-6 flex-1">
                     <div class="space-y-3">
                         @forelse($frequentInfrastructures as $index => $infra)
-                        <div @click="openDetailModal({{ json_encode($infra) }})" class="cursor-pointer group flex items-center justify-between p-3.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md transition-all relative">
+                        <div @click='openDetailModal({{ json_encode($infra) }})' class="cursor-pointer group flex items-center justify-between p-3.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md transition-all relative">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center font-black text-[10px] group-hover:bg-pelindo-blue group-hover:text-white transition-colors">
                                     #{{ $index + 1 }}
@@ -380,7 +394,7 @@
                 <div class="p-6 flex-1">
                     <div class="space-y-3">
                         @forelse($upcomingMaintenance as $sched)
-                        <div class="flex items-center justify-between p-3.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800/50 shadow-sm relative group overflow-hidden">
+                        <div @click='openDetailModal({{ json_encode($sched->infrastructure) }})' class="cursor-pointer flex items-center justify-between p-3.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800/50 shadow-sm relative group overflow-hidden">
                             <div class="absolute left-0 top-0 w-1 h-full bg-pelindo-blue opacity-20 group-hover:opacity-100 transition-opacity"></div>
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-900 flex flex-col items-center justify-center border border-slate-100 dark:border-slate-700">
@@ -420,7 +434,7 @@
                 <div class="p-6 flex-1">
                     <div class="space-y-3">
                         @forelse($urgentBreakdowns as $log)
-                        <div @click="openDetailModal({{ json_encode($log->infrastructure) }})" class="cursor-pointer group flex items-start gap-3 p-3.5 border border-red-100 dark:border-red-900/30 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:border-red-400 dark:hover:border-red-700 transition-all">
+                        <div @click='openDetailModal({{ json_encode($log->infrastructure) }}, {{ json_encode($log->only(["issue_detail", "repair_status", "vendor_pic", "created_at"])) }})' class="cursor-pointer group flex items-start gap-3 p-3.5 border border-red-100 dark:border-red-900/30 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:border-red-400 dark:hover:border-red-700 transition-all">
                             <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-pelindo-blue group-hover:text-white transition-colors">
                                 <i class="fas fa-exclamation text-[10px]"></i>
                             </div>
@@ -503,7 +517,7 @@
                                 </div>
                             </td>
                             <td class="px-8 py-5 text-center">
-                                <button @click="openDetailModal({{ json_encode($log->infrastructure) }})" class="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-800 transition-all shadow-sm">
+                                <button @click='openDetailModal({{ json_encode($log->infrastructure) }}, {{ json_encode($log->only(["issue_detail", "repair_status", "vendor_pic", "created_at"])) }})' class="w-8 h-8 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-800 transition-all shadow-sm">
                                     <i class="fas fa-eye text-xs"></i>
                                 </button>
                             </td>
@@ -560,30 +574,65 @@
 
                 <!-- Modal Body (Scrollable) -->
                 <div class="p-6 overflow-y-auto flex-1 bg-white dark:bg-slate-900 custom-scrollbar">
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
+                    <!-- Detail Insiden Aktif (Jika dibuka dari Log) -->
+                    <template x-if="activeLog">
+                        <div class="mb-8 p-6 rounded-2xl bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30">
+                            <h4 class="text-[10px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                <i class="fas fa-exclamation-triangle"></i> Detail Insiden Terkini
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="md:col-span-2">
+                                    <p class="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Deskripsi Kendala</p>
+                                    <p class="text-sm font-black text-slate-800 dark:text-slate-200 italic" x-text="'&quot;' + activeLog.issue_detail + '&quot;'"></p>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Status Perbaikan</p>
+                                    <span class="inline-flex px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border"
+                                          :class="{
+                                              'bg-red-100 text-red-700 border-red-200': activeLog.repair_status === 'reported',
+                                              'bg-amber-100 text-amber-700 border-amber-200': activeLog.repair_status === 'on_progress',
+                                              'bg-blue-100 text-blue-700 border-blue-200': activeLog.repair_status === 'work_order',
+                                              'bg-purple-100 text-purple-700 border-purple-200': activeLog.repair_status === 'order_part',
+                                              'bg-emerald-100 text-emerald-700 border-emerald-200': activeLog.repair_status === 'resolved'
+                                          }"
+                                          x-text="activeLog.repair_status"></span>
+                                </div>
+                                <div>
+                                    <p class="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">PIC / Vendor</p>
+                                    <p class="text-xs font-black text-slate-700 dark:text-slate-300" x-text="activeLog.vendor_pic || 'Internal'"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+
+                    <!-- Asset Photo Section -->
+                    <div class="mb-8" x-show="infraData?.image">
+                        <div class="relative rounded-2xl overflow-hidden border-4 border-white dark:border-slate-800 shadow-xl group">
+                            <img :src="infraData?.image?.startsWith('http') ? infraData.image : '/storage/' + infraData?.image" 
+                                 class="w-full h-48 md:h-64 object-cover transition-transform duration-700 group-hover:scale-110" 
+                                 alt="Foto Aset">
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                                <p class="text-white text-[10px] font-black uppercase tracking-widest"><i class="fas fa-camera mr-2"></i> Foto Dokumentasi Aset</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <!-- Quick Stats -->
-                        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-xl p-4 flex items-center gap-4 shadow-sm">
-                            <div class="w-10 h-10 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-700"><i class="fas fa-history text-lg"></i></div>
+                        <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 rounded-xl p-5 flex items-center gap-5 shadow-sm">
+                            <div class="w-12 h-12 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-700 shadow-sm"><i class="fas fa-history text-xl"></i></div>
                             <div>
-                                <p class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">Total Kerusakan</p>
-                                <p class="text-xl font-black text-slate-800 dark:text-slate-100" x-text="infraData?.breakdown_logs?.length + ' Kali'"></p>
+                                <p class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">Total Riwayat Kerusakan</p>
+                                <p class="text-2xl font-black text-slate-800 dark:text-slate-100" x-text="infraData?.breakdown_logs?.length + ' Kali'"></p>
                             </div>
                         </div>
                         
-                        <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 rounded-xl p-4 flex items-center gap-4 shadow-sm">
-                            <div class="w-10 h-10 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-700"><i class="fas fa-battery-half text-lg"></i></div>
+                        <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 rounded-xl p-5 flex items-center gap-5 shadow-sm">
+                            <div class="w-12 h-12 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center text-amber-600 dark:text-amber-400 border border-amber-100 dark:border-amber-700 shadow-sm"><i class="fas fa-battery-half text-xl"></i></div>
                             <div>
-                                <p class="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">Status Saat Ini</p>
-                                <p class="text-xl font-black text-slate-800 dark:text-slate-100 uppercase text-sm mt-1" x-text="infraData?.status"></p>
-                            </div>
-                        </div>
-
-                        <div class="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 rounded-xl p-4 flex items-center gap-4 shadow-sm">
-                            <div class="w-10 h-10 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-700"><i class="fas fa-boxes text-lg"></i></div>
-                            <div>
-                                <p class="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Kuantitas</p>
-                                <p class="text-xl font-black text-slate-800 dark:text-slate-100" x-text="infraData?.quantity + ' Unit'"></p>
+                                <p class="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">Kondisi Aset Saat Ini</p>
+                                <p class="text-2xl font-black text-slate-800 dark:text-slate-100 uppercase mt-1" x-text="infraData?.status"></p>
                             </div>
                         </div>
                     </div>

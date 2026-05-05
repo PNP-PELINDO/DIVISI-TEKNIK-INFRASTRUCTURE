@@ -98,6 +98,8 @@
                     {{ $slot }}
                 </main>
 
+                <x-flash-popup />
+
                 <!-- STANDARDIZED FOOTER -->
                 <footer class="w-full border-t border-slate-200 dark:border-slate-800 py-8 px-10 bg-white dark:bg-slate-900/50 transition-all duration-300 mt-auto">
                     <div class="max-w-[1600px] mx-auto flex flex-col md:flex-row items-center justify-between gap-6">

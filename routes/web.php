@@ -6,7 +6,6 @@ use App\Http\Controllers\EntityController;
 use App\Http\Controllers\InfrastructureController;
 use App\Http\Controllers\BreakdownLogController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\MaintenanceScheduleController;
 use App\Models\Entity;
@@ -47,13 +46,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         // 1. Dashboard Utama (Sekarang namanya menjadi admin.dashboard)
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-        // 2. Fitur Analytics & Export
-        Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics.index');
+        // 2. Fitur Export
         Route::get('/export/process', [ExportController::class, 'process'])->name('export.process');
 
         // 3. Resource Operasional (Akses Semua Level)
         Route::resource('infrastructures', InfrastructureController::class);
         Route::resource('breakdowns', BreakdownLogController::class);
+        Route::get('breakdowns/{breakdown}/proof', [BreakdownLogController::class, 'downloadProof'])->name('breakdowns.proof');
         Route::resource('maintenance', MaintenanceScheduleController::class);
 
         /* --- KHUSUS AKSES SUPERADMIN (Administrator Pusat) --- */

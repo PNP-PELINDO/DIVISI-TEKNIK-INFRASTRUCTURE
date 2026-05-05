@@ -11,6 +11,7 @@ use App\Http\Requests\UpdateBreakdownLogRequest;
 use App\Helpers\ResponseMessage;
 use App\Mail\BreakdownReportedMail;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 
 class BreakdownLogController extends Controller
@@ -27,7 +28,7 @@ class BreakdownLogController extends Controller
         // JIKA YANG LOGIN ADALAH SUPERADMIN (TAMPILAN RIWAYAT LOG GLOBAL)
         if ($user->role === 'superadmin') {
             $query = BreakdownLog::with(['infrastructure' => fn($q) => $q->withTrashed()->with('entity'), 'createdBy', 'updatedBy', 'statusHistories']);
-            
+
             if ($filterInfraId) {
                 $query->where('infrastructure_id', $filterInfraId);
             }
@@ -50,25 +51,25 @@ class BreakdownLogController extends Controller
             if ($filterStatus && $filterStatus !== 'all') {
                 $query->where('repair_status', $filterStatus);
             }
-            
+
             $logs = $query->latest()->paginate(20)->withQueryString();
-            
+
             $allInfrastructures = Infrastructure::with('entity')->get();
             $activeBreakdowns = BreakdownLog::with(['infrastructure' => fn($q) => $q->withTrashed()->with('entity')])
                 ->where('repair_status', '!=', 'resolved')
                 ->latest()
                 ->get()
                 ->keyBy('infrastructure_id');
-            
+
             $allEntities = Entity::orderBy('name')->get();
-                
+
             return view('admin.breakdowns.index_admin', compact('logs', 'allInfrastructures', 'activeBreakdowns', 'allEntities'));
         }
 
         // JIKA YANG LOGIN ADALAH OPERATOR (TAMPILAN EXCEL KESIAPAN ALAT)
         else {
             $infraBaseQuery = Infrastructure::where('entity_id', $user->entity_id);
-            
+
             // Statistik Akurat (Global untuk Entitas ini)
             $stats = [
                 'total' => (clone $infraBaseQuery)->count(),
@@ -78,7 +79,7 @@ class BreakdownLogController extends Controller
             $stats['readiness_rate'] = $stats['total'] > 0 ? round(($stats['available'] / $stats['total']) * 100, 1) : 0;
 
             $infraQuery = Infrastructure::with('entity')->where('entity_id', $user->entity_id);
-            
+
             if ($filterInfraId) {
                 $infraQuery->where('id', $filterInfraId);
             }
@@ -94,20 +95,20 @@ class BreakdownLogController extends Controller
             if ($filterStatus && $filterStatus !== 'all') {
                 $infraQuery->where('status', $filterStatus === 'resolved' ? 'available' : 'breakdown');
             }
-            
+
             $infrastructures = $infraQuery->latest()->paginate(15, ['*'], 'infra_page')->withQueryString();
 
             $activeQuery = BreakdownLog::where('repair_status', '!=', 'resolved')
                 ->whereHas('infrastructure', function($q) use ($user) {
                     $q->where('entity_id', $user->entity_id);
                 });
-                
+
             if ($filterInfraId) {
                 $activeQuery->where('infrastructure_id', $filterInfraId);
             }
-                
+
             $activeBreakdowns = $activeQuery->get()->keyBy('infrastructure_id');
-                
+
             $allInfrastructures = Infrastructure::with('entity')
                 ->where('entity_id', $user->entity_id)
                 ->get();
@@ -185,11 +186,13 @@ class BreakdownLogController extends Controller
             return redirect()->back()->withErrors(['infrastructure_id' => 'Aset ini sedang dalam status Breakdown dan memiliki laporan perbaikan yang belum selesai.'])->withInput();
         }
 
-        // 1. Catat ke Log Kerusakan (Tahap awal: reported - FIXED dari 'troubleshooting')
+        $initialStatus = $request->repair_status ?? 'reported';
+
+        // 1. Catat ke Log Kerusakan. Gunakan status awal sesuai input form.
         $log = BreakdownLog::create([
             'infrastructure_id' => $request->infrastructure_id,
             'issue_detail' => $request->issue_detail,
-            'repair_status' => 'reported',
+            'repair_status' => $initialStatus,
             'vendor_pic' => $request->vendor_pic,
             'created_by' => $user->id,
             'updated_by' => $user->id,
@@ -201,7 +204,7 @@ class BreakdownLogController extends Controller
         // 3. Record Audit Trail
         StatusHistory::create([
             'breakdown_log_id' => $log->id,
-            'new_status' => 'reported',
+            'new_status' => $initialStatus,
             'user_id' => $user->id,
             'note' => 'Laporan awal dibuat'
         ]);
@@ -241,9 +244,9 @@ class BreakdownLogController extends Controller
 
             // Prevent going backward in status (optional, but usually good for integrity)
             if ($statusOrder[$newStatus] < $statusOrder[$currentStatus]) {
-                // Allow going back if it's not resolved yet? 
+                // Allow going back if it's not resolved yet?
                 // For now, let's just allow all forward moves and prevent illegal jumps if any.
-                // Actually, let's just remove the restrictive order and let users decide, 
+                // Actually, let's just remove the restrictive order and let users decide,
                 // but keep the resolved status as final.
             }
         }
@@ -251,13 +254,23 @@ class BreakdownLogController extends Controller
         // 3. Logika Upload Bukti Fisik
         if ($request->hasFile('document_proof')) {
             $file = $request->file('document_proof');
-            $filename = 'proof_' . $log->infrastructure->code_name . '_' . time() . '.' . $file->getClientOriginalExtension();
-            // Simpan file baru ke folder public/assets/proofs
-            $dataToUpdate['document_proof'] = $file->storeAs('assets/proofs', $filename, 'public');
+            // Generate secure random filename to avoid path guessing
+            $ext = $file->getClientOriginalExtension();
+            $filename = 'proof_' . Str::uuid() . '.' . $ext;
+            $path = 'assets/proofs/' . $filename;
+
+            // Delete previous file if exists
+            if (!empty($log->document_proof) && Storage::disk('public')->exists($log->document_proof)) {
+                try { Storage::disk('public')->delete($log->document_proof); } catch (\Exception $e) { \Log::warning('Failed to delete old proof: '.$e->getMessage()); }
+            }
+
+            // Store new file on public disk (consider private disk in production)
+            $stored = $file->storeAs('assets/proofs', $filename, 'public');
+            $dataToUpdate['document_proof'] = $stored;
         }
 
         if ($request->repair_status === 'resolved') {
-            $dataToUpdate['resolved_at'] = now();
+            $dataToUpdate['resolved_date'] = $request->resolved_date ?: now();
         }
 
         // 4. Update data ke database (Status dan Deretan Tanggal)
@@ -307,5 +320,20 @@ class BreakdownLogController extends Controller
         $log->delete();
 
         return redirect()->back()->with('success', ResponseMessage::BREAKDOWN_DELETED);
+    }
+
+    /**
+     * Download stored document proof (protected by policy).
+     */
+    public function downloadProof($id)
+    {
+        $log = BreakdownLog::findOrFail($id);
+        $this->authorize('view', $log);
+
+        if (empty($log->document_proof) || !Storage::disk('public')->exists($log->document_proof)) {
+            abort(404, 'File bukti tidak ditemukan.');
+        }
+
+        return Storage::disk('public')->download($log->document_proof);
     }
 }

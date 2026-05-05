@@ -183,6 +183,12 @@
                 });
             });
             return total;
+        },
+        showIncidentModal: false,
+        selectedIncident: null,
+        openIncidentModal(incident) {
+            this.selectedIncident = incident;
+            this.showIncidentModal = true;
         }
       }">
 
@@ -190,12 +196,12 @@
         <div class="max-w-[1600px] mx-auto px-4 md:px-10 h-16 md:h-20 flex items-center justify-between">
             <div class="flex items-center gap-3 md:gap-6">
                 <!-- Logo Danantara: Dark in Light Mode, White in Dark Mode -->
-                <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-6 md:h-10 object-contain dark:invert dark:brightness-200 transition-all duration-300">
+                <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-6 md:h-10 object-contain dark:grayscale dark:invert dark:brightness-200 transition-all duration-300">
                 
                 <div class="w-px h-6 md:h-10 bg-slate-200 dark:bg-slate-700"></div>
                 
                 <!-- Logo Pelindo: Dark in Light Mode, White in Dark Mode -->
-                <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-6 md:h-10 object-contain dark:invert dark:brightness-200 transition-all duration-300">
+                <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-6 md:h-10 object-contain dark:grayscale dark:invert dark:brightness-200 transition-all duration-300">
             </div>
             <div class="flex items-center gap-3 md:gap-5">
                 <!-- Dark Mode Toggle -->
@@ -239,7 +245,10 @@
                 <div class="relative group">
                     <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#0055a4] dark:group-focus-within:text-sky-400 transition-colors"></i>
                     <input type="text" x-model="search" placeholder="Cari Kode Alat, Nama, atau Jenis..." 
-                           class="w-full pl-12 pr-6 py-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm focus:ring-2 focus:ring-[#0055a4] dark:focus:ring-sky-500 focus:border-transparent outline-none transition-all text-sm font-bold placeholder:text-slate-400 dark:text-white">
+                           class="w-full pl-12 pr-12 py-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm focus:ring-2 focus:ring-[#0055a4] dark:focus:ring-sky-500 focus:border-transparent outline-none transition-all text-sm font-bold placeholder:text-slate-400 dark:text-white">
+                    <button x-show="search.length > 0" @click="search = ''" class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-500 transition-colors">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
                 </div>
 
                 <!-- Filter Pills -->
@@ -274,10 +283,10 @@
             <section 
                 data-entity-id="{{ $entity->id }}"
                 data-entity-name="{{ $entity->name }}"
-                x-show="(filter === 'all' || {{ $availableCategories }}.includes(filter)) && (filterEntity === 'all' || filterEntity === '{{ $entity->name }}')" 
+                x-show="((filter === 'all' || {{ $availableCategories }}.includes(filter)) && (filterEntity === 'all' || filterEntity === '{{ $entity->name }}')) && (search === '' || visibleUnits > 0)" 
                 x-data="{ 
                     showModal: false,
-                    visibleUnits: 0,
+                    visibleUnits: {{ $entity->infrastructures->count() }},
                     updateCounter() {
                         this.$nextTick(() => {
                             let count = 0;
@@ -451,7 +460,9 @@
                     </thead>
                     <tbody class="divide-y divide-slate-100 dark:divide-slate-800 whitespace-nowrap">
                         @forelse ($breakdowns as $index => $log)
-                        <tr class="text-[10px] md:text-xs uppercase font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                        <tr x-show="(filter === 'all' || filter === '{{ $log->infrastructure->category }}') && (filterEntity === 'all' || filterEntity === '{{ $log->infrastructure->entity->name }}') && (search === '' || '{{ strtolower($log->infrastructure->code_name) }}'.includes(search.toLowerCase()) || '{{ strtolower($log->infrastructure->entity->name ?? '') }}'.includes(search.toLowerCase()) || '{{ strtolower($log->issue_detail) }}'.includes(search.toLowerCase()))"
+                            @click='openIncidentModal({{ json_encode($log->only(["id", "issue_detail", "repair_status", "vendor_pic", "created_at"]) + ["infrastructure" => $log->infrastructure->only(["code_name", "type", "category"]) + ["entity" => $log->infrastructure->entity->only(["name"])]]) }})'
+                            class="cursor-pointer text-[10px] md:text-xs uppercase font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                             <td class="px-5 py-4 md:px-8 md:py-5 text-center text-slate-400 dark:text-slate-600">{{ $index + 1 }}</td>
                             <td class="px-5 py-4 md:px-8 md:py-5">{{ $log->infrastructure->entity->name ?? '-' }}</td>
                             <td class="px-5 py-4 md:px-8 md:py-5 text-center">
@@ -541,6 +552,59 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Modal Detail Insiden -->
+    <template x-teleport="body">
+        <div x-show="showIncidentModal" class="fixed inset-0 z-[110] flex items-center justify-center px-4 bg-slate-900/60 backdrop-blur-md transition-opacity" x-cloak style="display: none;">
+            <div @click.away="showIncidentModal = false" x-show="showIncidentModal" x-transition.scale.origin.bottom class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
+                <div class="bg-red-600 px-6 py-5 flex items-center justify-between text-white">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-exclamation-triangle text-xl"></i>
+                        <div>
+                            <h3 class="font-black uppercase tracking-widest text-sm">Detail Insiden</h3>
+                            <p class="text-red-100 text-[10px] font-bold uppercase tracking-wider mt-0.5" x-text="selectedIncident?.infrastructure?.code_name"></p>
+                        </div>
+                    </div>
+                    <button @click="showIncidentModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="p-8 space-y-6">
+                    <div class="grid grid-cols-2 gap-6">
+                        <div>
+                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Entitas</p>
+                            <p class="text-xs font-black text-slate-800 dark:text-slate-200 uppercase" x-text="selectedIncident?.infrastructure?.entity?.name"></p>
+                        </div>
+                        <div>
+                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Status Perbaikan</p>
+                            <span class="inline-flex px-2 py-1 rounded bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-800 text-[9px] font-black uppercase tracking-widest" x-text="selectedIncident?.repair_status?.replace('_', ' ')"></span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-100 dark:border-slate-700">
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2">Kendala Dilaporkan</p>
+                        <p class="text-sm font-bold text-slate-700 dark:text-slate-300 italic leading-relaxed" x-text="'&quot;' + selectedIncident?.issue_detail + '&quot;'"></p>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <div>
+                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Petugas (PIC)</p>
+                            <p class="text-xs font-bold text-slate-600 dark:text-slate-400" x-text="selectedIncident?.vendor_pic || 'Sedang Ditunjuk'"></p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Waktu Lapor</p>
+                            <p class="text-xs font-bold text-slate-600 dark:text-slate-400" x-text="selectedIncident ? new Date(selectedIncident.created_at).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) : ''"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-700 flex justify-center">
+                    <button @click="showIncidentModal = false" class="px-8 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all shadow-sm">Tutup Detail</button>
                 </div>
             </div>
         </div>

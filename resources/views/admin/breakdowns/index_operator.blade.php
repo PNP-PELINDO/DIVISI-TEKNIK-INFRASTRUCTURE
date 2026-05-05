@@ -1,9 +1,9 @@
 <x-app-layout>
-    <div class="max-w-[1600px] mx-auto w-full space-y-8 animate-fade-up" 
-         x-data="{ 
+    <div class="max-w-[1600px] mx-auto w-full space-y-8 animate-fade-up"
+         x-data="{
                  activeTab: '{{ request('history_page') ? 'history' : 'active' }}',
-                 showReportModal: false, 
-                 showUpdateModal: false, 
+                 showReportModal: false,
+                 showUpdateModal: false,
                  selectedAsset: null,
                  selectedLogId: null,
                  currentStatus: '',
@@ -29,22 +29,22 @@
 
             <div class="flex items-center gap-3">
                 <div class="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-inner">
-                    <button @click="activeTab = 'active'" 
+                    <button @click="activeTab = 'active'"
                             :class="activeTab === 'active' ? 'bg-white dark:bg-slate-700 text-[#003366] dark:text-blue-400 shadow-md scale-100' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 scale-95'"
                             class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
                         <i class="fas fa-exclamation-triangle"></i> Unit Rusak
                     </button>
-                    <button @click="activeTab = 'ready'" 
+                    <button @click="activeTab = 'ready'"
                             :class="activeTab === 'ready' ? 'bg-white dark:bg-slate-700 text-[#003366] dark:text-blue-400 shadow-md scale-100' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 scale-95'"
                             class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
                         <i class="fas fa-check-circle"></i> Unit Siap
                     </button>
-                    <button @click="activeTab = 'excel'" 
+                    <button @click="activeTab = 'excel'"
                             :class="activeTab === 'excel' ? 'bg-white dark:bg-slate-700 text-[#003366] dark:text-blue-400 shadow-md scale-100' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 scale-95'"
                             class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
                         <i class="fas fa-file-excel"></i> Live Excel
                     </button>
-                    <button @click="activeTab = 'history'" 
+                    <button @click="activeTab = 'history'"
                             :class="activeTab === 'history' ? 'bg-white dark:bg-slate-700 text-[#003366] dark:text-blue-400 shadow-md scale-100' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 scale-95'"
                             class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2">
                         <i class="fas fa-history"></i> Riwayat
@@ -52,46 +52,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- NOTIFICATION ALERTS -->
-        @if(session('success') || session('error') || $errors->any())
-        <div class="space-y-4 animate-fade-down">
-            @if(session('success'))
-                <div class="bg-emerald-50 dark:bg-emerald-900/20 border-l-4 border-emerald-500 p-6 rounded-2xl shadow-sm flex items-center gap-5">
-                    <div class="w-12 h-12 bg-emerald-500 text-white rounded-xl flex items-center justify-center text-xl shrink-0 shadow-lg shadow-emerald-500/20">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <div>
-                        <h4 class="text-sm font-black text-emerald-800 dark:text-emerald-400 uppercase tracking-widest">Berhasil!</h4>
-                        <p class="text-xs font-bold text-emerald-600 dark:text-emerald-500 mt-1">{{ session('success') }}</p>
-                    </div>
-                </div>
-            @endif
-
-            @if(session('error') || $errors->any())
-                <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-600 p-6 rounded-2xl shadow-sm flex items-start gap-5">
-                    <div class="w-12 h-12 bg-red-600 text-white rounded-xl flex items-center justify-center text-xl shrink-0 shadow-lg shadow-red-600/20">
-                        <i class="fas fa-triangle-exclamation"></i>
-                    </div>
-                    <div class="flex-1">
-                        <h4 class="text-sm font-black text-red-800 dark:text-red-400 uppercase tracking-widest">Terjadi Kesalahan!</h4>
-                        @if(session('error'))
-                            <p class="text-xs font-bold text-red-600 dark:text-red-500 mt-1">{{ session('error') }}</p>
-                        @endif
-                        @if($errors->any())
-                            <ul class="mt-2 space-y-1">
-                                @foreach($errors->all() as $error)
-                                    <li class="text-[10px] font-bold text-red-600/80 dark:text-red-500/80 flex items-center gap-2 uppercase tracking-tight">
-                                        <span class="w-1.5 h-1.5 bg-red-600 rounded-full"></span> {{ $error }}
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @endif
-                    </div>
-                </div>
-            @endif
-        </div>
-        @endif
 
         <!-- STATS CARDS -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -130,12 +90,12 @@
             <form action="{{ route('admin.breakdowns.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="relative lg:col-span-2">
                     <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    <input type="text" name="search" value="{{ request('search') }}" 
-                           placeholder="Cari berdasarkan kode alat atau detail kerusakan..." 
-                           class="w-full pl-12 pr-6 py-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl text-sm font-bold placeholder-slate-400 focus:ring-2 focus:ring-[#0055a4] dark:text-white transition-all">
+                    <input type="text" name="search" value="{{ request('search') }}"
+                           placeholder="Cari berdasarkan kode alat atau detail kerusakan..."
+                           class="w-full pl-12 pr-6 py-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl text-sm font-bold text-slate-700 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-[#0055a4] transition-all">
                 </div>
-                
-                <button type="button" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2">
+
+                <button type="submit" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2">
                     <i class="fas fa-filter"></i> Filter
                 </button>
 
@@ -157,7 +117,7 @@
 
         <!-- MAIN CONTENT AREA -->
         <div class="space-y-6">
-            
+
             <!-- TAB: UNIT RUSAK (ACTIVE BREAKDOWNS) -->
             <div x-show="activeTab === 'active'" x-transition class="space-y-4">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -227,9 +187,9 @@
                                             </a>
                                         @endif
                                         <button @click="
-                                                selectedAsset = {id: '{{ $item->id }}', code: '{{ $item->code_name }}'}; 
-                                                selectedLogId = '{{ $activeLog->id ?? '' }}'; 
-                                                currentStatus = '{{ $activeLog->repair_status ?? 'reported' }}'; 
+                                                selectedAsset = {id: '{{ $item->id }}', code: '{{ $item->code_name }}'};
+                                                selectedLogId = '{{ $activeLog->id ?? '' }}';
+                                                currentStatus = '{{ $activeLog->repair_status ?? 'reported' }}';
                                                 logDates = {
                                                     troubleshoot_date: '{{ $activeLog->troubleshoot_date ?? '' }}',
                                                     ba_date: '{{ $activeLog->ba_date ?? '' }}',
@@ -242,7 +202,7 @@
                                                     vendor_pic: '{{ addslashes($activeLog->vendor_pic ?? '') }}'
                                                 };
                                                 showUpdateModal = true;
-                                            " 
+                                            "
                                             class="bg-[#003366] dark:bg-blue-600 hover:bg-[#001e3c] dark:hover:bg-blue-700 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-900/10 transition-all flex items-center gap-2">
                                             Update Progres
                                         </button>
@@ -293,7 +253,7 @@
                                         <span class="bg-emerald-500 text-white px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest shadow-sm">Ready</span>
                                     </td>
                                     <td class="px-8 py-6 text-right">
-                                        <button @click="selectedAsset = {id: '{{ $item->id }}', code: '{{ addslashes($item->code_name) }}'}; showReportModal = true;" 
+                                        <button @click="selectedAsset = {id: '{{ $item->id }}', code: '{{ addslashes($item->code_name) }}'}; showReportModal = true;"
                                                 class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-600 hover:text-white px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
                                             Lapor Rusak
                                         </button>
@@ -367,8 +327,8 @@
                                         </td>
                                         <td class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center uppercase">
                                             @if($activeLog)
-                                                <span class="px-2 py-1 rounded border {{ 
-                                                    $activeLog->repair_status === 'order_part' ? 'bg-amber-50 text-amber-600 border-amber-200' : 
+                                                <span class="px-2 py-1 rounded border {{
+                                                    $activeLog->repair_status === 'order_part' ? 'bg-amber-50 text-amber-600 border-amber-200' :
                                                     ($activeLog->repair_status === 'on_progress' ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-slate-100 text-slate-600')
                                                 }}">
                                                     {{ str_replace('_', ' ', $activeLog->repair_status) }}
@@ -395,9 +355,9 @@
                                         <td class="px-6 py-4 text-center">
                                             @if($activeLog)
                                                 <button @click="
-                                                    selectedAsset = {id: '{{ $item->id }}', code: '{{ $item->code_name }}'}; 
-                                                    selectedLogId = '{{ $activeLog->id }}'; 
-                                                    currentStatus = '{{ $activeLog->repair_status }}'; 
+                                                    selectedAsset = {id: '{{ $item->id }}', code: '{{ $item->code_name }}'};
+                                                    selectedLogId = '{{ $activeLog->id }}';
+                                                    currentStatus = '{{ $activeLog->repair_status }}';
                                                     logDates = {
                                                         troubleshoot_date: '{{ $activeLog->troubleshoot_date ?? '' }}',
                                                         ba_date: '{{ $activeLog->ba_date ?? '' }}',
@@ -491,12 +451,12 @@
 
         <!-- MODAL: LAPOR KERUSAKAN -->
         <template x-teleport="body">
-            <div x-show="showReportModal" 
+            <div x-show="showReportModal"
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 scale-95"
                  x-transition:enter-end="opacity-100 scale-100"
                  class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md" style="display: none;">
-                
+
                 <div @click.away="showReportModal = false" class="bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl max-w-md w-full overflow-hidden border border-slate-200 dark:border-slate-800">
                     <div class="bg-red-600 p-8 border-b border-red-700 flex items-center justify-between text-white">
                         <div class="flex items-center gap-4">
@@ -508,11 +468,11 @@
                         </div>
                         <button @click="showReportModal = false" class="text-white/60 hover:text-white transition-colors"><i class="fas fa-times text-2xl"></i></button>
                     </div>
-                    
+
                     <form action="{{ route('admin.breakdowns.store') }}" method="POST" class="p-8 space-y-6">
                         @csrf
                         <input type="hidden" name="infrastructure_id" :value="selectedAsset ? selectedAsset.id : ''">
-                        
+
                         <div>
                             <label class="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">Detail Kendala / Kerusakan</label>
                             <textarea name="issue_detail" rows="4" placeholder="Jelaskan secara singkat apa yang terjadi pada unit ini..."
@@ -523,7 +483,7 @@
                             <label class="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">PIC / Vendor Penanggung Jawab</label>
                             <div class="relative">
                                 <i class="fas fa-user-gear absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                                <input type="text" name="vendor_pic" placeholder="Nama teknisi atau vendor..." 
+                                <input type="text" name="vendor_pic" placeholder="Nama teknisi atau vendor..."
                                        class="w-full pl-12 pr-6 py-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-red-500 transition-all" required>
                             </div>
                         </div>
@@ -539,12 +499,12 @@
 
         <!-- MODAL: UPDATE PROGRES -->
         <template x-teleport="body">
-            <div x-show="showUpdateModal" 
+            <div x-show="showUpdateModal"
                  x-transition:enter="transition ease-out duration-300"
                  x-transition:enter-start="opacity-0 scale-95"
                  x-transition:enter-end="opacity-100 scale-100"
                  class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md" style="display: none;">
-                
+
                 <div @click.away="showUpdateModal = false" class="bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl max-w-2xl w-full overflow-hidden border border-slate-200 dark:border-slate-800 max-h-[90vh] flex flex-col">
                     <div class="bg-[#003366] dark:bg-slate-950 p-8 border-b border-white/5 flex items-center justify-between text-white shrink-0">
                         <div class="flex items-center gap-4">
@@ -556,10 +516,10 @@
                         </div>
                         <button @click="showUpdateModal = false" class="text-white/60 hover:text-white transition-colors"><i class="fas fa-times text-2xl"></i></button>
                     </div>
-                    
+
                     <form :action="`/admin/breakdowns/${selectedLogId}`" method="POST" enctype="multipart/form-data" class="p-8 space-y-8 overflow-y-auto custom-scrollbar">
                         @csrf @method('PUT')
-                        
+
                         <!-- Status Picker -->
                         <div class="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-3xl border border-blue-100 dark:border-blue-800">
                             <label class="block text-[10px] font-black text-[#003366] dark:text-blue-400 uppercase tracking-widest mb-4">Ubah Tahap Pekerjaan</label>
@@ -568,7 +528,7 @@
                                     <label class="relative cursor-pointer">
                                         <input type="radio" name="repair_status" :value="s" x-model="currentStatus" class="sr-only">
                                         <div :class="currentStatus === s ? 'bg-[#003366] text-white shadow-lg scale-105' : 'bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700'"
-                                             class="px-3 py-4 rounded-xl text-[9px] font-black uppercase tracking-tighter text-center transition-all border border-transparent" 
+                                             class="px-3 py-4 rounded-xl text-[9px] font-black uppercase tracking-tighter text-center transition-all border border-transparent"
                                              x-text="s.replace('_', ' ')"></div>
                                     </label>
                                 </template>

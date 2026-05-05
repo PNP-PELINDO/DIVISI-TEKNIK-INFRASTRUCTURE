@@ -67,9 +67,9 @@
                 </div>
 
                 <div class="w-full flex items-center justify-center gap-6 md:gap-8 bg-white/5 border border-white/10 p-6 rounded-3xl backdrop-blur-md shadow-2xl mb-8 animate-fade-up" style="animation-delay: 200ms;">
-                    <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-12 xl:h-14 object-contain brightness-0 invert">
+                    <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-12 xl:h-14 object-contain grayscale brightness-0 invert">
                     <div class="w-px h-12 bg-white/20"></div>
-                    <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-12 xl:h-14 object-contain brightness-0 invert">
+                    <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-12 xl:h-14 object-contain grayscale brightness-0 invert">
                 </div>
 
                 <div class="animate-fade-up" style="animation-delay: 300ms;">
@@ -96,9 +96,9 @@
             
             <div class="absolute top-8 left-0 w-full flex justify-center lg:hidden px-6 animate-fade-up">
                 <div class="flex items-center gap-4 bg-white dark:bg-slate-900 px-6 py-3 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 w-full max-w-sm justify-center">
-                    <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-6 sm:h-8 object-contain dark:invert dark:brightness-200">
+                    <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-6 sm:h-8 object-contain dark:grayscale dark:invert dark:brightness-200">
                     <div class="w-px h-8 bg-slate-200 dark:bg-slate-800"></div>
-                    <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-6 sm:h-8 object-contain dark:invert dark:brightness-200">
+                    <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-6 sm:h-8 object-contain dark:grayscale dark:invert dark:brightness-200">
                 </div>
             </div>
 

@@ -36,6 +36,21 @@
                 </div>
                 
                 <div class="flex items-center gap-3">
+                    <div x-data="{ openExport: false }" class="relative">
+                        <button @click="openExport = !openExport" @click.away="openExport = false" 
+                                class="bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-3 border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700">
+                            <i class="fas fa-file-export text-red-500"></i> Export Laporan <i class="fas fa-chevron-down text-[8px] opacity-60"></i>
+                        </button>
+                        <div x-show="openExport" x-transition class="absolute right-0 mt-3 w-56 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl z-[100] overflow-hidden">
+                            <button onclick="openExportModal('pdf')" class="w-full text-left px-6 py-4 text-[10px] font-black uppercase text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-4">
+                                <i class="fas fa-file-pdf text-red-500 text-sm"></i> Format PDF (.pdf)
+                            </button>
+                            <button onclick="openExportModal('excel')" class="w-full text-left px-6 py-4 text-[10px] font-black uppercase text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors flex items-center gap-4 border-t border-slate-100 dark:border-slate-700">
+                                <i class="fas fa-file-excel text-emerald-500 text-sm"></i> Format Excel (.xlsx)
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="flex p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-inner">
                         <button @click="activeTab = 'list'" 
                                 :class="activeTab === 'list' ? 'bg-white dark:bg-slate-700 text-red-600 dark:text-red-400 shadow-md scale-100' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 scale-95'"
@@ -50,46 +65,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- NOTIFICATION ALERTS -->
-            @if(session('success') || session('error') || $errors->any())
-            <div class="pt-6 border-t border-slate-100 dark:border-slate-800/50 space-y-4 animate-fade-down">
-                @if(session('success'))
-                    <div class="bg-emerald-50 dark:bg-emerald-900/20 border-l-4 border-emerald-500 p-6 rounded-2xl shadow-sm flex items-center gap-5">
-                        <div class="w-12 h-12 bg-emerald-500 text-white rounded-xl flex items-center justify-center text-xl shrink-0 shadow-lg shadow-emerald-500/20">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-black text-emerald-800 dark:text-emerald-400 uppercase tracking-widest">Berhasil!</h4>
-                            <p class="text-xs font-bold text-emerald-600 dark:text-emerald-500 mt-1">{{ session('success') }}</p>
-                        </div>
-                    </div>
-                @endif
-
-                @if(session('error') || $errors->any())
-                    <div class="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-600 p-6 rounded-2xl shadow-sm flex items-start gap-5">
-                        <div class="w-12 h-12 bg-red-600 text-white rounded-xl flex items-center justify-center text-xl shrink-0 shadow-lg shadow-red-600/20">
-                            <i class="fas fa-triangle-exclamation"></i>
-                        </div>
-                        <div class="flex-1">
-                            <h4 class="text-sm font-black text-red-800 dark:text-red-400 uppercase tracking-widest">Terjadi Kesalahan!</h4>
-                            @if(session('error'))
-                                <p class="text-xs font-bold text-red-600 dark:text-red-500 mt-1">{{ session('error') }}</p>
-                            @endif
-                            @if($errors->any())
-                                <ul class="mt-2 space-y-1">
-                                    @foreach($errors->all() as $error)
-                                        <li class="text-[10px] font-bold text-red-600/80 dark:text-red-500/80 flex items-center gap-2 uppercase tracking-tight">
-                                            <span class="w-1.5 h-1.5 bg-red-600 rounded-full"></span> {{ $error }}
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @endif
-                        </div>
-                    </div>
-                @endif
-            </div>
-            @endif
 
             <!-- Server-side Filter Form -->
             <form action="{{ route('admin.breakdowns.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 pt-8 border-t border-slate-100 dark:border-slate-800/50">
@@ -419,34 +394,11 @@
             </div>
         </template>
 
-        <template x-teleport="body">
-            <div x-show="showDeleteModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-xl" style="display: none;">
-                <div @click.away="showDeleteModal = false" 
-                     x-transition:enter="transition ease-out duration-300"
-                     x-transition:enter-start="opacity-0 scale-90"
-                     x-transition:enter-end="opacity-100 scale-100"
-                     class="bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl max-w-sm w-full overflow-hidden border border-red-100 dark:border-red-900/30">
-                    <div class="bg-red-600 h-2 w-full"></div>
-                    <div class="p-10 text-center">
-                        <div class="w-24 h-24 bg-red-50 dark:bg-red-900/30 text-red-600 rounded-full flex items-center justify-center text-5xl mx-auto mb-8 shadow-inner border border-red-100 dark:border-red-800 animate-pulse">
-                            <i class="fas fa-radiation"></i>
-                        </div>
-                        <h2 class="text-2xl font-black text-[#003366] dark:text-white uppercase leading-tight mb-4">Hapus Log Laporan?</h2>
-                        <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-2xl mb-8 border border-red-100 dark:border-red-800">
-                            <p class="text-[10px] font-black text-red-700 dark:text-red-400 uppercase tracking-widest mb-1">Tindakan Kritikal!</p>
-                            <p class="text-[11px] text-red-600 dark:text-red-500 font-bold leading-relaxed">Menghapus log akan mereset status unit <span class="underline" x-text="assetCode"></span> secara permanen.</p>
-                        </div>
-                        <div class="flex flex-col gap-3">
-                            <form :action="deleteUrl" method="POST" class="w-full">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="w-full py-5 bg-red-600 hover:bg-red-700 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-red-900/30 transition-all active:scale-95">Ya, Hapus Permanen</button>
-                            </form>
-                            <button @click="showDeleteModal = false" class="w-full py-4 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 dark:hover:bg-slate-700 transition-all">Batalkan Tindakan</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </template>
+    <x-confirm-modal 
+        name="delete" 
+        title="Hapus Log Laporan?" 
+        message="Menghapus log akan mereset status unit <strong class='text-red-600' x-text='assetCode'></strong> secara permanen. Tindakan ini tidak dapat dibatalkan."
+    />
 
         <!-- Audit Trail Modal -->
         <template x-teleport="body">

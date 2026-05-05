@@ -10,11 +10,34 @@ class ExportController extends Controller
 {
     public function process(Request $request)
     {
+        $this->authorize('viewAny', Infrastructure::class);
         $user = auth()->user();
         $format = $request->input('format', 'pdf');
-        
+        if (!in_array($format, ['pdf', 'excel'])) {
+            $format = 'pdf';
+        }
+
         $infraQuery = Infrastructure::with('entity');
         $logQuery = BreakdownLog::with(['infrastructure' => fn($q) => $q->withTrashed()->with('entity')]);
+
+        $applyDateFilters = function ($query) use ($request) {
+            if ($request->filled('start_date')) {
+                $query->whereDate('created_at', '>=', $request->start_date);
+            }
+            if ($request->filled('end_date')) {
+                $query->whereDate('created_at', '<=', $request->end_date);
+            }
+        };
+
+        $applyStatusFilters = function ($query) use ($request) {
+            if ($request->filled('status')) {
+                if ($request->status === 'available') {
+                    $query->where('repair_status', 'resolved');
+                } elseif ($request->status === 'breakdown') {
+                    $query->where('repair_status', '!=', 'resolved');
+                }
+            }
+        };
 
         // 1. Role Filtering
         if ($user->role !== 'superadmin') {
@@ -29,15 +52,7 @@ class ExportController extends Controller
             });
         }
 
-        // 2. Date Range Filtering (for Logs)
-        if ($request->filled('start_date')) {
-            $logQuery->whereDate('created_at', '>=', $request->start_date);
-        }
-        if ($request->filled('end_date')) {
-            $logQuery->whereDate('created_at', '<=', $request->end_date);
-        }
-
-        // 3. Category Filtering
+        // 2. Category Filtering
         if ($request->filled('category')) {
             $infraQuery->where('category', $request->category);
             $logQuery->whereHas('infrastructure', function ($q) use ($request) {
@@ -45,20 +60,24 @@ class ExportController extends Controller
             });
         }
 
-        // 4. Status Filtering
+        // 3. Status Filtering
         if ($request->filled('status')) {
             $infraQuery->where('status', $request->status);
-            
-            if ($request->status == 'available') {
-                $logQuery->where('repair_status', 'resolved');
-            } elseif ($request->status == 'breakdown') {
-                $logQuery->where('repair_status', '!=', 'resolved');
-            }
-        } else {
-            // Default behavior if status not specified and no date range: only show active breakdowns
-            if (!$request->filled('start_date') && !$request->filled('end_date')) {
-                $logQuery->where('repair_status', '!=', 'resolved');
-            }
+            $applyStatusFilters($logQuery);
+        } elseif (!$request->filled('start_date') && !$request->filled('end_date')) {
+            // Default behavior if user has not specified status or date range:
+            // show non-resolved breakdown logs only.
+            $logQuery->where('repair_status', '!=', 'resolved');
+        }
+
+        // 4. Date Range Filtering (for Logs and Report consistency)
+        $applyDateFilters($logQuery);
+
+        if ($request->filled('start_date') || $request->filled('end_date')) {
+            $infraQuery->whereHas('breakdownLogs', function ($q) use ($applyDateFilters, $applyStatusFilters) {
+                $applyDateFilters($q);
+                $applyStatusFilters($q);
+            });
         }
 
         $allInfrastructures = $infraQuery->get();

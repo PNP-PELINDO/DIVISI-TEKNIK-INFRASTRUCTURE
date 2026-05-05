@@ -6,53 +6,6 @@
             userName: '' 
          }">
 
-        <!-- MODAL DELETE (Enterprise Style, Konsisten) -->
-        <template x-teleport="body">
-            <div x-show="showDeleteModal" 
-                 x-transition:enter="transition ease-out duration-300"
-                 x-transition:enter-start="opacity-0 backdrop-blur-none"
-                 x-transition:enter-end="opacity-100 backdrop-blur-sm"
-                 x-transition:leave="transition ease-in duration-200"
-                 x-transition:leave-start="opacity-100 backdrop-blur-sm"
-                 x-transition:leave-end="opacity-0 backdrop-blur-none"
-                 class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm"
-                 style="display: none;">
-                
-                <div @click.away="showDeleteModal = false" 
-                     class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200 dark:border-slate-800 transform transition-all">
-                    
-                    <div class="p-6 sm:p-8">
-                        <div class="flex items-start gap-5">
-                            <div class="flex-shrink-0 w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-xl">
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </div>
-                            <div>
-                                <h2 class="text-lg font-bold text-slate-900 dark:text-slate-100 mb-1">Hapus Akses Pengguna</h2>
-                                <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                                    Apakah Anda yakin ingin menghapus akun <span class="font-bold text-slate-900 dark:text-slate-100" x-text="userName"></span>? Data akses ini akan dihapus secara permanen dari sistem.
-                                </p>
-                            </div>
-                        </div>
-
-                        <div class="mt-8 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
-                            <button type="button" @click="showDeleteModal = false" 
-                                    class="w-full sm:w-auto px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-semibold transition-colors">
-                                Batal
-                            </button>
-                            
-                            <form :action="deleteUrl" method="POST" class="w-full sm:w-auto">
-                                @csrf @method('DELETE')
-                                <button type="submit" 
-                                        class="w-full px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-semibold transition-colors shadow-sm">
-                                    Ya, Hapus Akun
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </template>
-
         <!-- HEADER SECTION -->
         <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm space-y-10 relative overflow-hidden mb-8">
             <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#003366] to-[#0055a4]"></div>
@@ -110,22 +63,7 @@
             </form>
         </div>
 
-        <!-- ALERTS -->
-        @if(session('success'))
-            <div class="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800 p-5 rounded-3xl flex items-start gap-4 shadow-sm animate-fade-in mb-8">
-                <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 shrink-0">
-                    <i class="fas fa-check-circle text-xl"></i>
-                </div>
-                <div>
-                    <h3 class="text-sm font-black text-emerald-800 dark:text-emerald-400 uppercase tracking-tight">Berhasil</h3>
-                    <p class="text-xs text-emerald-700 dark:text-emerald-300 mt-1 font-medium leading-relaxed">{{ session('success') }}</p>
-                </div>
-            </div>
-        @endif
-
-
         @php
-            // Ambil underlying collection dari paginator sebelum di-grouping
             $groupedUsers = $users->getCollection()->groupBy('role');
         @endphp
 
@@ -137,7 +75,6 @@
                 @endphp
 
                 <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-                    
                     <div class="bg-slate-50/80 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 px-6 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div class="flex items-center gap-4">
                             <div class="w-10 h-10 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center shadow-sm">
@@ -171,14 +108,12 @@
                                     <td class="px-8 py-5 text-center text-xs font-bold text-slate-400 dark:text-slate-500">
                                         {{ $index + 1 }}
                                     </td>
-                                    
                                     <td class="px-8 py-5">
                                         <div class="flex flex-col">
                                             <span class="text-sm font-black text-[#003366] dark:text-blue-400 uppercase tracking-tight group-hover:text-blue-600 transition-colors">{{ $user->name }}</span>
                                             <span class="text-[10px] font-bold text-slate-500 dark:text-slate-400 mt-1"><i class="far fa-envelope mr-1 opacity-70"></i> {{ $user->email }}</span>
                                         </div>
                                     </td>
-                                    
                                     <td class="px-8 py-5">
                                         @if($user->entity)
                                             <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
@@ -190,17 +125,15 @@
                                             </span>
                                         @endif
                                     </td>
-                                    
                                     <td class="px-8 py-5 text-right">
                                         <div class="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
                                             <a href="{{ route('admin.users.edit', $user->id) }}" 
                                                class="w-9 h-9 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-800 flex items-center justify-center transition-all shadow-sm">
                                                 <i class="fas fa-pen text-xs"></i>
                                             </a>
-                                            
                                             @if($user->id !== auth()->id())
                                             <button type="button" 
-                                                    @click="
+                                                    x-on:click="
                                                         deleteUrl = '{{ route('admin.users.destroy', $user->id) }}'; 
                                                         userName = '{{ addslashes($user->name) }}'; 
                                                         showDeleteModal = true;
@@ -240,6 +173,11 @@
                 {{ $users->links() }}
             </div>
         @endif
+
+        <x-confirm-modal 
+            name="delete" 
+            title="Hapus Pengguna?" 
+            message="Apakah Anda yakin ingin menghapus akun <strong class='text-red-600' x-text='userName'></strong>? Data akses ini akan dihapus secara permanen dari sistem."
+        />
     </div>
 </x-app-layout>
-

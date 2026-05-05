@@ -18,10 +18,11 @@
         options: {{ json_encode($options) }},
         get filteredOptions() {
             if (this.search === '') return this.options;
+            const s = this.search.toLowerCase();
             return this.options.filter(option => 
-                option.label.toLowerCase().includes(this.search.toLowerCase()) ||
-                (option.description && option.description.toLowerCase().includes(this.search.toLowerCase())) ||
-                option.value.toLowerCase().includes(this.search.toLowerCase())
+                (option.label && String(option.label).toLowerCase().includes(s)) ||
+                (option.description && String(option.description).toLowerCase().includes(s)) ||
+                (option.value && String(option.value).toLowerCase().includes(s))
             );
         },
         select(option) {

@@ -132,12 +132,27 @@
                     @error('type') <p class="text-red-500 text-xs mt-2 font-bold ml-1">{{ $message }}</p> @enderror
                 </div>
 
-                <div>
-                    <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Status Operasional Saat Ini</label>
-                    <select name="status" class="w-full border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-sm font-bold p-4 focus:ring-4 focus:ring-blue-50 dark:focus:ring-blue-900/20 focus:border-[#0055a4] dark:focus:border-blue-400 transition-all uppercase text-slate-900 dark:text-slate-100">
-                        <option value="available" {{ (old('status') ?? $infrastructure->status) == 'available' ? 'selected' : '' }}>Available (Siap Pakai)</option>
-                        <option value="breakdown" {{ (old('status') ?? $infrastructure->status) == 'breakdown' ? 'selected' : '' }}>Breakdown (Terkendala)</option>
-                    </select>
+                <div x-data="{ assetStatus: '{{ old('status', $infrastructure->status) }}' }">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Status Operasional Saat Ini</label>
+                            <select name="status" x-model="assetStatus" class="w-full border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-sm font-bold p-4 focus:ring-4 focus:ring-blue-50 dark:focus:ring-blue-900/20 focus:border-[#0055a4] dark:focus:border-blue-400 transition-all uppercase text-slate-900 dark:text-slate-100">
+                                <option value="available" {{ (old('status') ?? $infrastructure->status) == 'available' ? 'selected' : '' }}>Available (Siap Pakai)</option>
+                                <option value="breakdown" {{ (old('status') ?? $infrastructure->status) == 'breakdown' ? 'selected' : '' }}>Breakdown (Terkendala)</option>
+                            </select>
+                            @error('status') <p class="text-red-500 text-[10px] mt-2 font-bold ml-1 uppercase">{{ $message }}</p> @enderror
+                        </div>
+
+                        <div x-show="assetStatus === 'breakdown'" x-cloak x-transition class="space-y-3">
+                            <label class="block text-[11px] font-black text-red-600 dark:text-red-400 uppercase tracking-[0.2em] mb-2 ml-1">Detail Kerusakan / Kendala</label>
+                            <div class="relative">
+                                <i class="fas fa-tools absolute left-5 top-5 text-red-400"></i>
+                                <textarea name="issue_detail" placeholder="Jelaskan detail kerusakan alat saat ini..." 
+                                          class="w-full border border-red-200 dark:border-red-900/30 bg-red-50/30 dark:bg-red-900/10 rounded-2xl text-sm font-bold p-5 pl-12 focus:ring-4 focus:ring-red-50 focus:border-red-500 transition-all text-slate-700 dark:text-slate-200">{{ old('issue_detail') }}</textarea>
+                            </div>
+                            @error('issue_detail') <p class="text-red-500 text-[10px] font-bold ml-1 uppercase">{{ $message }}</p> @enderror
+                        </div>
+                    </div>
                 </div>
 
                 <div class="pt-8 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row gap-4">
