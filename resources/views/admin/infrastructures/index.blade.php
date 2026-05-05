@@ -25,7 +25,7 @@
                         <div class="w-20 h-20 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full flex items-center justify-center text-4xl mx-auto mb-6 border border-red-100 dark:border-red-800">
                             <i class="fas fa-trash-alt"></i>
                         </div>
-                        <h3 class="text-2xl font-black text-[#003366] dark:text-white uppercase tracking-tight mb-2">Hapus Aset?</h3>
+                        <h3 class="text-2xl font-black text-pelindo-blue dark:text-white uppercase tracking-tight mb-2">Hapus Aset?</h3>
                         <p class="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed mb-8">
                             Anda yakin ingin menghapus data <strong class="text-red-600 dark:text-red-400" x-text="assetCode"></strong>? <br>
                             Data ini akan dihapus secara permanen.
@@ -56,7 +56,7 @@
                      x-transition:enter-end="opacity-100 scale-100"
                      class="bg-white dark:bg-slate-900 rounded-[3rem] shadow-2xl max-w-4xl w-full overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col max-h-[90vh]">
                     
-                    <div class="bg-[#003366] dark:bg-slate-800 p-8 flex justify-between items-center shrink-0 border-b border-white/10 relative overflow-hidden">
+                    <div class="bg-pelindo-blue dark:bg-slate-800 p-8 flex justify-between items-center shrink-0 border-b border-white/10 relative overflow-hidden">
                         <div class="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
                             <i class="fas fa-boxes-stacked text-8xl text-white"></i>
                         </div>
@@ -64,8 +64,8 @@
                             <div class="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center text-2xl text-white shadow-inner border border-white/10"><i class="fas fa-info-circle"></i></div>
                             <div>
                                 <h2 class="text-2xl font-black text-white uppercase tracking-tight leading-none" x-text="selectedItem.code"></h2>
-                                <p class="text-[10px] font-black text-blue-300 uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
-                                    <span class="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></span>
+                                <p class="text-[10px] font-black text-white/60 uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
+                                    <span class="w-2 h-2 bg-pelindo-cyan rounded-full animate-pulse"></span>
                                     Inventory Specification & Health History
                                 </p>
                             </div>
@@ -99,8 +99,8 @@
                                     <div class="bg-slate-50 dark:bg-slate-800/50 p-5 rounded-2xl border border-slate-100 dark:border-slate-700 shadow-sm">
                                         <p class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2">Status Saat Ini</p>
                                         <span class="inline-flex items-center gap-2 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border"
-                                              :class="selectedItem.status === 'available' ? 'bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800' : 'bg-red-50 text-red-600 border-red-100 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800'">
-                                            <span class="w-1.5 h-1.5 rounded-full" :class="selectedItem.status === 'available' ? 'bg-emerald-500' : 'bg-red-500 animate-pulse'"></span>
+                                              :class="selectedItem.status === 'available' ? 'bg-sky-50 text-pelindo-blue border-sky-100 dark:bg-sky-900/30 dark:text-pelindo-cyan dark:border-sky-800' : 'bg-slate-100 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'">
+                                            <span class="w-1.5 h-1.5 rounded-full" :class="selectedItem.status === 'available' ? 'bg-pelindo-cyan' : 'bg-slate-400'"></span>
                                             <span x-text="selectedItem.status === 'available' ? 'Ready' : 'Down'"></span>
                                         </span>
                                     </div>
@@ -134,7 +134,7 @@
                             <!-- RIGHT COLUMN: MAINTENANCE TIMELINE -->
                             <div class="lg:col-span-7 flex flex-col">
                                 <div class="flex items-center justify-between mb-6">
-                                    <h3 class="text-xs font-black text-[#003366] dark:text-blue-400 uppercase tracking-widest flex items-center gap-3">
+                                    <h3 class="text-xs font-black text-pelindo-blue dark:text-pelindo-cyan uppercase tracking-widest flex items-center gap-3">
                                         <i class="fas fa-history text-slate-400"></i> Histori Kerusakan & Perbaikan
                                     </h3>
                                     <span class="text-[9px] font-black bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700" x-text="selectedItem.logs?.length + ' Catatan'"></span>
@@ -158,10 +158,10 @@
                                                     <div class="flex justify-between items-start mb-2">
                                                         <span class="text-[9px] font-black px-2 py-1 rounded-md uppercase tracking-widest border"
                                                               :class="{
-                                                                  'bg-red-50 text-red-600 border-red-100': log.repair_status === 'reported',
-                                                                  'bg-amber-50 text-amber-600 border-amber-100': log.repair_status === 'on_progress',
-                                                                  'bg-purple-50 text-purple-600 border-purple-100': log.repair_status === 'order_part',
-                                                                  'bg-emerald-50 text-emerald-600 border-emerald-100': log.repair_status === 'resolved'
+                                                                  'bg-slate-100 text-slate-600 border-slate-200': log.repair_status === 'reported',
+                                                                  'bg-sky-50 text-pelindo-blue border-sky-100': log.repair_status === 'on_progress',
+                                                                  'bg-slate-50 text-slate-500 border-slate-100': log.repair_status === 'order_part',
+                                                                  'bg-sky-100 text-pelindo-blue border-pelindo-cyan': log.repair_status === 'resolved'
                                                               }"
                                                               x-text="log.repair_status.replace('_', ' ')">
                                                         </span>
@@ -224,24 +224,24 @@
 
         <!-- HEADER & FILTER SECTION -->
         <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm space-y-10 relative overflow-hidden mb-8">
-            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#003366] to-[#0055a4]"></div>
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-pelindo-blue to-pelindo-cyan"></div>
 
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
                 <div class="flex items-center gap-6">
-                    <div class="w-16 h-16 bg-blue-50 dark:bg-blue-900/30 text-[#0055a4] dark:text-blue-400 rounded-[1.5rem] flex items-center justify-center text-3xl border border-blue-100 dark:border-blue-800 shadow-inner">
+                    <div class="w-16 h-16 bg-sky-50 dark:bg-blue-900/30 text-pelindo-blue dark:text-pelindo-cyan rounded-[1.5rem] flex items-center justify-center text-3xl border border-sky-100 dark:border-blue-800 shadow-inner">
                         <i class="fas fa-boxes-stacked"></i>
                     </div>
                     <div>
-                        <h1 class="text-3xl font-black text-[#003366] dark:text-white uppercase tracking-tight">Katalog Infrastruktur</h1>
+                        <h1 class="text-3xl font-black text-pelindo-blue dark:text-white uppercase tracking-tight">Katalog Infrastruktur</h1>
                         <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
-                            <span class="w-2 h-2 bg-blue-500 rounded-full"></span> 
+                            <span class="w-2 h-2 bg-pelindo-cyan rounded-full"></span> 
                             Sistem Manajemen Aset Terpadu
                         </p>
                     </div>
                 </div>
                 
                 <a href="{{ route('admin.infrastructures.create') }}" 
-                   class="bg-[#003366] hover:bg-[#001e3c] dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-lg shadow-blue-900/20 active:scale-95">
+                   class="bg-pelindo-blue hover:bg-pelindo-navy dark:bg-pelindo-blue dark:hover:bg-pelindo-navy text-white px-10 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 shadow-lg shadow-blue-900/20 active:scale-95">
                     <i class="fas fa-plus text-xs"></i> Register Aset Baru
                 </a>
             </div>
@@ -251,12 +251,12 @@
                 <div class="relative lg:col-span-2">
                     <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-xs"></i>
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari Kode atau Nama Aset..." 
-                           class="w-full pl-12 pr-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-[#0055a4] transition-all">
+                           class="w-full pl-12 pr-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-pelindo-blue transition-all">
                 </div>
                 
                 @if(auth()->user()->role === 'superadmin')
                 <div class="relative">
-                    <select name="entity_id" onchange="this.form.submit()" class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-black text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-[#0055a4] uppercase transition-all appearance-none cursor-pointer">
+                    <select name="entity_id" onchange="this.form.submit()" class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-black text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-pelindo-blue uppercase transition-all appearance-none cursor-pointer">
                         <option value="all">Semua Terminal</option>
                         @foreach($allEntities as $entity)
                             <option value="{{ $entity->id }}" {{ request('entity_id') == $entity->id ? 'selected' : '' }}>{{ $entity->name }}</option>
@@ -267,7 +267,7 @@
                 @endif
 
                 <div class="relative">
-                    <select name="category" onchange="this.form.submit()" class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-black text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-[#0055a4] uppercase transition-all appearance-none cursor-pointer">
+                    <select name="category" onchange="this.form.submit()" class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-black text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-pelindo-blue uppercase transition-all appearance-none cursor-pointer">
                         <option value="all">Kategori</option>
                         <option value="equipment" {{ request('category') == 'equipment' ? 'selected' : '' }}>EQUIPMENT</option>
                         <option value="facility" {{ request('category') == 'facility' ? 'selected' : '' }}>FACILITY</option>
@@ -277,7 +277,7 @@
                 </div>
 
                 <div class="relative">
-                    <select name="status" onchange="this.form.submit()" class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-black text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-[#0055a4] uppercase transition-all appearance-none cursor-pointer">
+                    <select name="status" onchange="this.form.submit()" class="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-black text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-pelindo-blue uppercase transition-all appearance-none cursor-pointer">
                         <option value="all">Status</option>
                         <option value="available" {{ request('status') == 'available' ? 'selected' : '' }}>Ready</option>
                         <option value="breakdown" {{ request('status') == 'breakdown' ? 'selected' : '' }}>Down</option>
@@ -310,10 +310,10 @@
                                 <tr class="bg-blue-50/50 dark:bg-blue-900/10 border-y border-blue-100 dark:border-blue-900/30">
                                     <td colspan="5" class="px-8 py-4">
                                         <div class="flex items-center justify-between">
-                                            <h3 class="font-black text-[#003366] dark:text-blue-400 uppercase tracking-widest text-[11px] flex items-center gap-2">
-                                                <i class="fas fa-map-marker-alt text-[#0055a4] dark:text-blue-400 text-sm"></i> {{ $entityName }}
+                                            <h3 class="font-black text-pelindo-blue dark:text-pelindo-cyan uppercase tracking-widest text-[11px] flex items-center gap-2">
+                                                <i class="fas fa-map-marker-alt text-pelindo-blue dark:text-pelindo-cyan text-sm"></i> {{ $entityName }}
                                             </h3>
-                                            <span class="text-[9px] font-black text-[#0055a4] dark:text-blue-400 uppercase bg-white dark:bg-slate-800 px-3 py-1.5 rounded-md border border-blue-100 dark:border-blue-900/50 shadow-sm">{{ $items->count() }} Unit Aset</span>
+                                            <span class="text-[9px] font-black text-pelindo-blue dark:text-pelindo-cyan uppercase bg-white dark:bg-slate-800 px-3 py-1.5 rounded-md border border-blue-100 dark:border-blue-900/50 shadow-sm">{{ $items->count() }} Unit Aset</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -332,7 +332,7 @@
                                                         </div>
                                                     @endif
                                                 </div>
-                                                <span class="font-black text-[#003366] dark:text-blue-400 text-xs tracking-wider uppercase bg-white dark:bg-slate-800 px-2.5 py-1 rounded border border-slate-200 dark:border-slate-700 shadow-sm">{{ $item->code_name }}</span>
+                                                <span class="font-black text-pelindo-blue dark:text-pelindo-cyan text-xs tracking-wider uppercase bg-white dark:bg-slate-800 px-2.5 py-1 rounded border border-slate-200 dark:border-slate-700 shadow-sm">{{ $item->code_name }}</span>
                                             </div>
                                         </td>
                                         <td class="px-8 py-5">
@@ -345,12 +345,12 @@
                                         </td>
                                         <td class="px-8 py-5 text-center">
                                             @if($item->status === 'available')
-                                                <span class="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 rounded text-[9px] font-black uppercase tracking-widest border border-emerald-200 dark:border-emerald-800 inline-flex items-center gap-1.5">
-                                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Ready
+                                                <span class="bg-sky-50 dark:bg-sky-900/20 text-pelindo-blue dark:text-pelindo-cyan px-3 py-1.5 rounded text-[9px] font-black uppercase tracking-widest border border-sky-100 dark:border-sky-800 inline-flex items-center gap-1.5">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-pelindo-cyan"></span> Ready
                                                 </span>
                                             @else
-                                                <span class="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 px-3 py-1.5 rounded text-[9px] font-black uppercase tracking-widest border border-red-200 dark:border-red-800 inline-flex items-center gap-1.5">
-                                                    <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span> Down
+                                                <span class="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-3 py-1.5 rounded text-[9px] font-black uppercase tracking-widest border border-slate-200 dark:border-slate-700 inline-flex items-center gap-1.5">
+                                                    <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span> Down
                                                 </span>
                                             @endif
                                         </td>

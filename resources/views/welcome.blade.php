@@ -11,7 +11,25 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script>
-        if (localStorage.getItem('dark-mode') === 'true' || (!('dark-mode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        pelindo: {
+                            blue: '#0064a7',
+                            cyan: '#58b9e4',
+                            navy: '#002d5d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <script>
+        // Force light mode by default if no preference is saved
+        if (localStorage.getItem('dark-mode') === 'true') {
             document.documentElement.classList.add('dark');
         } else {
             document.documentElement.classList.remove('dark');
@@ -111,6 +129,33 @@
 
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Dark Mode Overrides for Custom Classes */
+        .dark body {
+            background-color: #020617;
+            background-image: radial-gradient(#1e293b 1px, transparent 1px);
+            color: #f1f5f9;
+        }
+
+        .dark .asset-card {
+            background-color: #0f172a;
+            border-color: #1e293b;
+        }
+
+        .dark .asset-card:hover {
+            border-color: #38bdf8;
+            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .dark .asset-image-placeholder {
+            background-color: #1e293b;
+        }
+
+        .dark .stat-available { background-color: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.2); }
+        .dark .stat-available .stat-label { color: #34d399; }
+
+        .dark .stat-breakdown { background-color: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.2); }
+        .dark .stat-breakdown .stat-label { color: #f87171; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col animate-fade-up" 
@@ -144,21 +189,26 @@
     <nav class="bg-white/90 dark:bg-[#001e3c]/90 backdrop-blur-md sticky top-0 z-[70] border-b border-slate-200 dark:border-slate-800 shadow-sm transition-colors duration-300">
         <div class="max-w-[1600px] mx-auto px-4 md:px-10 h-16 md:h-20 flex items-center justify-between">
             <div class="flex items-center gap-3 md:gap-6">
-                <!-- Logo Danantara: Black in Light Mode, White in Dark Mode -->
-                <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-6 md:h-10 object-contain brightness-0 dark:brightness-100 transition-all duration-300">
+                <!-- Logo Danantara: Dark in Light Mode, White in Dark Mode -->
+                <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-6 md:h-10 object-contain dark:invert dark:brightness-200 transition-all duration-300">
                 
                 <div class="w-px h-6 md:h-10 bg-slate-200 dark:bg-slate-700"></div>
                 
-                <!-- Logo Pelindo: Black in Light Mode, White in Dark Mode -->
-                <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-6 md:h-10 object-contain brightness-0 dark:brightness-100 transition-all duration-300">
+                <!-- Logo Pelindo: Dark in Light Mode, White in Dark Mode -->
+                <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-6 md:h-10 object-contain dark:invert dark:brightness-200 transition-all duration-300">
             </div>
-            <div>
+            <div class="flex items-center gap-3 md:gap-5">
+                <!-- Dark Mode Toggle -->
+                <button onclick="toggleDarkMode()" class="w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-amber-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all border border-slate-200 dark:border-slate-700">
+                    <i id="dark-icon" class="fas fa-moon dark:fa-sun"></i>
+                </button>
+
                 @auth
-                    <a href="{{ route('dashboard') }}" class="px-4 py-2 md:px-6 md:py-2.5 bg-[#003366] text-white rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest shadow-md transition-all whitespace-nowrap">
+                    <a href="{{ route('dashboard') }}" class="px-4 py-2 md:px-6 md:py-2.5 bg-[#003366] dark:bg-sky-600 text-white rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest shadow-md transition-all whitespace-nowrap">
                         <i class="fas fa-desktop md:mr-2"></i> <span class="hidden md:inline">Dashboard</span>
                     </a>
                 @else
-                    <a href="{{ route('login') }}" class="px-4 py-2 md:px-6 md:py-2.5 bg-white text-[#003366] border-2 border-[#003366] rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest shadow-sm transition-all hover:bg-slate-50 whitespace-nowrap">
+                    <a href="{{ route('login') }}" class="px-4 py-2 md:px-6 md:py-2.5 bg-white dark:bg-slate-800 text-[#003366] dark:text-sky-400 border-2 border-[#003366] dark:border-slate-700 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest shadow-sm transition-all hover:bg-slate-50 dark:hover:bg-slate-700 whitespace-nowrap">
                         <i class="fas fa-lock md:mr-2"></i> <span class="hidden md:inline">Login</span>
                     </a>
                 @endauth
@@ -169,13 +219,13 @@
     <main class="flex-1 w-full max-w-[1600px] mx-auto px-4 md:px-10 py-8 md:py-10 space-y-10 md:space-y-12">
 
         <div class="text-center py-4 md:py-8 ">
-            <h1 class="text-3xl md:text-5xl font-black text-[#003366] uppercase tracking-tight leading-tight">
+            <h1 class="text-3xl md:text-5xl font-black text-[#003366] dark:text-white uppercase tracking-tight leading-tight">
                 Dasbor Kesiapan <br>
-                <span class="text-[#0055a4]">Infrastruktur</span>
+                <span class="text-[#0055a4] dark:text-sky-400">Infrastruktur</span>
             </h1>
-            <p class="mt-3 md:mt-4 text-xs md:text-sm font-bold text-slate-500 tracking-widest uppercase">Pelindo Regional Group</p>
+            <p class="mt-3 md:mt-4 text-xs md:text-sm font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase">Pelindo Regional Group</p>
             
-            <div class="inline-flex items-center gap-2 md:gap-3 mt-6 bg-white border border-slate-200 px-4 md:px-6 py-2 md:py-3 rounded-full shadow-sm text-[10px] md:text-xs font-bold text-slate-600 uppercase tracking-widest">
+            <div class="inline-flex items-center gap-2 md:gap-3 mt-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-4 md:px-6 py-2 md:py-3 rounded-full shadow-sm text-[10px] md:text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">
                 <span class="relative flex h-2.5 w-2.5 md:h-3 md:w-3">
                   <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span class="relative inline-flex rounded-full h-2.5 w-2.5 md:h-3 md:w-3 bg-emerald-500"></span>
@@ -187,23 +237,23 @@
             <div class="max-w-4xl mx-auto mt-10 space-y-4 px-4">
                 <!-- Search Bar -->
                 <div class="relative group">
-                    <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#0055a4] transition-colors"></i>
+                    <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#0055a4] dark:group-focus-within:text-sky-400 transition-colors"></i>
                     <input type="text" x-model="search" placeholder="Cari Kode Alat, Nama, atau Jenis..." 
-                           class="w-full pl-12 pr-6 py-4 bg-white/80 backdrop-blur-xl border border-slate-200 rounded-2xl shadow-sm focus:ring-2 focus:ring-[#0055a4] focus:border-transparent outline-none transition-all text-sm font-bold placeholder:text-slate-400 placeholder:font-normal">
+                           class="w-full pl-12 pr-6 py-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm focus:ring-2 focus:ring-[#0055a4] dark:focus:ring-sky-500 focus:border-transparent outline-none transition-all text-sm font-bold placeholder:text-slate-400 dark:text-white">
                 </div>
 
                 <!-- Filter Pills -->
                 <div class="flex flex-wrap items-center justify-center gap-2">
-                    <div class="bg-white/80 border border-slate-200 rounded-full p-1.5 shadow-sm flex flex-wrap gap-1">
-                        <button @click="filter = 'all'" :class="filter === 'all' ? 'bg-[#003366] text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'" class="px-4 py-2 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all">Semua Kategori</button>
-                        <button @click="filter = 'equipment'" :class="filter === 'equipment' ? 'bg-[#003366] text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'" class="px-4 py-2 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all">Peralatan</button>
-                        <button @click="filter = 'facility'" :class="filter === 'facility' ? 'bg-[#003366] text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'" class="px-4 py-2 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all">Fasilitas</button>
-                        <button @click="filter = 'utility'" :class="filter === 'utility' ? 'bg-[#003366] text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'" class="px-4 py-2 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all">Utilitas</button>
+                    <div class="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-full p-1.5 shadow-sm flex flex-wrap gap-1">
+                        <button @click="filter = 'all'" :class="filter === 'all' ? 'bg-[#003366] dark:bg-sky-600 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'" class="px-4 py-2 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all">Semua Kategori</button>
+                        <button @click="filter = 'equipment'" :class="filter === 'equipment' ? 'bg-[#003366] dark:bg-sky-600 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'" class="px-4 py-2 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all">Peralatan</button>
+                        <button @click="filter = 'facility'" :class="filter === 'facility' ? 'bg-[#003366] dark:bg-sky-600 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'" class="px-4 py-2 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all">Fasilitas</button>
+                        <button @click="filter = 'utility'" :class="filter === 'utility' ? 'bg-[#003366] dark:bg-sky-600 text-white shadow-md' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'" class="px-4 py-2 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all">Utilitas</button>
                     </div>
 
-                    <div class="bg-white/80 border border-slate-200 rounded-full p-1.5 shadow-sm flex items-center gap-2">
-                        <i class="fas fa-filter text-[#0055a4] ml-3 text-xs"></i>
-                        <select x-model="filterEntity" class="bg-transparent text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-600 outline-none pr-4 py-1 cursor-pointer">
+                    <div class="bg-white/80 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-full p-1.5 shadow-sm flex items-center gap-2">
+                        <i class="fas fa-filter text-[#0055a4] dark:text-sky-400 ml-3 text-xs"></i>
+                        <select x-model="filterEntity" class="bg-transparent text-[9px] md:text-[10px] font-black uppercase tracking-widest text-slate-600 dark:text-slate-400 outline-none pr-4 py-1 cursor-pointer">
                             <option value="all">Seluruh Wilayah</option>
                             @foreach($entities as $e)
                                 <option value="{{ $e->name }}">{{ $e->name }}</option>
@@ -218,7 +268,7 @@
             @forelse ($entities as $index => $entity)
             
             @php
-                $availableCategories = $entity->infrastructures->pluck('category')->unique()->values()->toJson();
+    $availableCategories = $entity->infrastructures->pluck('category')->unique()->values()->toJson();
             @endphp
             
             <section 
@@ -244,45 +294,46 @@
                 }"
                 x-init="updateCounter(); $watch('filter', () => updateCounter()); $watch('search', () => updateCounter()); $watch('filterEntity', () => updateCounter());">
                 
-                <div class="bg-gradient-to-r from-[#003366] to-[#0055a4] text-white px-5 py-4 md:px-8 md:py-5 rounded-t-2xl shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div class="bg-gradient-to-r from-[#003366] to-[#0055a4] dark:from-slate-800 dark:to-slate-900 text-white px-5 py-4 md:px-8 md:py-5 rounded-t-2xl shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <h3 class="font-black text-sm md:text-lg uppercase tracking-widest flex items-center gap-2 md:gap-3">
-                        <i class="fas fa-building text-blue-300"></i> {{ $entity->name }}
+                        <i class="fas fa-building text-blue-300 dark:text-sky-400"></i> {{ $entity->name }}
                     </h3>
                     
-                    <span class="text-[9px] md:text-[10px] font-bold text-blue-100 uppercase bg-black/20 px-3 py-1 md:px-4 md:py-1.5 rounded-full border border-white/20">
+                    <span class="text-[9px] md:text-[10px] font-bold text-blue-100 dark:text-slate-300 uppercase bg-black/20 px-3 py-1 md:px-4 md:py-1.5 rounded-full border border-white/20">
                         Unit Terfilter: <span x-text="visibleUnits"></span> / {{ $entity->infrastructures->count() }}
                     </span>
                 </div>
 
-                <div class="bg-white/80 border-x border-b border-slate-200 rounded-b-2xl p-4 md:p-8 shadow-sm">
+                <div class="bg-white/80 dark:bg-slate-900/50 border-x border-b border-slate-200 dark:border-slate-800 rounded-b-2xl p-4 md:p-8 shadow-sm">
                     @if($entity->infrastructures->count() > 0)
                         
                         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-3 md:gap-4">
                             @foreach ($entity->infrastructures->groupBy('type') as $type => $items)
                                 @php
-                                    $availableQty = $items->where('status', 'available')->count();
-                                    $breakdownQty = $items->where('status', 'breakdown')->count();
-                                    $representativeItem = $items->whereNotNull('image')->first();
-                                    $itemCategory = $items->first()->category ?? 'equipment';
+            $availableQty = $items->where('status', 'available')->count();
+            $breakdownQty = $items->where('status', 'breakdown')->count();
+            $representativeItem = $items->whereNotNull('image')->first();
+            $itemCategory = $items->first()->category ?? 'equipment';
                                 @endphp
                                 
                                 <div class="asset-card group cursor-pointer relative" 
                                      data-type="{{ htmlspecialchars($type, ENT_QUOTES) }}"
                                      data-entity="{{ htmlspecialchars($entity->name, ENT_QUOTES) }}"
-                                     data-items="{{ json_encode($items->map(function($i) { return ['code' => $i->code_name, 'status' => $i->status]; })->values()) }}"
+                                     data-items="{{ json_encode($items->map(function ($i) {
+                return ['code' => $i->code_name, 'status' => $i->status]; })->values()) }}"
                                      @click="selectedTypeTitle = $el.dataset.type; selectedTypeEntity = $el.dataset.entity; selectedTypeItems = JSON.parse($el.dataset.items); showTypeModal = true;"
                                      x-show="(filter === 'all' || filter === '{{ $itemCategory }}') && (search === '' || '{{ strtolower($type) }}'.includes(search.toLowerCase()) || '{{ strtolower($entity->name) }}'.includes(search.toLowerCase()) || JSON.parse($el.dataset.items).some(item => item.code.toLowerCase().includes(search.toLowerCase())))">
                                      
                                     <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                                        <div class="w-6 h-6 bg-white/90 backdrop-blur rounded-full flex items-center justify-center text-[#0055a4] shadow-sm border border-slate-200">
+                                        <div class="w-6 h-6 bg-white/90 dark:bg-slate-800/90 backdrop-blur rounded-full flex items-center justify-center text-[#0055a4] dark:text-sky-400 shadow-sm border border-slate-200 dark:border-slate-700">
                                             <i class="fas fa-expand-alt text-[10px]"></i>
                                         </div>
                                     </div>
                                     
                                     <div class="asset-image-placeholder relative group overflow-hidden">
                                         @if($representativeItem && $representativeItem->image)
-                                            <img src="{{ asset('storage/' . ltrim($representativeItem->image, '/')) }}" 
-                                                 onerror="this.onerror=null; this.src='{{ asset(ltrim($representativeItem->image, '/')) }}';"
+                                            <img src="{{ str_starts_with($representativeItem->image, 'http') ? $representativeItem->image : asset('storage/' . ltrim($representativeItem->image, '/')) }}" 
+                                                 onerror="this.onerror=null; this.src='{{ str_starts_with($representativeItem->image, 'http') ? $representativeItem->image : asset(ltrim($representativeItem->image, '/')) }}';"
                                                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                                  alt="{{ $type }}">
                                         @else
@@ -296,9 +347,9 @@
                                         @endif
                                     </div>
 
-                                    <h4 class="text-[9px] font-black text-[#003366] text-center uppercase mb-2 h-6 flex items-center justify-center leading-tight">{{ $type }}</h4>
+                                    <h4 class="text-[9px] font-black text-[#003366] dark:text-slate-200 text-center uppercase mb-2 h-6 flex items-center justify-center leading-tight">{{ $type }}</h4>
                                     
-                                    <div class="mt-auto border-t border-slate-100 pt-2 md:pt-3">
+                                    <div class="mt-auto border-t border-slate-100 dark:border-slate-800 pt-2 md:pt-3">
                                         <div class="stat-row stat-available">
                                             <span class="stat-label">Tersedia (Ready)</span>
                                             <span class="stat-value">{{ $availableQty }}</span>
@@ -312,16 +363,16 @@
                             @endforeach
                         </div>
 
-                        <div class="mt-6 md:mt-8 pt-4 md:pt-6 border-t border-slate-200 border-dashed text-center">
-                            <button @click="showModal = true" class="inline-flex items-center justify-center px-6 py-2.5 bg-slate-50 hover:bg-blue-50 text-[#0055a4] border border-slate-200 hover:border-blue-200 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest transition-all">
+                        <div class="mt-6 md:mt-8 pt-4 md:pt-6 border-t border-slate-200 dark:border-slate-800 border-dashed text-center">
+                            <button @click="showModal = true" class="inline-flex items-center justify-center px-6 py-2.5 bg-slate-50 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 text-[#0055a4] dark:text-sky-400 border border-slate-200 dark:border-slate-700 hover:border-blue-200 rounded-full text-[10px] md:text-xs font-black uppercase tracking-widest transition-all">
                                 <i class="fas fa-list-ul mr-2"></i> Lihat Semua Alat
                             </button>
                         </div>
 
                         <div x-show="showModal" class="fixed inset-0 z-[100] flex items-center justify-center px-4 bg-slate-900/60 backdrop-blur-sm transition-opacity" x-cloak>
-                            <div @click.away="showModal = false" x-show="showModal" x-transition.scale.origin.bottom class="bg-white rounded-2xl w-full max-w-4xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+                            <div @click.away="showModal = false" x-show="showModal" x-transition.scale.origin.bottom class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-4xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
                                 
-                                <div class="bg-[#00152b] px-6 py-4 flex items-center justify-between shrink-0">
+                                <div class="bg-[#00152b] dark:bg-slate-950 px-6 py-4 flex items-center justify-between shrink-0">
                                     <div>
                                         <h3 class="text-white font-black uppercase tracking-widest text-sm">Daftar Aset</h3>
                                         <p class="text-slate-400 text-[10px] font-bold uppercase tracking-wider mt-1">{{ $entity->name }}</p>
@@ -331,10 +382,10 @@
                                     </button>
                                 </div>
 
-                                <div class="flex-1 overflow-y-auto p-6 bg-slate-50">
-                                    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden overflow-x-auto hide-scrollbar">
+                                <div class="flex-1 overflow-y-auto p-6 bg-slate-50 dark:bg-slate-950">
+                                    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden overflow-x-auto hide-scrollbar">
                                         <table class="w-full text-left text-xs whitespace-nowrap min-w-[500px]">
-                                            <thead class="bg-slate-100 text-slate-500 text-[9px] font-black uppercase tracking-widest border-b border-slate-200">
+                                            <thead class="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[9px] font-black uppercase tracking-widest border-b border-slate-200 dark:border-slate-700">
                                                 <tr>
                                                     <th class="px-5 py-3 w-12 text-center">No</th>
                                                     <th class="px-5 py-3">Kode Alat</th>
@@ -343,18 +394,18 @@
                                                     <th class="px-5 py-3 text-center">Status</th>
                                                 </tr>
                                             </thead>
-                                            <tbody class="divide-y divide-slate-100">
+                                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                                                 @foreach($entity->infrastructures as $idx => $asset)
-                                                <tr class="hover:bg-slate-50 transition-colors">
-                                                    <td class="px-5 py-3 text-center font-bold text-slate-400">{{ $idx + 1 }}</td>
-                                                    <td class="px-5 py-3 font-black text-[#003366] uppercase">{{ $asset->code_name }}</td>
-                                                    <td class="px-5 py-3 font-bold text-slate-600">{{ $asset->type }}</td>
-                                                    <td class="px-5 py-3 text-slate-500 uppercase text-[10px] tracking-widest">{{ $asset->category }}</td>
+                                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                                    <td class="px-5 py-3 text-center font-bold text-slate-400 dark:text-slate-600">{{ $idx + 1 }}</td>
+                                                    <td class="px-5 py-3 font-black text-[#003366] dark:text-sky-400 uppercase">{{ $asset->code_name }}</td>
+                                                    <td class="px-5 py-3 font-bold text-slate-600 dark:text-slate-300">{{ $asset->type }}</td>
+                                                    <td class="px-5 py-3 text-slate-500 dark:text-slate-500 uppercase text-[10px] tracking-widest">{{ $asset->category }}</td>
                                                     <td class="px-5 py-3 text-center">
                                                         @if($asset->status == 'available')
-                                                            <span class="px-2 py-1 rounded bg-emerald-50 text-emerald-600 border border-emerald-100 text-[9px] font-black uppercase">Tersedia</span>
+                                                            <span class="px-2 py-1 rounded bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-500/20 text-[9px] font-black uppercase">Tersedia</span>
                                                         @else
-                                                            <span class="px-2 py-1 rounded bg-red-50 text-red-600 border border-red-100 text-[9px] font-black uppercase">Rusak</span>
+                                                            <span class="px-2 py-1 rounded bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-500/20 text-[9px] font-black uppercase">Rusak</span>
                                                         @endif
                                                     </td>
                                                 </tr>
@@ -378,10 +429,10 @@
             @endforelse
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mt-10 md:mt-16">
-            <div class="bg-[#00152b] px-5 py-4 md:px-8 md:py-5 flex items-center justify-between">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden mt-10 md:mt-16">
+            <div class="bg-[#00152b] dark:bg-slate-950 px-5 py-4 md:px-8 md:py-5 flex items-center justify-between">
                 <div class="flex items-center gap-3 md:gap-4 text-white">
-                    <i class="fas fa-clipboard-list text-red-500 text-lg md:text-xl"></i>
+                    <i class="fas fa-clipboard-list text-red-500 dark:text-rose-500 text-lg md:text-xl"></i>
                     <h3 class="font-black text-xs md:text-sm uppercase tracking-widest">Log Insiden Aktif</h3>
                 </div>
             </div>
@@ -389,7 +440,7 @@
             <div class="w-full overflow-x-auto hide-scrollbar">
                 <table class="w-full text-left border-collapse min-w-[800px]">
                     <thead>
-                        <tr class="bg-[#002244] text-slate-300 text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap">
+                        <tr class="bg-[#002244] dark:bg-slate-900 text-slate-300 dark:text-slate-400 text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] whitespace-nowrap">
                             <th class="px-5 py-4 md:px-8 md:py-5 w-16 text-center">NO</th>
                             <th class="px-5 py-4 md:px-8 md:py-5">Entitas Pelabuhan</th>
                             <th class="px-5 py-4 md:px-8 md:py-5 text-center">Identitas Alat</th>
@@ -398,36 +449,36 @@
                             <th class="px-5 py-4 md:px-8 md:py-5">PIC</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-100 whitespace-nowrap">
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800 whitespace-nowrap">
                         @forelse ($breakdowns as $index => $log)
-                        <tr class="text-[10px] md:text-xs uppercase font-bold text-slate-600 hover:bg-slate-50 transition-colors">
-                            <td class="px-5 py-4 md:px-8 md:py-5 text-center text-slate-400">{{ $index + 1 }}</td>
+                        <tr class="text-[10px] md:text-xs uppercase font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                            <td class="px-5 py-4 md:px-8 md:py-5 text-center text-slate-400 dark:text-slate-600">{{ $index + 1 }}</td>
                             <td class="px-5 py-4 md:px-8 md:py-5">{{ $log->infrastructure->entity->name ?? '-' }}</td>
                             <td class="px-5 py-4 md:px-8 md:py-5 text-center">
-                                <span class="bg-blue-50 text-[#003366] px-3 py-1.5 rounded border border-blue-100 text-[9px] md:text-[10px] font-black">
+                                <span class="bg-blue-50 dark:bg-sky-500/10 text-[#003366] dark:text-sky-400 px-3 py-1.5 rounded border border-blue-100 dark:border-sky-500/20 text-[9px] md:text-[10px] font-black">
                                     {{ $log->infrastructure->code_name ?? '-' }}
                                 </span>
                             </td>
-                            <td class="px-5 py-4 md:px-8 md:py-5 text-slate-500 lowercase first-letter:uppercase font-medium italic max-w-xs truncate" title="{{ $log->issue_detail }}">{{ $log->issue_detail }}</td>
+                            <td class="px-5 py-4 md:px-8 md:py-5 text-slate-500 dark:text-slate-500 lowercase first-letter:uppercase font-medium italic max-w-xs truncate" title="{{ $log->issue_detail }}">{{ $log->issue_detail }}</td>
                             <td class="px-5 py-4 md:px-8 md:py-5 text-center">
                                 @php
-                                    $statusConfig = [
-                                        'reported' => ['bg' => 'bg-red-50', 'text' => 'text-red-600', 'border' => 'border-red-200', 'icon' => 'fa-exclamation-circle', 'label' => 'Dilaporkan'],
-                                        'troubleshooting' => ['bg' => 'bg-orange-50', 'text' => 'text-orange-600', 'border' => 'border-orange-200', 'icon' => 'fa-search', 'label' => 'Troubleshoot'],
-                                        'work_order' => ['bg' => 'bg-blue-50', 'text' => 'text-blue-600', 'border' => 'border-blue-200', 'icon' => 'fa-file-signature', 'label' => 'Work Order'],
-                                        'order_part' => ['bg' => 'bg-purple-50', 'text' => 'text-purple-600', 'border' => 'border-purple-200', 'icon' => 'fa-box-open', 'label' => 'Order Part'],
-                                        'on_progress' => ['bg' => 'bg-amber-50', 'text' => 'text-amber-600', 'border' => 'border-amber-200', 'icon' => 'fa-tools', 'label' => 'Sedang Diperbaiki'],
-                                        'testing' => ['bg' => 'bg-indigo-50', 'text' => 'text-indigo-600', 'border' => 'border-indigo-200', 'icon' => 'fa-vial', 'label' => 'Com Test'],
-                                        'resolved' => ['bg' => 'bg-emerald-50', 'text' => 'text-emerald-600', 'border' => 'border-emerald-200', 'icon' => 'fa-check-circle', 'label' => 'Selesai']
-                                    ];
-                                    $conf = $statusConfig[$log->repair_status] ?? $statusConfig['reported'];
+    $statusConfig = [
+        'reported' => ['bg' => 'bg-red-50 dark:bg-rose-500/10', 'text' => 'text-red-600 dark:text-rose-400', 'border' => 'border-red-200 dark:border-rose-500/20', 'icon' => 'fa-exclamation-circle', 'label' => 'Dilaporkan'],
+        'troubleshooting' => ['bg' => 'bg-orange-50 dark:bg-amber-500/10', 'text' => 'text-orange-600 dark:text-amber-400', 'border' => 'border-orange-200 dark:border-amber-500/20', 'icon' => 'fa-search', 'label' => 'Troubleshoot'],
+        'work_order' => ['bg' => 'bg-blue-50 dark:bg-sky-500/10', 'text' => 'text-blue-600 dark:text-sky-400', 'border' => 'border-blue-200 dark:border-sky-500/20', 'icon' => 'fa-file-signature', 'label' => 'Work Order'],
+        'order_part' => ['bg' => 'bg-purple-50 dark:bg-indigo-500/10', 'text' => 'text-purple-600 dark:text-indigo-400', 'border' => 'border-purple-200 dark:border-indigo-500/20', 'icon' => 'fa-box-open', 'label' => 'Order Part'],
+        'on_progress' => ['bg' => 'bg-amber-50 dark:bg-yellow-500/10', 'text' => 'text-amber-600 dark:text-yellow-400', 'border' => 'border-amber-200 dark:border-yellow-500/20', 'icon' => 'fa-tools', 'label' => 'Sedang Diperbaiki'],
+        'testing' => ['bg' => 'bg-indigo-50 dark:bg-violet-500/10', 'text' => 'text-indigo-600 dark:text-violet-400', 'border' => 'border-indigo-200 dark:border-violet-500/20', 'icon' => 'fa-vial', 'label' => 'Com Test'],
+        'resolved' => ['bg' => 'bg-emerald-50 dark:bg-emerald-500/10', 'text' => 'text-emerald-600 dark:text-emerald-400', 'border' => 'border-emerald-200 dark:border-emerald-500/20', 'icon' => 'fa-check-circle', 'label' => 'Selesai']
+    ];
+    $conf = $statusConfig[$log->repair_status] ?? $statusConfig['reported'];
                                 @endphp
                                 <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded {{ $conf['bg'] }} {{ $conf['text'] }} border {{ $conf['border'] }} text-[8px] md:text-[9px] font-black uppercase tracking-widest whitespace-nowrap">
                                     <i class="fas {{ $conf['icon'] }}"></i>
                                     {{ $conf['label'] }}
                                 </span>
                             </td>
-                            <td class="px-5 py-4 md:px-8 md:py-5 text-slate-500"><i class="fas fa-user-gear mr-2 opacity-30"></i>{{ $log->vendor_pic ?? '-' }}</td>
+                            <td class="px-5 py-4 md:px-8 md:py-5 text-slate-500 dark:text-slate-500"><i class="fas fa-user-gear mr-2 opacity-30"></i>{{ $log->vendor_pic ?? '-' }}</td>
                         </tr>
                         @empty
                         <tr>
@@ -443,46 +494,46 @@
 
     </main>
 
-    <footer class="bg-white border-t border-slate-200 py-6 md:py-8 mt-10 md:mt-12 text-center">
-        <p class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] md:tracking-[0.3em] px-4">
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 md:py-8 mt-10 md:mt-12 text-center">
+        <p class="text-[9px] md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] md:tracking-[0.3em] px-4">
             &copy; {{ date('Y') }} Danantara Indonesia x Pelindo. All Rights Reserved.
         </p>
     </footer>
 
     <template x-teleport="body">
         <div x-show="showTypeModal" class="fixed inset-0 z-[100] flex items-center justify-center px-4 bg-slate-900/60 backdrop-blur-sm transition-opacity" x-cloak style="display: none;">
-            <div @click.away="showTypeModal = false" x-show="showTypeModal" x-transition.scale.origin.bottom class="bg-white rounded-2xl w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
-                <div class="bg-[#003366] px-6 py-4 flex items-center justify-between shrink-0">
+            <div @click.away="showTypeModal = false" x-show="showTypeModal" x-transition.scale.origin.bottom class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
+                <div class="bg-[#003366] dark:bg-slate-950 px-6 py-4 flex items-center justify-between shrink-0">
                     <div>
                         <h3 class="text-white font-black uppercase tracking-widest text-sm" x-text="selectedTypeTitle"></h3>
-                        <p class="text-blue-200 text-[10px] font-bold uppercase tracking-wider mt-1" x-text="selectedTypeEntity"></p>
+                        <p class="text-blue-200 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider mt-1" x-text="selectedTypeEntity"></p>
                     </div>
                     <button @click="showTypeModal = false" class="w-8 h-8 rounded-full bg-white/10 hover:bg-red-500 text-white flex items-center justify-center transition-colors">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
                 
-                <div class="flex-1 overflow-y-auto p-6 bg-slate-50">
-                    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden overflow-x-auto hide-scrollbar">
+                <div class="flex-1 overflow-y-auto p-6 bg-slate-50 dark:bg-slate-950">
+                    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden overflow-x-auto hide-scrollbar">
                         <table class="w-full text-left text-xs whitespace-nowrap min-w-[300px]">
-                            <thead class="bg-slate-100 text-slate-500 text-[9px] font-black uppercase tracking-widest border-b border-slate-200">
+                            <thead class="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[9px] font-black uppercase tracking-widest border-b border-slate-200 dark:border-slate-700">
                                 <tr>
                                     <th class="px-5 py-3 w-12 text-center">No</th>
                                     <th class="px-5 py-3">Kode Alat</th>
                                     <th class="px-5 py-3 text-center">Status</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-100">
+                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                                 <template x-for="(item, index) in selectedTypeItems" :key="index">
-                                    <tr class="hover:bg-slate-50 transition-colors">
-                                        <td class="px-5 py-3 text-center font-bold text-slate-400" x-text="index + 1"></td>
-                                        <td class="px-5 py-3 font-black text-[#003366] uppercase" x-text="item.code"></td>
+                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                        <td class="px-5 py-3 text-center font-bold text-slate-400 dark:text-slate-600" x-text="index + 1"></td>
+                                        <td class="px-5 py-3 font-black text-[#003366] dark:text-sky-400 uppercase" x-text="item.code"></td>
                                         <td class="px-5 py-3 text-center">
                                             <template x-if="item.status === 'available'">
-                                                <span class="px-2 py-1 rounded bg-emerald-50 text-emerald-600 border border-emerald-100 text-[9px] font-black uppercase">Tersedia</span>
+                                                <span class="px-2 py-1 rounded bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-500/20 text-[9px] font-black uppercase">Tersedia</span>
                                             </template>
                                             <template x-if="item.status !== 'available'">
-                                                <span class="px-2 py-1 rounded bg-red-50 text-red-600 border border-red-100 text-[9px] font-black uppercase animate-pulse">Rusak</span>
+                                                <span class="px-2 py-1 rounded bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border border-red-100 dark:border-red-500/20 text-[9px] font-black uppercase animate-pulse">Rusak</span>
                                             </template>
                                         </td>
                                     </tr>
@@ -494,5 +545,28 @@
             </div>
         </div>
     </template>
+
+    <script>
+        function updateDarkIcon() {
+            const darkIcon = document.getElementById('dark-icon');
+            if (!darkIcon) return;
+            if (document.documentElement.classList.contains('dark')) {
+                darkIcon.classList.remove('fa-moon');
+                darkIcon.classList.add('fa-sun');
+            } else {
+                darkIcon.classList.remove('fa-sun');
+                darkIcon.classList.add('fa-moon');
+            }
+        }
+
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('dark-mode', isDark);
+            updateDarkIcon();
+        }
+
+        // Initialize icon on load
+        document.addEventListener('DOMContentLoaded', updateDarkIcon);
+    </script>
 </body>
 </html>

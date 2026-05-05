@@ -9,24 +9,49 @@
     <title>Otentikasi Sistem | DIA Portal</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        pelindo: {
+                            blue: '#0064a7',
+                            cyan: '#58b9e4',
+                            navy: '#002d5d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script>
+        if (localStorage.getItem('dark-mode') === 'true') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; transition: background-color 0.5s ease; }
         @keyframes fadeUp { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
         @keyframes scaleIn { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
         .animate-fade-up { animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
         .animate-scale-in { animation: scaleIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
         .bg-corporate-pattern { background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 32px 32px; }
+
+        .dark body { background-color: #020617; }
     </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="antialiased overflow-hidden">
 
-    <div class="flex h-screen w-full bg-white">
+    <div class="flex h-screen w-full bg-white dark:bg-slate-950 transition-colors duration-500">
         
-        <div class="hidden lg:flex lg:w-5/12 xl:w-1/2 bg-gradient-to-br from-[#00152b] via-[#002244] to-[#003366] relative flex-col justify-center items-center p-12 bg-corporate-pattern animate-scale-in">
+        <div class="hidden lg:flex lg:w-5/12 xl:w-1/2 bg-gradient-to-br from-[#00152b] via-[#002244] to-[#003366] dark:from-slate-900 dark:via-slate-950 dark:to-black relative flex-col justify-center items-center p-12 bg-corporate-pattern animate-scale-in">
             
             <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                 <div class="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] bg-blue-500/10 rounded-full blur-[100px]"></div>
@@ -42,9 +67,9 @@
                 </div>
 
                 <div class="w-full flex items-center justify-center gap-6 md:gap-8 bg-white/5 border border-white/10 p-6 rounded-3xl backdrop-blur-md shadow-2xl mb-8 animate-fade-up" style="animation-delay: 200ms;">
-                    <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-12 xl:h-14 object-contain filter brightness-0 invert">
+                    <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-12 xl:h-14 object-contain brightness-0 invert">
                     <div class="w-px h-12 bg-white/20"></div>
-                    <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-12 xl:h-14 object-contain filter brightness-0 invert">
+                    <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-12 xl:h-14 object-contain brightness-0 invert">
                 </div>
 
                 <div class="animate-fade-up" style="animation-delay: 300ms;">
@@ -67,22 +92,29 @@
             </div>
         </div>
 
-        <div class="w-full lg:w-7/12 xl:w-1/2 flex flex-col justify-center items-center p-8 sm:p-12 relative bg-slate-50 overflow-y-auto">
+        <div class="w-full lg:w-7/12 xl:w-1/2 flex flex-col justify-center items-center p-8 sm:p-12 relative bg-slate-50 dark:bg-slate-950 overflow-y-auto transition-colors duration-500">
             
             <div class="absolute top-8 left-0 w-full flex justify-center lg:hidden px-6 animate-fade-up">
-                <div class="flex items-center gap-4 bg-white px-6 py-3 rounded-2xl shadow-sm border border-slate-200 w-full max-w-sm justify-center">
-                    <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-6 sm:h-8 object-contain">
-                    <div class="w-px h-8 bg-slate-200"></div>
-                    <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-6 sm:h-8 object-contain">
+                <div class="flex items-center gap-4 bg-white dark:bg-slate-900 px-6 py-3 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 w-full max-w-sm justify-center">
+                    <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-6 sm:h-8 object-contain dark:invert dark:brightness-200">
+                    <div class="w-px h-8 bg-slate-200 dark:bg-slate-800"></div>
+                    <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-6 sm:h-8 object-contain dark:invert dark:brightness-200">
                 </div>
             </div>
 
-            <div class="w-full max-w-md bg-white p-8 sm:p-10 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 relative z-10 mt-16 lg:mt-0 animate-fade-up">
+            <!-- Dark Mode Toggle Floating -->
+            <div class="absolute top-8 right-8 z-50">
+                <button onclick="toggleDarkMode()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white dark:bg-slate-800 text-slate-500 dark:text-amber-400 shadow-md border border-slate-200 dark:border-slate-700 transition-all">
+                    <i id="dark-icon" class="fas fa-moon dark:fa-sun"></i>
+                </button>
+            </div>
+
+            <div class="w-full max-w-md bg-white dark:bg-slate-900 p-8 sm:p-10 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none border border-slate-100 dark:border-slate-800 relative z-10 mt-16 lg:mt-0 animate-fade-up">
                 
                 <div class="mb-8 flex justify-between items-center">
-                    <a href="{{ url('/login') }}" class="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 hover:text-[#003366] uppercase tracking-widest transition-colors group">
+                    <a href="{{ url('/') }}" class="inline-flex items-center gap-2 text-[10px] font-black text-slate-400 dark:text-slate-500 hover:text-[#003366] dark:hover:text-sky-400 uppercase tracking-widest transition-colors group">
                         <i class="fas fa-arrow-left group-hover:-translate-x-1 transition-transform"></i>
-                        Kembali
+                        Beranda
                     </a>
                 </div>
 
@@ -103,5 +135,27 @@
             
         </div>
     </div>
+
+    <script>
+        function updateDarkIcon() {
+            const darkIcon = document.getElementById('dark-icon');
+            if (!darkIcon) return;
+            if (document.documentElement.classList.contains('dark')) {
+                darkIcon.classList.remove('fa-moon');
+                darkIcon.classList.add('fa-sun');
+            } else {
+                darkIcon.classList.remove('fa-sun');
+                darkIcon.classList.add('fa-moon');
+            }
+        }
+
+        function toggleDarkMode() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('dark-mode', isDark);
+            updateDarkIcon();
+        }
+
+        document.addEventListener('DOMContentLoaded', updateDarkIcon);
+    </script>
 </body>
 </html>

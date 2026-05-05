@@ -75,9 +75,9 @@
                 </div>
 
                 <div class="w-full flex items-center justify-center gap-6 md:gap-8 bg-white/5 border border-white/10 p-6 rounded-3xl backdrop-blur-md shadow-2xl mb-8 animate-fade-up delay-200">
-                    <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-12 xl:h-14 object-contain filter brightness-0 invert">
+                    <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-12 xl:h-14 object-contain">
                     <div class="w-px h-12 bg-white/20"></div>
-                    <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-12 xl:h-14 object-contain filter brightness-0 invert">
+                    <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-12 xl:h-14 object-contain">
                 </div>
 
                 <div class="animate-fade-up delay-300">

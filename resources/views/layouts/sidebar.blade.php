@@ -19,26 +19,26 @@
 
     /* Styling Active State Premium */
     .sidebar-link-active {
-        background: linear-gradient(90deg, #0055a4 0%, #003366 100%) !important;
+        background: linear-gradient(90deg, #58b9e4 0%, #0064a7 100%) !important;
         color: #ffffff !important;
-        box-shadow: 0 4px 15px -3px rgba(0, 85, 164, 0.4) !important;
+        box-shadow: 0 4px 15px -3px rgba(0, 100, 167, 0.4) !important;
         border-radius: 12px !important;
         font-weight: 700 !important;
     }
 
     /* Warna Ikon saat Aktif */
     .sidebar-link-active i {
-        color: #93c5fd !important; /* Warna biru muda menyala */
+        color: #ffffff !important;
     }
 </style>
 
-<aside id="main-sidebar" style="font-family: 'Inter', sans-serif;" class="sidebar-transition w-[280px] bg-[#021326] flex flex-col fixed lg:relative inset-y-0 left-0 z-[90] shadow-[4px_0_24px_rgba(0,0,0,0.15)] shrink-0 border-r border-white/5">
+<aside id="main-sidebar" style="font-family: 'Inter', sans-serif;" class="sidebar-transition w-[280px] bg-gradient-to-b from-[#003d7a] to-pelindo-navy flex flex-col fixed lg:relative inset-y-0 left-0 z-[90] shadow-[10px_0_40px_rgba(0,45,93,0.1)] shrink-0">
 
     <!-- Logo Area -->
-    <div class="h-[88px] flex items-center px-8 bg-[#010e1c] border-b border-white/5 shrink-0 relative overflow-hidden">
+    <div class="h-[88px] flex items-center px-8 shrink-0 relative overflow-hidden">
         <!-- Efek Glow di belakang logo -->
-        <div class="absolute inset-0 bg-[#0055a4] opacity-10 blur-xl rounded-full scale-150 transform -translate-y-1/2"></div>
-        <img src="{{ asset('pelindo.png') }}" alt="Pelindo Logo" class="h-8 md:h-9 object-contain filter brightness-110 relative z-10">
+        <div class="absolute inset-0 bg-pelindo-blue opacity-20 blur-2xl rounded-full scale-150 transform -translate-y-1/2"></div>
+        <img src="{{ asset('pelindo.png') }}" alt="Pelindo Logo" class="h-8 md:h-9 object-contain brightness-0 invert brightness-200 relative z-10">
     </div>
 
     <!-- Navigation Area -->
@@ -105,13 +105,13 @@
     </div>
 
     <!-- User Profile & Action Area -->
-    <div class="mt-auto bg-[#010e1c] border-t border-white/5 shrink-0 pb-2">
+    <div class="mt-auto shrink-0 pb-2">
         @auth
             <div class="p-4 flex items-center justify-between gap-3">
 
                 <!-- Profile Info -->
                 <div class="flex items-center gap-3 min-w-0">
-                    <div class="relative w-10 h-10 rounded-full bg-gradient-to-br from-[#0055a4] to-[#003366] flex items-center justify-center text-white font-bold text-sm shadow-md shrink-0 border border-blue-400/20">
+                    <div class="relative w-10 h-10 rounded-full bg-gradient-to-br from-pelindo-cyan to-pelindo-blue flex items-center justify-center text-white font-bold text-sm shadow-md shrink-0 border border-blue-400/20">
                         {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                         <!-- Online Indicator -->
                         <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-[#010e1c] rounded-full"></span>
@@ -134,8 +134,8 @@
         @endauth
 
         <!-- Version Footer -->
-        <div class="px-4 text-center">
-            <p class="text-[9px] font-bold text-slate-600 uppercase tracking-[0.2em]">Dashboard Infrastructure</p>
+        <div class="px-6 py-4 text-center opacity-40">
+            <p class="text-[8px] font-black text-white uppercase tracking-[0.3em]">Infrastructure Management v2.0</p>
         </div>
     </div>
 </aside>

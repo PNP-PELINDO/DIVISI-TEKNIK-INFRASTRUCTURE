@@ -11,6 +11,11 @@ class ImageHelper
      */
     public static function compressAndSave($file, $path, $filename, $quality = 60)
     {
+        if (!extension_loaded('gd')) {
+            // Fallback to direct store if GD is not available
+            return $file->storeAs($path, $filename, 'public');
+        }
+
         $extension = strtolower($file->getClientOriginalExtension());
         $imagePath = $file->getRealPath();
 
@@ -18,17 +23,17 @@ class ImageHelper
         switch ($extension) {
             case 'jpeg':
             case 'jpg':
-                $image = imagecreatefromjpeg($imagePath);
+                $image = \imagecreatefromjpeg($imagePath);
                 break;
             case 'png':
-                $image = imagecreatefrompng($imagePath);
+                $image = \imagecreatefrompng($imagePath);
                 // Handle transparency for PNG
-                imagepalettetotruecolor($image);
-                imagealphablending($image, true);
-                imagesavealpha($image, true);
+                \imagepalettetotruecolor($image);
+                \imagealphablending($image, true);
+                \imagesavealpha($image, true);
                 break;
             case 'webp':
-                $image = imagecreatefromwebp($imagePath);
+                $image = \imagecreatefromwebp($imagePath);
                 break;
             default:
                 // Fallback to direct store if unsupported
@@ -41,18 +46,18 @@ class ImageHelper
         // Save compressed image to temp file
         if ($extension === 'png') {
             // PNG quality is 0-9
-            imagepng($image, $tempPath, round(9 * ($quality / 100)));
+            \imagepng($image, $tempPath, round(9 * ($quality / 100)));
         } else if ($extension === 'webp') {
-            imagewebp($image, $tempPath, $quality);
+            \imagewebp($image, $tempPath, $quality);
         } else {
-            imagejpeg($image, $tempPath, $quality);
+            \imagejpeg($image, $tempPath, $quality);
         }
 
         // Store to disk
         $storedPath = Storage::disk('public')->putFileAs($path, new \Illuminate\Http\File($tempPath), $filename);
 
         // Cleanup
-        imagedestroy($image);
+        \imagedestroy($image);
         unlink($tempPath);
 
         return $storedPath;

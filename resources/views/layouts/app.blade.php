@@ -14,9 +14,9 @@
                     extend: {
                         colors: {
                             pelindo: {
-                                dark: '#001e3c',
-                                blue: '#003366',
-                                light: '#0055a4'
+                                blue: '#0064a7',
+                                cyan: '#58b9e4',
+                                navy: '#002d5d',
                             }
                         }
                     }
@@ -24,7 +24,8 @@
             }
         </script>
         <script>
-            if (localStorage.getItem('dark-mode') === 'true' || (!('dark-mode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            // Force light mode by default if no preference is saved
+            if (localStorage.getItem('dark-mode') === 'true') {
                 document.documentElement.classList.add('dark');
             } else {
                 document.documentElement.classList.remove('dark');
@@ -44,8 +45,8 @@
             /* Custom Scrollbar for Dark Mode */
             .dark ::-webkit-scrollbar { width: 8px; height: 8px; }
             .dark ::-webkit-scrollbar-track { background: #001e3c; }
-            .dark ::-webkit-scrollbar-thumb { background: #003366; border-radius: 10px; }
-            .dark ::-webkit-scrollbar-thumb:hover { background: #0055a4; }
+            .dark ::-webkit-scrollbar-thumb { background: #0064a7; border-radius: 10px; }
+            .dark ::-webkit-scrollbar-thumb:hover { background: #58b9e4; }
         </style>
     </head>
     <body class="font-sans antialiased flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-500">
@@ -84,8 +85,8 @@
                         <span id="realtime-date" class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">Memuat...</span>
                     </div>
                     <div class="flex items-center gap-3 px-4">
-                        <i class="far fa-clock text-[#0055a4] dark:text-blue-400 animate-pulse"></i>
-                        <span id="realtime-time" class="text-sm font-black text-[#003366] dark:text-blue-400 tracking-widest font-mono">00:00:00</span>
+                        <i class="far fa-clock text-pelindo-cyan dark:text-pelindo-cyan animate-pulse"></i>
+                        <span id="realtime-time" class="text-sm font-black text-pelindo-blue dark:text-pelindo-cyan tracking-widest font-mono">00:00:00</span>
                         <span class="text-[8px] font-black text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 px-2 py-1 rounded-lg uppercase tracking-widest ml-2">WIB</span>
                     </div>
                 </div>
@@ -101,9 +102,9 @@
                 <footer class="w-full border-t border-slate-200 dark:border-slate-800 py-8 px-10 bg-white dark:bg-slate-900/50 transition-all duration-300 mt-auto">
                     <div class="max-w-[1600px] mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
                         <div class="flex items-center gap-4 group">
-                            <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-5 brightness-0 dark:brightness-100 opacity-40 group-hover:opacity-100 transition-all">
+                            <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-5 object-contain opacity-80 group-hover:opacity-100 transition-all">
                             <div class="w-[1px] h-4 bg-slate-200 dark:bg-slate-700"></div>
-                            <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-5 brightness-0 dark:brightness-100 opacity-40 group-hover:opacity-100 transition-all">
+                            <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-5 object-contain opacity-80 group-hover:opacity-100 transition-all">
                             <div class="h-4 w-[1px] bg-slate-200 dark:bg-slate-700"></div>
                             <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
                                 &copy; {{ date('Y') }} PT Pelabuhan Indonesia (Persero).

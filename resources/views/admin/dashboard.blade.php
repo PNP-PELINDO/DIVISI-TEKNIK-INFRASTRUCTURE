@@ -47,7 +47,7 @@
         .ent-card:hover {
             transform: translateY(-4px);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
-            border-color: #3b82f6;
+            border-color: #0064a7;
         }
 
         .dark .ent-card:hover {
@@ -90,19 +90,19 @@
 
         <!-- HEADER & FILTER SECTION -->
         <div class="bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm space-y-10 relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#003366] to-[#0055a4]"></div>
+            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-pelindo-blue to-pelindo-cyan"></div>
 
             <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-8">
                 <div class="flex items-center gap-6">
                     <div class="flex items-center justify-center gap-4 bg-slate-50 dark:bg-slate-800 p-4 rounded-[1.5rem] border border-slate-100 dark:border-slate-700 shadow-inner">
-                        <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-8 md:h-10 object-contain brightness-0 dark:brightness-100 transition-all duration-300">
+                        <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-8 md:h-10 object-contain transition-all duration-300">
                         <div class="w-px h-8 bg-slate-300 dark:bg-slate-600"></div>
                         <img src="{{ asset('pelindo.png') }}" alt="Pelindo" class="h-8 md:h-10 object-contain transition-all duration-300">
                     </div>
                     <div>
-                        <h1 class="text-3xl font-black text-[#003366] dark:text-white uppercase tracking-tight">Command Center</h1>
+                        <h1 class="text-3xl font-black text-pelindo-blue dark:text-white uppercase tracking-tight">Command Center</h1>
                         <p class="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
-                            <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span> 
+                            <span class="w-2 h-2 bg-pelindo-cyan rounded-full animate-pulse"></span> 
                             Monitoring Dashboard Operasional Regional 2
                         </p>
                     </div>
@@ -111,7 +111,7 @@
                 <div class="flex flex-wrap items-center gap-3 w-full xl:w-auto">
                     <div x-data="{ open: false }" class="relative flex-1 sm:flex-none">
                         <button @click="open = !open" @click.away="open = false" 
-                                class="w-full justify-center bg-white dark:bg-slate-800 text-[#003366] dark:text-blue-400 px-5 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-3 border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700">
+                                class="w-full justify-center bg-white dark:bg-slate-800 text-pelindo-blue dark:text-pelindo-cyan px-5 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-3 border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700">
                             <i class="fas fa-file-export text-xs"></i> <span class="hidden xs:inline">Export Laporan</span> <i class="fas fa-chevron-down text-[8px] opacity-60 ml-1"></i>
                         </button>
                         <div x-show="open" x-transition:enter="transition ease-out duration-200"
@@ -127,12 +127,12 @@
                         </div>
                     </div>
 
-                    <a href="{{ url('/') }}" target="_blank" class="flex-1 sm:flex-none justify-center bg-slate-50 dark:bg-slate-800/50 text-[#003366] dark:text-blue-400 px-5 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-3 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700">
+                    <a href="{{ url('/') }}" target="_blank" class="flex-1 sm:flex-none justify-center bg-slate-50 dark:bg-slate-800/50 text-pelindo-blue dark:text-pelindo-cyan px-5 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-3 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700">
                         <i class="fas fa-external-link-alt text-xs"></i> <span class="hidden xs:inline">Portal Publik</span>
                     </a>
                     
                     <a href="{{ route('admin.infrastructures.create') }}" 
-                       class="flex-1 sm:flex-none justify-center bg-[#003366] hover:bg-[#001e3c] dark:bg-blue-600 dark:hover:bg-blue-700 text-white px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-3 shadow-lg shadow-blue-900/20 active:scale-95">
+                       class="flex-1 sm:flex-none justify-center bg-pelindo-blue hover:bg-pelindo-navy dark:bg-pelindo-blue dark:hover:bg-pelindo-navy text-white px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center gap-3 shadow-lg shadow-blue-900/20 active:scale-95">
                         <i class="fas fa-plus text-xs"></i> <span class="hidden xs:inline">Registrasi Aset</span>
                     </a>
                 </div>
@@ -143,7 +143,7 @@
                 @if(auth()->user()->role === 'superadmin')
                 <div class="relative lg:col-span-1">
                     <i class="fas fa-map-marker-alt absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-xs"></i>
-                    <select name="entity_id" onchange="this.form.submit()" class="w-full pl-12 pr-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-black text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-[#003366] uppercase transition-all appearance-none cursor-pointer">
+                    <select name="entity_id" onchange="this.form.submit()" class="w-full pl-12 pr-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-black text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-pelindo-blue uppercase transition-all appearance-none cursor-pointer">
                         <option value="">Semua Area (Pusat)</option>
                         @foreach($allEntities ?? [] as $entity)
                             <option value="{{ $entity->id }}" {{ ($filterEntity ?? '') == $entity->id ? 'selected' : '' }}>{{ $entity->name }}</option>
@@ -155,7 +155,7 @@
                 
                 <div class="relative {{ auth()->user()->role === 'superadmin' ? 'lg:col-span-1' : 'lg:col-span-2' }}">
                     <i class="fas fa-layer-group absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-xs"></i>
-                    <select name="category" onchange="this.form.submit()" class="w-full pl-12 pr-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-black text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-[#003366] uppercase transition-all appearance-none cursor-pointer">
+                    <select name="category" onchange="this.form.submit()" class="w-full pl-12 pr-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-black text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-pelindo-blue uppercase transition-all appearance-none cursor-pointer">
                         <option value="">Semua Kategori Aset</option>
                         <option value="equipment" {{ ($filterCategory ?? '') == 'equipment' ? 'selected' : '' }}>Peralatan (Equipment)</option>
                         <option value="facility" {{ ($filterCategory ?? '') == 'facility' ? 'selected' : '' }}>Fasilitas (Facility)</option>
@@ -165,7 +165,7 @@
                 </div>
 
                 <div class="flex gap-2 {{ auth()->user()->role === 'superadmin' ? 'lg:col-span-2' : 'lg:col-span-2' }}">
-                    <button type="submit" class="flex-1 bg-[#003366] hover:bg-[#001e3c] dark:bg-slate-800 dark:hover:bg-slate-700 text-white px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 border border-transparent dark:border-slate-700 shadow-lg active:scale-95">
+                    <button type="submit" class="flex-1 bg-pelindo-blue hover:bg-pelindo-navy dark:bg-slate-800 dark:hover:bg-slate-700 text-white px-6 py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 border border-transparent dark:border-slate-700 shadow-lg active:scale-95">
                         <i class="fas fa-filter"></i> Terapkan Filter
                     </button>
                     @if(($filterEntity ?? false) || ($filterCategory ?? false))
@@ -184,7 +184,7 @@
                 <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-50 dark:bg-blue-900/20 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
                 <div class="flex items-start justify-between relative z-10">
                     <div>
-                        <p class="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-1">Total Aset & Kesiapan</p>
+                        <p class="text-[10px] font-black text-pelindo-blue dark:text-pelindo-cyan uppercase tracking-widest mb-1">Total Aset & Kesiapan</p>
                         <div class="flex items-end gap-2">
                             <p class="text-3xl font-black text-slate-800 dark:text-slate-100">{{ $stats['total'] ?? 0 }}</p>
                             <p class="text-sm font-bold text-slate-500 dark:text-slate-400 mb-1">Unit</p>
@@ -200,7 +200,7 @@
                         <span class="text-blue-600 dark:text-blue-400">{{ $stats['readiness_rate'] }}%</span>
                     </div>
                     <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5">
-                        <div class="bg-blue-500 h-1.5 rounded-full" style="width: {{ $stats['readiness_rate'] }}%"></div>
+                        <div class="bg-pelindo-blue h-1.5 rounded-full" style="width: {{ $stats['readiness_rate'] }}%"></div>
                     </div>
                 </div>
             </div>
@@ -209,18 +209,18 @@
                 <div class="absolute -right-4 -top-4 w-24 h-24 bg-red-50 dark:bg-red-900/20 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
                 <div class="flex items-start justify-between relative z-10">
                     <div>
-                        <p class="text-[10px] font-black text-red-600 dark:text-red-400 uppercase tracking-widest mb-1">Laporan Masuk (Baru)</p>
+                        <p class="text-[10px] font-black text-pelindo-cyan dark:text-pelindo-cyan uppercase tracking-widest mb-1">Laporan Masuk (Baru)</p>
                         <div class="flex items-end gap-2">
                             <p class="text-3xl font-black text-slate-800 dark:text-slate-100">{{ $stats['reported'] ?? 0 }}</p>
                             <p class="text-sm font-bold text-slate-500 dark:text-slate-400 mb-1">Tiket</p>
                         </div>
                     </div>
-                    <div class="w-12 h-12 bg-red-50 dark:bg-red-900/30 rounded-full flex items-center justify-center text-red-500 text-xl shadow-inner border border-red-100 dark:border-red-800">
+                    <div class="w-12 h-12 bg-sky-50 dark:bg-sky-900/30 rounded-full flex items-center justify-center text-pelindo-cyan text-xl shadow-inner border border-sky-100 dark:border-sky-800">
                         <i class="fas fa-bell"></i>
                     </div>
                 </div>
                 <div class="mt-4 relative z-10 flex items-center gap-2">
-                    <span class="text-[10px] font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/30 px-2 py-1 rounded border border-red-100 dark:border-red-800">URGENT ACTION</span>
+                    <span class="text-[10px] font-bold text-pelindo-blue dark:text-pelindo-cyan bg-sky-50 dark:bg-sky-900/30 px-2 py-1 rounded border border-sky-100 dark:border-sky-800">URGENT ACTION</span>
                     <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500">Belum direspons</span>
                 </div>
             </div>
@@ -229,18 +229,18 @@
                 <div class="absolute -right-4 -top-4 w-24 h-24 bg-amber-50 dark:bg-amber-900/20 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
                 <div class="flex items-start justify-between relative z-10">
                     <div>
-                        <p class="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-1">Sedang Dikerjakan</p>
+                        <p class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Sedang Dikerjakan</p>
                         <div class="flex items-end gap-2">
                             <p class="text-3xl font-black text-slate-800 dark:text-slate-100">{{ $stats['on_progress'] ?? 0 }}</p>
                             <p class="text-sm font-bold text-slate-500 dark:text-slate-400 mb-1">Tiket</p>
                         </div>
                     </div>
-                    <div class="w-12 h-12 bg-amber-50 dark:bg-amber-900/30 rounded-full flex items-center justify-center text-amber-500 text-xl shadow-inner border border-amber-100 dark:border-amber-800">
+                    <div class="w-12 h-12 bg-slate-50 dark:bg-slate-800/30 rounded-full flex items-center justify-center text-slate-500 text-xl shadow-inner border border-slate-100 dark:border-slate-800">
                         <i class="fas fa-tools"></i>
                     </div>
                 </div>
                 <div class="mt-4 relative z-10 flex items-center gap-2">
-                    <span class="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2 py-1 rounded border border-amber-100 dark:border-amber-800">ON PROGRESS</span>
+                    <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/30 px-2 py-1 rounded border border-slate-100 dark:border-slate-800">ON PROGRESS</span>
                     <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500">Ditangani teknisi</span>
                 </div>
             </div>
@@ -249,18 +249,18 @@
                 <div class="absolute -right-4 -top-4 w-24 h-24 bg-purple-50 dark:bg-purple-900/20 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
                 <div class="flex items-start justify-between relative z-10">
                     <div>
-                        <p class="text-[10px] font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest mb-1">Menunggu Suku Cadang</p>
+                        <p class="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Menunggu Suku Cadang</p>
                         <div class="flex items-end gap-2">
                             <p class="text-3xl font-black text-slate-800 dark:text-slate-100">{{ $stats['order_part'] ?? 0 }}</p>
                             <p class="text-sm font-bold text-slate-500 dark:text-slate-400 mb-1">Tiket</p>
                         </div>
                     </div>
-                    <div class="w-12 h-12 bg-purple-50 dark:bg-purple-900/30 rounded-full flex items-center justify-center text-purple-500 text-xl shadow-inner border border-purple-100 dark:border-purple-800">
+                    <div class="w-12 h-12 bg-slate-50 dark:bg-slate-800/30 rounded-full flex items-center justify-center text-slate-500 text-xl shadow-inner border border-slate-100 dark:border-slate-800">
                         <i class="fas fa-box-open"></i>
                     </div>
                 </div>
                 <div class="mt-4 relative z-10 flex items-center gap-2">
-                    <span class="text-[10px] font-bold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/30 px-2 py-1 rounded border border-purple-100 dark:border-purple-800">ORDER PART</span>
+                    <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-900/30 px-2 py-1 rounded border border-slate-100 dark:border-slate-800">ORDER PART</span>
                     <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500">Menunggu vendor/logistik</span>
                 </div>
             </div>
@@ -272,7 +272,7 @@
             <!-- Tren Chart (Expanded) -->
             <div class="lg:col-span-9 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-sm flex flex-col">
                 <h3 class="text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-widest mb-4 flex items-center gap-2">
-                    <i class="fas fa-chart-line text-[#0055a4]"></i> Tren Insiden (30 Hari Terakhir)
+                    <i class="fas fa-chart-line text-pelindo-blue"></i> Tren Insiden (30 Hari Terakhir)
                 </h3>
                 <div class="relative h-64 w-full mt-auto">
                     <canvas id="trendChart"></canvas>
@@ -280,11 +280,11 @@
             </div>
 
             <!-- Operational KPI Card (Replacement for Donut) -->
-            <div class="lg:col-span-3 bg-[#00152b] dark:bg-slate-900 text-white p-6 rounded-2xl shadow-xl flex flex-col justify-between relative overflow-hidden group border border-white/5 dark:border-white/10 transition-all">
+            <div class="lg:col-span-3 bg-pelindo-navy dark:bg-slate-900 text-white p-6 rounded-2xl shadow-xl flex flex-col justify-between relative overflow-hidden group border border-white/5 dark:border-white/10 transition-all">
                 <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl opacity-50 group-hover:opacity-80 transition-opacity"></div>
                 
                 <div class="relative z-10">
-                    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-blue-400 mb-6 flex items-center gap-2">
+                    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-pelindo-cyan mb-6 flex items-center gap-2">
                         <i class="fas fa-microchip"></i> Performance KPI
                     </h3>
                     
@@ -303,8 +303,8 @@
                         <div class="group/kpi">
                             <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1 group-hover/kpi:text-emerald-300 transition-colors">Target SLA (Sembuh)</p>
                             <div class="flex items-center gap-3">
-                                <span class="text-2xl font-black text-emerald-400">92%</span>
-                                <span class="text-[9px] font-black bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded border border-emerald-500/20 uppercase tracking-tighter">On Schedule</span>
+                                <span class="text-2xl font-black text-pelindo-cyan">92%</span>
+                                <span class="text-[9px] font-black bg-white/10 text-pelindo-cyan px-2 py-1 rounded border border-white/10 uppercase tracking-tighter">On Schedule</span>
                             </div>
                         </div>
                     </div>
@@ -318,7 +318,7 @@
             <!-- Top 5 Entitas Bermasalah -->
             <div class="lg:col-span-12 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-sm flex flex-col">
                 <h3 class="text-xs font-black text-slate-700 dark:text-slate-200 uppercase tracking-widest mb-4 flex items-center gap-2">
-                    <i class="fas fa-city text-red-500"></i> Sebaran Kerusakan per Cabang (Top 5)
+                    <i class="fas fa-city text-pelindo-blue"></i> Sebaran Kerusakan per Cabang (Top 5)
                 </h3>
                 <div class="relative h-40 w-full mt-auto">
                     <canvas id="topEntityChart"></canvas>
@@ -346,16 +346,16 @@
                         @forelse($frequentInfrastructures as $index => $infra)
                         <div @click="openDetailModal({{ json_encode($infra) }})" class="cursor-pointer group flex items-center justify-between p-3.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md transition-all relative">
                             <div class="flex items-center gap-3">
-                                <div class="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center font-black text-[10px] group-hover:bg-red-500 group-hover:text-white transition-colors">
+                                <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center font-black text-[10px] group-hover:bg-pelindo-blue group-hover:text-white transition-colors">
                                     #{{ $index + 1 }}
                                 </div>
                                 <div>
-                                    <h4 class="text-[11px] font-black text-slate-800 dark:text-slate-200 uppercase group-hover:text-blue-700 dark:group-hover:text-blue-400 transition-colors">{{ $infra->code_name }}</h4>
+                                    <h4 class="text-[11px] font-black text-slate-800 dark:text-slate-200 uppercase group-hover:text-pelindo-blue dark:group-hover:text-pelindo-cyan transition-colors">{{ $infra->code_name }}</h4>
                                     <p class="text-[9px] text-slate-400 dark:text-slate-500 uppercase font-bold">{{ $infra->entity->name ?? '-' }}</p>
                                 </div>
                             </div>
                             <div class="text-right">
-                                <span class="text-sm font-black text-[#003366] dark:text-blue-400">{{ $infra->breakdown_logs_count }}</span>
+                                <span class="text-sm font-black text-pelindo-blue dark:text-pelindo-cyan">{{ $infra->breakdown_logs_count }}</span>
                                 <p class="text-[8px] text-slate-400 uppercase font-bold">Kali</p>
                             </div>
                         </div>
@@ -370,7 +370,7 @@
             <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm flex flex-col">
                 <div class="px-6 py-5 bg-blue-50/50 dark:bg-blue-900/10 border-b border-blue-100 dark:border-blue-800 flex items-center justify-between">
                     <div class="flex items-center gap-4">
-                        <i class="fas fa-calendar-alt text-blue-600 dark:text-blue-400 text-xl"></i>
+                        <i class="fas fa-calendar-alt text-pelindo-blue dark:text-pelindo-cyan text-xl"></i>
                         <div>
                             <h3 class="text-slate-800 dark:text-slate-100 font-black uppercase tracking-widest text-sm leading-none">Pemeliharaan Mendatang</h3>
                             <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1">Jadwal 7 Hari Ke Depan</p>
@@ -381,10 +381,10 @@
                     <div class="space-y-3">
                         @forelse($upcomingMaintenance as $sched)
                         <div class="flex items-center justify-between p-3.5 rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800/50 shadow-sm relative group overflow-hidden">
-                            <div class="absolute left-0 top-0 w-1 h-full bg-blue-500 opacity-20 group-hover:opacity-100 transition-opacity"></div>
+                            <div class="absolute left-0 top-0 w-1 h-full bg-pelindo-blue opacity-20 group-hover:opacity-100 transition-opacity"></div>
                             <div class="flex items-center gap-3">
                                 <div class="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-900 flex flex-col items-center justify-center border border-slate-100 dark:border-slate-700">
-                                    <span class="text-[9px] font-black text-blue-600 dark:text-blue-400 leading-none">{{ \Carbon\Carbon::parse($sched->scheduled_date)->translatedFormat('d') }}</span>
+                                    <span class="text-[9px] font-black text-pelindo-blue dark:text-pelindo-cyan leading-none">{{ \Carbon\Carbon::parse($sched->scheduled_date)->translatedFormat('d') }}</span>
                                     <span class="text-[8px] font-bold text-slate-400 uppercase leading-none mt-0.5">{{ \Carbon\Carbon::parse($sched->scheduled_date)->translatedFormat('M') }}</span>
                                 </div>
                                 <div>
@@ -410,10 +410,10 @@
             <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm flex flex-col">
                 <div class="px-6 py-5 bg-red-50 dark:bg-red-900/20 border-b border-red-100 dark:border-red-900/30 flex items-center justify-between">
                     <div class="flex items-center gap-4">
-                        <i class="fas fa-siren-on text-red-600 dark:text-red-400 text-xl"></i>
+                        <i class="fas fa-siren-on text-pelindo-blue dark:text-pelindo-cyan text-xl"></i>
                         <div>
-                            <h3 class="text-red-800 dark:text-red-200 font-black uppercase tracking-widest text-sm leading-none">Laporan Mendesak</h3>
-                            <p class="text-[9px] text-red-500 dark:text-red-400 font-bold uppercase tracking-widest mt-1">Tiket Status 'Reported'</p>
+                            <h3 class="text-slate-800 dark:text-slate-100 font-black uppercase tracking-widest text-sm leading-none">Laporan Mendesak</h3>
+                            <p class="text-[9px] text-pelindo-blue dark:text-pelindo-cyan font-bold uppercase tracking-widest mt-1">Tiket Status 'Reported'</p>
                         </div>
                     </div>
                 </div>
@@ -421,20 +421,20 @@
                     <div class="space-y-3">
                         @forelse($urgentBreakdowns as $log)
                         <div @click="openDetailModal({{ json_encode($log->infrastructure) }})" class="cursor-pointer group flex items-start gap-3 p-3.5 border border-red-100 dark:border-red-900/30 rounded-xl bg-white dark:bg-slate-800 shadow-sm hover:border-red-400 dark:hover:border-red-700 transition-all">
-                            <div class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-red-500 group-hover:text-white transition-colors">
+                            <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-pelindo-blue group-hover:text-white transition-colors">
                                 <i class="fas fa-exclamation text-[10px]"></i>
                             </div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex justify-between items-start mb-0.5">
                                     <h4 class="text-[11px] font-black text-slate-800 dark:text-slate-200 uppercase truncate max-w-[100px]">{{ $log->infrastructure->code_name ?? 'Asset' }}</h4>
-                                    <span class="text-[8px] font-bold text-red-500">{{ $log->created_at->diffForHumans() }}</span>
+                                    <span class="text-[8px] font-bold text-slate-500">{{ $log->created_at->diffForHumans() }}</span>
                                 </div>
                                 <p class="text-[10px] text-slate-600 dark:text-slate-400 line-clamp-1 italic">"{{ $log->issue_detail }}"</p>
                             </div>
                         </div>
                         @empty
                         <div class="text-center py-10 opacity-30">
-                            <i class="fas fa-shield-check text-4xl mb-3 text-emerald-500"></i>
+                            <i class="fas fa-shield-check text-4xl mb-3 text-pelindo-cyan"></i>
                             <p class="text-[10px] font-black uppercase tracking-widest">Semua Laporan Teratasi</p>
                         </div>
                         @endforelse
@@ -444,9 +444,9 @@
         </div>
 
         <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm " >
-            <div class="px-6 py-5 bg-[#00152b] dark:bg-[#000d1a] flex items-center justify-between">
+            <div class="px-6 py-5 bg-pelindo-navy dark:bg-[#000d1a] flex items-center justify-between">
                 <div class="flex items-center gap-4">
-                    <i class="fas fa-clipboard-list text-red-500 text-xl"></i>
+                    <i class="fas fa-clipboard-list text-pelindo-cyan text-xl"></i>
                     <div>
                         <h3 class="text-white font-black uppercase tracking-widest text-sm leading-none">Log Insiden Aktif</h3>
                         <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1">Status laporan yang belum terselesaikan</p>
@@ -459,7 +459,7 @@
             <div class="overflow-x-auto w-full">
                 <table class="w-full text-left border-collapse ent-table min-w-[1000px]">
                     <thead>
-                        <tr class="bg-[#002244] dark:bg-slate-800 text-slate-300 dark:text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">
+                        <tr class="bg-pelindo-blue dark:bg-slate-800 text-white/80 dark:text-slate-400 text-[10px] font-black uppercase tracking-[0.2em]">
                             <th class="px-8 py-5 w-16 text-center border-r border-white/5">NO</th>
                             <th class="px-8 py-5">Entitas Pelabuhan</th>
                             <th class="px-8 py-5">Identitas Alat</th>
@@ -480,20 +480,20 @@
                                 </div>
                             </td>
                             <td class="px-8 py-5">
-                                <span class="text-[#003366] dark:text-blue-400 font-black uppercase bg-blue-50 dark:bg-blue-900/30 px-3 py-1.5 rounded-lg border border-blue-100 dark:border-blue-800 shadow-sm group-hover:bg-blue-100 transition-colors">{{ $log->infrastructure->code_name ?? '-' }}</span>
+                                <span class="text-pelindo-blue dark:text-pelindo-cyan font-black uppercase bg-sky-50 dark:bg-sky-900/30 px-3 py-1.5 rounded-lg border border-sky-100 dark:border-sky-800 shadow-sm group-hover:bg-sky-100 transition-colors">{{ $log->infrastructure->code_name ?? '-' }}</span>
                             </td>
                             <td class="px-8 py-5">
                                 <p class="text-slate-600 dark:text-slate-400 max-w-[250px] truncate leading-relaxed italic" title="{{ $log->issue_detail }}">"{{ $log->issue_detail }}"</p>
                             </td>
                             <td class="px-8 py-5 text-center">
                                 @if($log->repair_status == 'order_part')
-                                    <span class="bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800 text-[9px] font-black px-3 py-1.5 rounded-md uppercase tracking-widest shadow-sm">Waiting Part</span>
+                                    <span class="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 text-[9px] font-black px-3 py-1.5 rounded-md uppercase tracking-widest shadow-sm">Waiting Part</span>
                                 @elseif($log->repair_status == 'on_progress')
-                                    <span class="bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 text-[9px] font-black px-3 py-1.5 rounded-md uppercase tracking-widest shadow-sm">On Repair</span>
+                                    <span class="bg-sky-50 dark:bg-sky-900/30 text-pelindo-blue dark:text-pelindo-cyan border border-sky-100 dark:border-sky-800 text-[9px] font-black px-3 py-1.5 rounded-md uppercase tracking-widest shadow-sm">On Repair</span>
                                 @elseif($log->repair_status == 'reported')
-                                    <span class="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 text-[9px] font-black px-3 py-1.5 rounded-md uppercase tracking-widest shadow-sm">Reported</span>
+                                    <span class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 text-[9px] font-black px-3 py-1.5 rounded-md uppercase tracking-widest shadow-sm">Reported</span>
                                 @else
-                                    <span class="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-[9px] font-black px-3 py-1.5 rounded-md uppercase tracking-widest shadow-sm">Resolved</span>
+                                    <span class="bg-sky-100 dark:bg-pelindo-blue/20 text-pelindo-blue dark:text-pelindo-cyan border border-pelindo-cyan/30 text-[9px] font-black px-3 py-1.5 rounded-md uppercase tracking-widest shadow-sm">Resolved</span>
                                 @endif
                             </td>
                             <td class="px-8 py-5">
@@ -655,7 +655,7 @@
                 <!-- Modal Footer -->
                 <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
                     <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Pelindo Infrastructure Reporting System</p>
-                    <a :href="'/admin/infrastructures/' + infraData?.id" class="bg-[#003366] dark:bg-blue-600 hover:bg-[#001e3c] dark:hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-md transition-colors flex items-center gap-2">
+                    <a :href="'/admin/infrastructures/' + infraData?.id" class="bg-pelindo-blue dark:bg-pelindo-blue hover:bg-pelindo-navy dark:hover:bg-pelindo-navy text-white px-5 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-md transition-colors flex items-center gap-2">
                         <i class="fas fa-tools"></i> Kelola Perbaikan (Update Status)
                     </a>
                 </div>
@@ -701,13 +701,13 @@
                     datasets: [{
                         label: 'Insiden Tercatat',
                         data: {!! json_encode($chartData['trendCounts'] ?? []) !!},
-                        borderColor: '#0055a4',
+                        borderColor: '#0064a7',
                         backgroundColor: createGradient(trendCtx),
                         borderWidth: 3,
                         tension: 0.4,
                         fill: true,
                         pointBackgroundColor: '#ffffff',
-                        pointBorderColor: '#0055a4',
+                        pointBorderColor: '#0064a7',
                         pointBorderWidth: 2,
                         pointRadius: 4,
                         pointHoverRadius: 6
@@ -748,7 +748,7 @@
                     datasets: [{
                         label: 'Total Aset Rusak',
                         data: {!! $topBrokenEntities->values()->toJson() !!},
-                        backgroundColor: '#ef4444',
+                        backgroundColor: '#58b9e4',
                         borderRadius: 4,
                         barThickness: 18
                     }]
