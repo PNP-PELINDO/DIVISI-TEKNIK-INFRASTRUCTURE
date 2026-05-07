@@ -48,6 +48,16 @@ class BreakdownLogSeeder extends Seeder
                 'Kebocoran pipa air bersih utama.',
                 'Panel surya tidak mengisi daya ke baterai.',
                 'Kompresor kehilangan tekanan secara perlahan.'
+            ],
+            'marine' => [
+                'Mesin induk (main engine) mati mendadak saat manuver.',
+                'Kebocoran pada lambung kapal sebelah kiri.',
+                'Propeller terbelit jaring nelayan atau tali mooring.',
+                'Sistem navigasi dan radar blank.',
+                'Genset kapal (auxiliary engine) tidak berfungsi.',
+                'Kerusakan pada sistem kemudi (steering gear).',
+                'Pompa bilga macet sehingga air masuk.',
+                'Winch penarik jangkar tidak bisa berputar.'
             ]
         ];
 
@@ -62,6 +72,14 @@ class BreakdownLogSeeder extends Seeder
             // Berapa kali alat ini pernah rusak? (0-5 kali histori)
             $historyCount = rand(0, 5);
             
+            // Ambil operator yang sesuai dengan entitas infrastruktur
+            $operator = User::where('entity_id', $infra->entity_id)->inRandomOrder()->first();
+            $creatorId = $operator ? $operator->id : $adminUsers->random()->id;
+            
+            // To make it look more real, sometimes the updater is different
+            $updater = User::where('entity_id', $infra->entity_id)->inRandomOrder()->first();
+            $updaterId = $updater ? $updater->id : $creatorId;
+
             // Jika status saat ini breakdown, pastikan ada 1 log yang belum resolved
             if ($infra->status === 'breakdown') {
                 $statusIndex = rand(0, 2); // reported, order_part, on_progress
@@ -89,7 +107,8 @@ class BreakdownLogSeeder extends Seeder
                     'start_work_date' => $start_work_date,
                     'com_test_date' => null,
                     'resolved_date' => null,
-                    'created_by' => $adminUsers->random()->id,
+                    'created_by' => $creatorId,
+                    'updated_by' => $updaterId,
                     'created_at' => $createdDate,
                     'updated_at' => Carbon::now()
                 ];
@@ -121,7 +140,8 @@ class BreakdownLogSeeder extends Seeder
                     'start_work_date' => $start_work_date,
                     'com_test_date' => $com_test_date,
                     'resolved_date' => $resolved_date,
-                    'created_by' => $adminUsers->random()->id,
+                    'created_by' => $creatorId,
+                    'updated_by' => $updaterId,
                     'created_at' => $createdDate,
                     'updated_at' => $resolved_date
                 ];
