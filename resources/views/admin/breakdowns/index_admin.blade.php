@@ -147,15 +147,11 @@
                                     </td>
                                     <td class="px-8 py-6 text-center">
                                         @php
-                                            $statusConfig = [
-                                                'reported' => ['bg' => 'bg-red-500', 'label' => 'Reported'],
-                                                'order_part' => ['bg' => 'bg-purple-600', 'label' => 'Order Part'],
-                                                'on_progress' => ['bg' => 'bg-amber-500', 'label' => 'Working'],
-                                                'resolved' => ['bg' => 'bg-emerald-500', 'label' => 'Ready']
-                                            ];
-                                            $conf = $statusConfig[$log->repair_status] ?? ['bg' => 'bg-slate-500', 'label' => 'Unknown'];
+                                            $statusConfig = \App\Models\BreakdownLog::getStatusConfig();
+                                            $conf = $statusConfig[$log->repair_status] ?? $statusConfig['reported'];
                                         @endphp
-                                        <span class="{{ $conf['bg'] }} text-white px-3 py-1 rounded-lg text-[8px] font-black uppercase tracking-widest shadow-sm">
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md {{ $conf['bg'] }} {{ $conf['text'] }} border {{ $conf['border'] }} text-[8px] font-black uppercase tracking-widest shadow-sm">
+                                            <i class="fas {{ $conf['icon'] }} text-[7px]"></i>
                                             {{ $conf['label'] }}
                                         </span>
                                     </td>
@@ -443,15 +439,11 @@
 
     </div>
 
-    <x-export-report :infrastructures="$allInfrastructures" :recentBreakdowns="$activeBreakdowns" />
     <x-export-filter-modal />
 
     <style>
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
-        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+
     </style>
 </x-app-layout>

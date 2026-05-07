@@ -13,25 +13,14 @@ use App\Models\Infrastructure;
 use App\Models\BreakdownLog;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\LandingController;
+
 /*
 |--------------------------------------------------------------------------
 | Rute Publik / Landing Page (Portal Utama)
 |--------------------------------------------------------------------------
 */
-Route::get('/', function () {
-    // Ambil data untuk katalog utama
-    $infrastructures = Infrastructure::all();
-
-    $entities = Entity::with('infrastructures')->get();
-
-    // Ambil log insiden aktif (yang belum sembuh/resolved)
-    $breakdowns = BreakdownLog::with(['infrastructure' => fn($q) => $q->withTrashed()->with('entity')])
-        ->where('repair_status', '!=', 'resolved')
-        ->orderBy('created_at', 'desc')
-        ->get();
-
-    return view('welcome', compact('infrastructures', 'entities', 'breakdowns'));
-})->name('home');
+Route::get('/', [LandingController::class, 'index'])->name('home');
 
 /*
 |--------------------------------------------------------------------------

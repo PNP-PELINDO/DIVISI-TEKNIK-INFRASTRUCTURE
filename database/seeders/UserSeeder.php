@@ -65,15 +65,19 @@ class UserSeeder extends Seeder
             ]);
         }
 
-        // 4. Operators - Belawan / Other
-        $belawan = \App\Models\Entity::where('code', 'BICT')->first() ?? \App\Models\Entity::where('id', '!=', $ptp->id ?? 0)->first();
-        if ($belawan) {
+        // 4. Generate Operators for ALL remaining entities
+        $allEntities = \App\Models\Entity::all();
+        foreach ($allEntities as $entity) {
+            // Check if this entity already has users from the specific seeds above
+            if (User::where('entity_id', $entity->id)->exists()) continue;
+
+            $slug = strtolower(str_replace(' ', '.', $entity->name));
             User::create([
-                'name' => 'Teknisi Belawan',
-                'email' => 'teknisi.belawan@pelindo.co.id',
+                'name' => 'Operator ' . $entity->name,
+                'email' => "ops.{$slug}@pelindo.co.id",
                 'password' => Hash::make('password'),
                 'role' => 'operator',
-                'entity_id' => $belawan->id,
+                'entity_id' => $entity->id,
                 'email_verified_at' => now(),
             ]);
         }

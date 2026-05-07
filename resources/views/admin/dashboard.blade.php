@@ -500,15 +500,14 @@
                                 <p class="text-slate-600 dark:text-slate-400 max-w-[250px] truncate leading-relaxed italic" title="{{ $log->issue_detail }}">"{{ $log->issue_detail }}"</p>
                             </td>
                             <td class="px-8 py-5 text-center">
-                                @if($log->repair_status == 'order_part')
-                                    <span class="bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 text-[9px] font-black px-3 py-1.5 rounded-md uppercase tracking-widest shadow-sm">Waiting Part</span>
-                                @elseif($log->repair_status == 'on_progress')
-                                    <span class="bg-sky-50 dark:bg-sky-900/30 text-pelindo-blue dark:text-pelindo-cyan border border-sky-100 dark:border-sky-800 text-[9px] font-black px-3 py-1.5 rounded-md uppercase tracking-widest shadow-sm">On Repair</span>
-                                @elseif($log->repair_status == 'reported')
-                                    <span class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 text-[9px] font-black px-3 py-1.5 rounded-md uppercase tracking-widest shadow-sm">Reported</span>
-                                @else
-                                    <span class="bg-sky-100 dark:bg-pelindo-blue/20 text-pelindo-blue dark:text-pelindo-cyan border border-pelindo-cyan/30 text-[9px] font-black px-3 py-1.5 rounded-md uppercase tracking-widest shadow-sm">Resolved</span>
-                                @endif
+                                @php
+                                    $statusConfig = \App\Models\BreakdownLog::getStatusConfig();
+                                    $conf = $statusConfig[$log->repair_status] ?? $statusConfig['reported'];
+                                @endphp
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded {{ $conf['bg'] }} {{ $conf['text'] }} border {{ $conf['border'] }} text-[8px] font-black uppercase tracking-widest shadow-sm">
+                                    <i class="fas {{ $conf['icon'] }}"></i>
+                                    {{ $conf['label'] }}
+                                </span>
                             </td>
                             <td class="px-8 py-5">
                                 <div class="flex items-center gap-2">
@@ -713,16 +712,9 @@
 
     </div>
 
-    <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-    </style>
 
-    <!-- Hidden Report Component (for fallback) -->
-    <x-export-report :infrastructures="$allInfrastructures" :recentBreakdowns="$allActiveBreakdowns" />
-    
+
+
     <!-- Export Filter Modal -->
     <x-export-filter-modal />
 

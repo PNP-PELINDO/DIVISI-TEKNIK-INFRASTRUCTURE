@@ -55,7 +55,6 @@ class BreakdownLogController extends Controller
 
             $logs = $query->latest()->paginate(20)->withQueryString();
 
-            $allInfrastructures = Infrastructure::with('entity')->get();
             $activeBreakdowns = BreakdownLog::with(['infrastructure' => fn($q) => $q->withTrashed()->with('entity')])
                 ->where('repair_status', '!=', 'resolved')
                 ->latest()
@@ -64,7 +63,7 @@ class BreakdownLogController extends Controller
 
             $allEntities = Entity::orderBy('name')->get();
 
-            return view('admin.breakdowns.index_admin', compact('logs', 'allInfrastructures', 'activeBreakdowns', 'allEntities'));
+            return view('admin.breakdowns.index_admin', compact('logs', 'activeBreakdowns', 'allEntities'));
         }
 
         // JIKA YANG LOGIN ADALAH OPERATOR (TAMPILAN EXCEL KESIAPAN ALAT)
@@ -112,10 +111,6 @@ class BreakdownLogController extends Controller
             }
 
             $activeBreakdowns = $activeQuery->get()->keyBy('infrastructure_id');
-
-            $allInfrastructures = Infrastructure::with('entity')
-                ->where('entity_id', $user->entity_id)
-                ->get();
 
             $recentQuery = BreakdownLog::with(['infrastructure' => fn($q) => $q->withTrashed()->with('entity')])
                 ->where('repair_status', '!=', 'resolved')
@@ -165,7 +160,7 @@ class BreakdownLogController extends Controller
                 ->paginate(15, ['*'], 'history_page')
                 ->withQueryString();
 
-            return view('admin.breakdowns.index_operator', compact('infrastructures', 'activeBreakdowns', 'allInfrastructures', 'recentBreakdowns', 'historyLogs', 'stats'));
+            return view('admin.breakdowns.index_operator', compact('infrastructures', 'activeBreakdowns', 'recentBreakdowns', 'historyLogs', 'stats'));
         }
     }
 

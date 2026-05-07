@@ -433,7 +433,14 @@
                                         </div>
                                     </td>
                                     <td class="px-8 py-6 text-center">
-                                        <span class="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800 px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest">Resolved</span>
+                                        @php
+                                            $statusConfig = \App\Models\BreakdownLog::getStatusConfig();
+                                            $conf = $statusConfig[$log->repair_status] ?? $statusConfig['resolved'];
+                                        @endphp
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg {{ $conf['bg'] }} {{ $conf['text'] }} border {{ $conf['border'] }} text-[9px] font-black uppercase tracking-widest shadow-sm">
+                                            <i class="fas {{ $conf['icon'] }}"></i>
+                                            {{ $conf['label'] }}
+                                        </span>
                                     </td>
                                     <td class="px-8 py-6 text-right">
                                         @if($log->document_proof)
@@ -611,13 +618,7 @@
     </div>
 
     <!-- Export Logic (Hidden Component) -->
-    <x-export-report :infrastructures="$allInfrastructures ?? collect()" :recentBreakdowns="$recentBreakdowns ?? collect()" />
     <x-export-filter-modal />
 
-    <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
-        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
-    </style>
+
 </x-app-layout>

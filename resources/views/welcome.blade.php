@@ -167,23 +167,6 @@
         selectedTypeTitle: '', 
         selectedTypeEntity: '', 
         selectedTypeItems: [],
-        
-        getTotalUnits(entityId = null) {
-            let total = 0;
-            const sections = document.querySelectorAll('section[data-entity-id]');
-            sections.forEach(section => {
-                if (entityId && section.dataset.entityId != entityId) return;
-                const cards = section.querySelectorAll('.asset-card');
-                cards.forEach(card => {
-                    if (card.style.display !== 'none') {
-                        // Assuming each card represents a group, we should actually count items
-                        const items = JSON.parse(card.dataset.items);
-                        total += items.length;
-                    }
-                });
-            });
-            return total;
-        },
         showIncidentModal: false,
         selectedIncident: null,
         openIncidentModal(incident) {
@@ -286,22 +269,20 @@
                 x-show="((filter === 'all' || {{ $availableCategories }}.includes(filter)) && (filterEntity === 'all' || filterEntity === '{{ $entity->name }}')) && (search === '' || visibleUnits > 0)" 
                 x-data="{ 
                     showModal: false,
-                    visibleUnits: {{ $entity->infrastructures->count() }},
-                    updateCounter() {
-                        this.$nextTick(() => {
-                            let count = 0;
-                            const cards = this.$el.querySelectorAll('.asset-card');
-                            cards.forEach(card => {
-                                if (card.style.display !== 'none') {
-                                    const items = JSON.parse(card.dataset.items);
-                                    count += items.length;
-                                }
-                            });
-                            this.visibleUnits = count;
-                        });
+                    infrastructures: {{ $entity->infrastructures->map(fn($i) => [
+                        'code' => strtolower($i->code_name), 
+                        'type' => strtolower($i->type), 
+                        'category' => $i->category
+                    ])->toJson() }},
+                    get visibleUnits() {
+                        if (search === '' && filter === 'all') return this.infrastructures.length;
+                        return this.infrastructures.filter(i => {
+                            const matchFilter = filter === 'all' || i.category === filter;
+                            const matchSearch = search === '' || i.code.includes(search.toLowerCase()) || i.type.includes(search.toLowerCase());
+                            return matchFilter && matchSearch;
+                        }).length;
                     }
-                }"
-                x-init="updateCounter(); $watch('filter', () => updateCounter()); $watch('search', () => updateCounter()); $watch('filterEntity', () => updateCounter());">
+                }">
                 
                 <div class="bg-gradient-to-r from-[#003366] to-[#0055a4] dark:from-slate-800 dark:to-slate-900 text-white px-5 py-4 md:px-8 md:py-5 rounded-t-2xl shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <h3 class="font-black text-sm md:text-lg uppercase tracking-widest flex items-center gap-2 md:gap-3">
@@ -473,16 +454,8 @@
                             <td class="px-5 py-4 md:px-8 md:py-5 text-slate-500 dark:text-slate-500 lowercase first-letter:uppercase font-medium italic max-w-xs truncate" title="{{ $log->issue_detail }}">{{ $log->issue_detail }}</td>
                             <td class="px-5 py-4 md:px-8 md:py-5 text-center">
                                 @php
-    $statusConfig = [
-        'reported' => ['bg' => 'bg-red-50 dark:bg-rose-500/10', 'text' => 'text-red-600 dark:text-rose-400', 'border' => 'border-red-200 dark:border-rose-500/20', 'icon' => 'fa-exclamation-circle', 'label' => 'Dilaporkan'],
-        'troubleshooting' => ['bg' => 'bg-orange-50 dark:bg-amber-500/10', 'text' => 'text-orange-600 dark:text-amber-400', 'border' => 'border-orange-200 dark:border-amber-500/20', 'icon' => 'fa-search', 'label' => 'Troubleshoot'],
-        'work_order' => ['bg' => 'bg-blue-50 dark:bg-sky-500/10', 'text' => 'text-blue-600 dark:text-sky-400', 'border' => 'border-blue-200 dark:border-sky-500/20', 'icon' => 'fa-file-signature', 'label' => 'Work Order'],
-        'order_part' => ['bg' => 'bg-purple-50 dark:bg-indigo-500/10', 'text' => 'text-purple-600 dark:text-indigo-400', 'border' => 'border-purple-200 dark:border-indigo-500/20', 'icon' => 'fa-box-open', 'label' => 'Order Part'],
-        'on_progress' => ['bg' => 'bg-amber-50 dark:bg-yellow-500/10', 'text' => 'text-amber-600 dark:text-yellow-400', 'border' => 'border-amber-200 dark:border-yellow-500/20', 'icon' => 'fa-tools', 'label' => 'Sedang Diperbaiki'],
-        'testing' => ['bg' => 'bg-indigo-50 dark:bg-violet-500/10', 'text' => 'text-indigo-600 dark:text-violet-400', 'border' => 'border-indigo-200 dark:border-violet-500/20', 'icon' => 'fa-vial', 'label' => 'Com Test'],
-        'resolved' => ['bg' => 'bg-emerald-50 dark:bg-emerald-500/10', 'text' => 'text-emerald-600 dark:text-emerald-400', 'border' => 'border-emerald-200 dark:border-emerald-500/20', 'icon' => 'fa-check-circle', 'label' => 'Selesai']
-    ];
-    $conf = $statusConfig[$log->repair_status] ?? $statusConfig['reported'];
+                                    $statusConfig = \App\Models\BreakdownLog::getStatusConfig();
+                                    $conf = $statusConfig[$log->repair_status] ?? $statusConfig['reported'];
                                 @endphp
                                 <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded {{ $conf['bg'] }} {{ $conf['text'] }} border {{ $conf['border'] }} text-[8px] md:text-[9px] font-black uppercase tracking-widest whitespace-nowrap">
                                     <i class="fas {{ $conf['icon'] }}"></i>
@@ -513,7 +486,14 @@
 
     <template x-teleport="body">
         <div x-show="showTypeModal" class="fixed inset-0 z-[100] flex items-center justify-center px-4 bg-slate-900/60 backdrop-blur-sm transition-opacity" x-cloak style="display: none;">
-            <div @click.away="showTypeModal = false" x-show="showTypeModal" x-transition.scale.origin.bottom class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
+            <div @click.away="showTypeModal = false" x-show="showTypeModal" 
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 scale-90"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-90"
+                 class="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg max-h-[85vh] flex flex-col shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
                 <div class="bg-[#003366] dark:bg-slate-950 px-6 py-4 flex items-center justify-between shrink-0">
                     <div>
                         <h3 class="text-white font-black uppercase tracking-widest text-sm" x-text="selectedTypeTitle"></h3>
@@ -560,7 +540,14 @@
     <!-- Modal Detail Insiden -->
     <template x-teleport="body">
         <div x-show="showIncidentModal" class="fixed inset-0 z-[110] flex items-center justify-center px-4 bg-slate-900/60 backdrop-blur-md transition-opacity" x-cloak style="display: none;">
-            <div @click.away="showIncidentModal = false" x-show="showIncidentModal" x-transition.scale.origin.bottom class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
+            <div @click.away="showIncidentModal = false" x-show="showIncidentModal"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 scale-90"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-90"
+                 class="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-md shadow-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
                 <div class="bg-red-600 px-6 py-5 flex items-center justify-between text-white">
                     <div class="flex items-center gap-3">
                         <i class="fas fa-exclamation-triangle text-xl"></i>
@@ -610,27 +597,6 @@
         </div>
     </template>
 
-    <script>
-        function updateDarkIcon() {
-            const darkIcon = document.getElementById('dark-icon');
-            if (!darkIcon) return;
-            if (document.documentElement.classList.contains('dark')) {
-                darkIcon.classList.remove('fa-moon');
-                darkIcon.classList.add('fa-sun');
-            } else {
-                darkIcon.classList.remove('fa-sun');
-                darkIcon.classList.add('fa-moon');
-            }
-        }
-
-        function toggleDarkMode() {
-            const isDark = document.documentElement.classList.toggle('dark');
-            localStorage.setItem('dark-mode', isDark);
-            updateDarkIcon();
-        }
-
-        // Initialize icon on load
-        document.addEventListener('DOMContentLoaded', updateDarkIcon);
-    </script>
+    <script src="{{ asset('js/theme-toggle.js') }}"></script>
 </body>
 </html>

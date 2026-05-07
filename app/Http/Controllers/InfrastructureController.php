@@ -13,6 +13,17 @@ use Illuminate\Support\Facades\Storage;
 
 class InfrastructureController extends Controller
 {
+    /**
+     * Get a map of all unique types to their categories.
+     * Used for populating dropdowns dynamically without redundancy.
+     */
+    protected function getTypeCategoryMap()
+    {
+        return Infrastructure::select('type', 'category')
+            ->distinct()
+            ->pluck('category', 'type')
+            ->toArray();
+    }
     public function index()
     {
         $this->authorize('viewAny', Infrastructure::class);
@@ -76,10 +87,7 @@ class InfrastructureController extends Controller
         }
 
         // Mengambil daftar tipe alat unik berdasarkan kategori untuk dropdown
-        $typeCategoryMap = Infrastructure::select('type', 'category')
-                            ->distinct()
-                            ->pluck('category', 'type')
-                            ->toArray();
+        $typeCategoryMap = $this->getTypeCategoryMap();
 
         return view('admin.infrastructures.create', compact('entities', 'typeCategoryMap'));
     }
@@ -160,10 +168,7 @@ class InfrastructureController extends Controller
             $entities = Entity::where('id', $user->entity_id)->get();
         }
 
-        $typeCategoryMap = Infrastructure::select('type', 'category')
-                            ->distinct()
-                            ->pluck('category', 'type')
-                            ->toArray();
+        $typeCategoryMap = $this->getTypeCategoryMap();
 
         return view('admin.infrastructures.edit', compact('infrastructure', 'entities', 'typeCategoryMap'));
     }

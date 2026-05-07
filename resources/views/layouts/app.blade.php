@@ -132,28 +132,8 @@
             .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         </style>
 
+        <script src="{{ asset('js/theme-toggle.js') }}"></script>
         <script>
-            function updateDarkIcon() {
-                const darkIcon = document.getElementById('dark-icon');
-                if (!darkIcon) return;
-                if (document.documentElement.classList.contains('dark')) {
-                    darkIcon.classList.remove('fa-moon');
-                    darkIcon.classList.add('fa-sun');
-                } else {
-                    darkIcon.classList.remove('fa-sun');
-                    darkIcon.classList.add('fa-moon');
-                }
-            }
-
-            function toggleDarkMode() {
-                const isDark = document.documentElement.classList.toggle('dark');
-                localStorage.setItem('dark-mode', isDark);
-                updateDarkIcon();
-            }
-
-            // Initialize icon on load
-            document.addEventListener('DOMContentLoaded', updateDarkIcon);
-
             function toggleSidebar() {
                 const sidebar = document.getElementById('main-sidebar');
                 const overlay = document.getElementById('mobile-overlay');

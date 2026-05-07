@@ -10,6 +10,65 @@ class BreakdownLog extends Model
 {
     use HasFactory, SoftDeletes;
 
+    /**
+     * Get the standardized configuration for repair statuses.
+     * Centralized to ensure UI consistency across all modules.
+     */
+    public static function getStatusConfig()
+    {
+        return [
+            'reported' => [
+                'bg' => 'bg-red-50 dark:bg-rose-500/10',
+                'text' => 'text-red-600 dark:text-rose-400',
+                'border' => 'border-red-200 dark:border-rose-500/20',
+                'icon' => 'fa-exclamation-circle',
+                'label' => 'Dilaporkan'
+            ],
+            'troubleshooting' => [
+                'bg' => 'bg-orange-50 dark:bg-amber-500/10',
+                'text' => 'text-orange-600 dark:text-amber-400',
+                'border' => 'border-orange-200 dark:border-amber-500/20',
+                'icon' => 'fa-search',
+                'label' => 'Troubleshoot'
+            ],
+            'work_order' => [
+                'bg' => 'bg-blue-50 dark:bg-sky-500/10',
+                'text' => 'text-blue-600 dark:text-sky-400',
+                'border' => 'border-blue-200 dark:border-sky-500/20',
+                'icon' => 'fa-file-signature',
+                'label' => 'Work Order'
+            ],
+            'order_part' => [
+                'bg' => 'bg-purple-50 dark:bg-indigo-500/10',
+                'text' => 'text-purple-600 dark:text-indigo-400',
+                'border' => 'border-purple-200 dark:border-indigo-500/20',
+                'icon' => 'fa-box-open',
+                'label' => 'Order Part'
+            ],
+            'on_progress' => [
+                'bg' => 'bg-amber-50 dark:bg-yellow-500/10',
+                'text' => 'text-amber-600 dark:text-yellow-400',
+                'border' => 'border-amber-200 dark:border-yellow-500/20',
+                'icon' => 'fa-tools',
+                'label' => 'Sedang Diperbaiki'
+            ],
+            'testing' => [
+                'bg' => 'bg-indigo-50 dark:bg-violet-500/10',
+                'text' => 'text-indigo-600 dark:text-violet-400',
+                'border' => 'border-indigo-200 dark:border-violet-500/20',
+                'icon' => 'fa-vial',
+                'label' => 'Com Test'
+            ],
+            'resolved' => [
+                'bg' => 'bg-emerald-50 dark:bg-emerald-500/10',
+                'text' => 'text-emerald-600 dark:text-emerald-400',
+                'border' => 'border-emerald-200 dark:border-emerald-500/20',
+                'icon' => 'fa-check-circle',
+                'label' => 'Selesai'
+            ]
+        ];
+    }
+
     protected $fillable = [
         'infrastructure_id',
         'issue_detail',
