@@ -194,6 +194,7 @@ class BreakdownLogController extends Controller
             'issue_detail' => $request->issue_detail,
             'repair_status' => $initialStatus,
             'vendor_pic' => $request->vendor_pic,
+            'breakdown_date' => $request->breakdown_date ?? now(),
             'created_by' => $user->id,
             'updated_by' => $user->id,
         ]);

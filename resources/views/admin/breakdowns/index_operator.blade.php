@@ -137,7 +137,7 @@
                                     </div>
                                     <div class="flex flex-col items-end">
                                         <span class="bg-red-600 text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-sm">Down</span>
-                                        <p class="text-[9px] font-bold text-slate-400 dark:text-slate-500 mt-2 uppercase">Lapor: {{ $activeLog ? $activeLog->created_at->format('d M Y') : '-' }}</p>
+                                        <p class="text-[9px] font-bold text-slate-400 dark:text-slate-500 mt-2 uppercase">Lapor: {{ $activeLog ? ($activeLog->breakdown_date ? \Carbon\Carbon::parse($activeLog->breakdown_date)->format('d M Y') : $activeLog->created_at->format('d M Y')) : '-' }}</p>
                                     </div>
                                 </div>
 
@@ -191,14 +191,15 @@
                                                 selectedLogId = '{{ $activeLog->id ?? '' }}';
                                                 currentStatus = '{{ $activeLog->repair_status ?? 'reported' }}';
                                                 logDates = {
-                                                    troubleshoot_date: '{{ $activeLog->troubleshoot_date ?? '' }}',
-                                                    ba_date: '{{ $activeLog->ba_date ?? '' }}',
-                                                    work_order_date: '{{ $activeLog->work_order_date ?? '' }}',
-                                                    pr_po_date: '{{ $activeLog->pr_po_date ?? '' }}',
-                                                    sparepart_date: '{{ $activeLog->sparepart_date ?? '' }}',
-                                                    start_work_date: '{{ $activeLog->start_work_date ?? '' }}',
-                                                    com_test_date: '{{ $activeLog->com_test_date ?? '' }}',
-                                                    resolved_date: '{{ $activeLog->resolved_date ?? '' }}',
+                                                    breakdown_date: '{{ $activeLog->breakdown_date ? \Carbon\Carbon::parse($activeLog->breakdown_date)->format('Y-m-d') : $activeLog->created_at->format('Y-m-d') }}',
+                                                    troubleshoot_date: '{{ $activeLog->troubleshoot_date ? \Carbon\Carbon::parse($activeLog->troubleshoot_date)->format('Y-m-d') : '' }}',
+                                                    ba_date: '{{ $activeLog->ba_date ? \Carbon\Carbon::parse($activeLog->ba_date)->format('Y-m-d') : '' }}',
+                                                    work_order_date: '{{ $activeLog->work_order_date ? \Carbon\Carbon::parse($activeLog->work_order_date)->format('Y-m-d') : '' }}',
+                                                    pr_po_date: '{{ $activeLog->pr_po_date ? \Carbon\Carbon::parse($activeLog->pr_po_date)->format('Y-m-d') : '' }}',
+                                                    sparepart_date: '{{ $activeLog->sparepart_date ? \Carbon\Carbon::parse($activeLog->sparepart_date)->format('Y-m-d') : '' }}',
+                                                    start_work_date: '{{ $activeLog->start_work_date ? \Carbon\Carbon::parse($activeLog->start_work_date)->format('Y-m-d') : '' }}',
+                                                    com_test_date: '{{ $activeLog->com_test_date ? \Carbon\Carbon::parse($activeLog->com_test_date)->format('Y-m-d') : '' }}',
+                                                    resolved_date: '{{ $activeLog->resolved_date ? \Carbon\Carbon::parse($activeLog->resolved_date)->format('Y-m-d') : '' }}',
                                                     vendor_pic: '{{ addslashes($activeLog->vendor_pic ?? '') }}'
                                                 };
                                                 showUpdateModal = true;
@@ -323,7 +324,7 @@
                                             {{ $activeLog ? ($activeLog->issue_detail ?? '-') : '-' }}
                                         </td>
                                         <td class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center">
-                                            {{ $activeLog ? $activeLog->created_at->format('d/m/Y') : '-' }}
+                                            {{ $activeLog ? ($activeLog->breakdown_date ? \Carbon\Carbon::parse($activeLog->breakdown_date)->format('d/m/Y') : $activeLog->created_at->format('d/m/Y')) : '-' }}
                                         </td>
                                         <td class="px-6 py-4 border-r border-slate-200 dark:border-slate-800 text-center uppercase">
                                             @if($activeLog)
@@ -359,14 +360,15 @@
                                                     selectedLogId = '{{ $activeLog->id }}';
                                                     currentStatus = '{{ $activeLog->repair_status }}';
                                                     logDates = {
-                                                        troubleshoot_date: '{{ $activeLog->troubleshoot_date ?? '' }}',
-                                                        ba_date: '{{ $activeLog->ba_date ?? '' }}',
-                                                        work_order_date: '{{ $activeLog->work_order_date ?? '' }}',
-                                                        pr_po_date: '{{ $activeLog->pr_po_date ?? '' }}',
-                                                        sparepart_date: '{{ $activeLog->sparepart_date ?? '' }}',
-                                                        start_work_date: '{{ $activeLog->start_work_date ?? '' }}',
-                                                        com_test_date: '{{ $activeLog->com_test_date ?? '' }}',
-                                                        resolved_date: '{{ $activeLog->resolved_date ?? '' }}',
+                                                        breakdown_date: '{{ $activeLog->breakdown_date ? \Carbon\Carbon::parse($activeLog->breakdown_date)->format('Y-m-d') : $activeLog->created_at->format('Y-m-d') }}',
+                                                        troubleshoot_date: '{{ $activeLog->troubleshoot_date ? \Carbon\Carbon::parse($activeLog->troubleshoot_date)->format('Y-m-d') : '' }}',
+                                                        ba_date: '{{ $activeLog->ba_date ? \Carbon\Carbon::parse($activeLog->ba_date)->format('Y-m-d') : '' }}',
+                                                        work_order_date: '{{ $activeLog->work_order_date ? \Carbon\Carbon::parse($activeLog->work_order_date)->format('Y-m-d') : '' }}',
+                                                        pr_po_date: '{{ $activeLog->pr_po_date ? \Carbon\Carbon::parse($activeLog->pr_po_date)->format('Y-m-d') : '' }}',
+                                                        sparepart_date: '{{ $activeLog->sparepart_date ? \Carbon\Carbon::parse($activeLog->sparepart_date)->format('Y-m-d') : '' }}',
+                                                        start_work_date: '{{ $activeLog->start_work_date ? \Carbon\Carbon::parse($activeLog->start_work_date)->format('Y-m-d') : '' }}',
+                                                        com_test_date: '{{ $activeLog->com_test_date ? \Carbon\Carbon::parse($activeLog->com_test_date)->format('Y-m-d') : '' }}',
+                                                        resolved_date: '{{ $activeLog->resolved_date ? \Carbon\Carbon::parse($activeLog->resolved_date)->format('Y-m-d') : '' }}',
                                                         vendor_pic: '{{ $activeLog->vendor_pic ?? '' }}'
                                                     };
                                                     showUpdateModal = true;
@@ -416,7 +418,7 @@
                                     </td>
                                     <td class="px-8 py-6 text-center">
                                         <div class="flex flex-col items-center">
-                                            <span class="text-[10px] font-black text-[#0055a4] dark:text-blue-400">{{ $log->created_at->format('d/m/Y') }}</span>
+                                            <span class="text-[10px] font-black text-[#0055a4] dark:text-blue-400">{{ $log->breakdown_date ? \Carbon\Carbon::parse($log->breakdown_date)->format('d/m/Y') : $log->created_at->format('d/m/Y') }}</span>
                                             @if($log->resolved_date)
                                                 <i class="fas fa-arrow-down text-[8px] my-0.5 text-slate-300"></i>
                                                 <span class="text-[10px] font-black text-emerald-600">{{ \Carbon\Carbon::parse($log->resolved_date)->format('d/m/Y') }}</span>
@@ -472,6 +474,12 @@
                     <form action="{{ route('admin.breakdowns.store') }}" method="POST" class="p-8 space-y-6">
                         @csrf
                         <input type="hidden" name="infrastructure_id" :value="selectedAsset ? selectedAsset.id : ''">
+                        <input type="hidden" name="repair_status" value="reported">
+
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">Tgl Breakdown</label>
+                            <input type="date" name="breakdown_date" value="{{ old('breakdown_date', now()->format('Y-m-d')) }}" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-[1.5rem] p-5 text-sm font-bold text-slate-900 dark:text-white focus:ring-2 focus:ring-red-500 transition-all" required>
+                        </div>
 
                         <div>
                             <label class="block text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-3">Detail Kendala / Kerusakan</label>
@@ -536,7 +544,11 @@
                         </div>
 
                         <!-- Date Section (Dynamic based on logic) -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div>
+                                <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Tgl Breakdown</label>
+                                <input type="date" name="breakdown_date" x-model="logDates.breakdown_date" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl py-3 px-4 text-xs font-bold text-slate-700 dark:text-white transition-all">
+                            </div>
                             <div x-show="['order_part', 'on_progress', 'resolved'].includes(currentStatus)">
                                 <label class="block text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2">Tgl Troubleshoot</label>
                                 <input type="date" name="troubleshoot_date" x-model="logDates.troubleshoot_date" class="w-full bg-slate-50 dark:bg-slate-800 border-none rounded-xl py-3 px-4 text-xs font-bold text-slate-700 dark:text-white transition-all">

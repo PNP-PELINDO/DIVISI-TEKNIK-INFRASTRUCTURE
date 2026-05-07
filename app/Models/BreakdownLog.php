@@ -16,6 +16,7 @@ class BreakdownLog extends Model
         'repair_status',
         'vendor_pic',
         // Tambahan Kolom Baru:
+        'breakdown_date',
         'troubleshoot_date',
         'ba_date',
         'work_order_date',
@@ -30,6 +31,7 @@ class BreakdownLog extends Model
     ];
 
     protected $casts = [
+        'breakdown_date' => 'date',
         'troubleshoot_date' => 'date',
         'ba_date' => 'date',
         'work_order_date' => 'date',

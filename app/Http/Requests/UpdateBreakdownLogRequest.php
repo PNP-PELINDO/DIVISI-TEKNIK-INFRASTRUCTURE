@@ -25,6 +25,7 @@ class UpdateBreakdownLogRequest extends FormRequest
         return [
             'repair_status' => 'required|in:reported,order_part,on_progress,resolved',
             'document_proof' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
+            'breakdown_date' => 'nullable|date_format:Y-m-d',
             'troubleshoot_date' => 'nullable|date_format:Y-m-d',
             'ba_date' => 'nullable|date_format:Y-m-d',
             'work_order_date' => 'nullable|date_format:Y-m-d',
@@ -47,6 +48,7 @@ class UpdateBreakdownLogRequest extends FormRequest
             'document_proof.file' => 'File harus berupa dokumen yang valid',
             'document_proof.mimes' => 'File dokumen harus berformat: PDF, JPG, JPEG, atau PNG',
             'document_proof.max' => 'Ukuran file dokumen maksimal 5MB',
+            'breakdown_date.date_format' => 'Format tanggal breakdown tidak valid (Y-m-d)',
             'troubleshoot_date.date_format' => 'Format tanggal troubleshoot tidak valid (Y-m-d)',
             'ba_date.date_format' => 'Format tanggal BA tidak valid (Y-m-d)',
             'work_order_date.date_format' => 'Format tanggal work order tidak valid (Y-m-d)',

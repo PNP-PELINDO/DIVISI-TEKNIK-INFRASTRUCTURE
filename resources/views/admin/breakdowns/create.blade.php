@@ -125,22 +125,29 @@
                     @error('issue_detail') <p class="text-red-500 dark:text-red-400 text-xs mt-2 font-bold ml-1">{{ $message }}</p> @enderror
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- TANGGAL BREAKDOWN -->
+                    <div>
+                        <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Tgl Breakdown <span class="text-red-500">*</span></label>
+                        <input type="date" name="breakdown_date" value="{{ old('breakdown_date', now()->format('Y-m-d')) }}" class="w-full border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-sm font-bold p-4 focus:ring-4 focus:ring-red-50 dark:focus:ring-red-900/20 focus:border-red-600 dark:focus:border-red-400 transition-all text-slate-900 dark:text-slate-100" required>
+                        @error('breakdown_date') <p class="text-red-500 dark:text-red-400 text-xs mt-2 font-bold ml-1">{{ $message }}</p> @enderror
+                    </div>
+
                     <!-- PIC / VENDOR -->
                     <div>
-                        <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Pelapor / Vendor Perbaikan</label>
-                        <input type="text" name="vendor_pic" value="{{ old('vendor_pic') }}" class="w-full border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-sm font-bold p-4 focus:ring-4 focus:ring-red-50 dark:focus:ring-red-900/20 focus:border-red-600 dark:focus:border-red-400 transition-all uppercase text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500" placeholder="Contoh: PT. BIMA / TIM INTERNAL">
+                        <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Pelapor / Vendor</label>
+                        <input type="text" name="vendor_pic" value="{{ old('vendor_pic') }}" class="w-full border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-sm font-bold p-4 focus:ring-4 focus:ring-red-50 dark:focus:ring-red-900/20 focus:border-red-600 dark:focus:border-red-400 transition-all uppercase text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500" placeholder="Contoh: PT. BIMA">
                         @error('vendor_pic') <p class="text-red-500 dark:text-red-400 text-xs mt-2 font-bold ml-1">{{ $message }}</p> @enderror
                     </div>
 
                     <!-- STATUS LAPORAN -->
                     <div>
-                        <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Status Laporan Awal <span class="text-red-500">*</span></label>
+                        <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Status Laporan <span class="text-red-500">*</span></label>
                         <div class="relative">
                             <select name="repair_status" class="w-full border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-sm font-bold p-4 focus:ring-4 focus:ring-red-50 dark:focus:ring-red-900/20 focus:border-red-600 dark:focus:border-red-400 transition-all uppercase text-slate-900 dark:text-slate-100 appearance-none cursor-pointer" required>
-                                <option value="reported" {{ old('repair_status') == 'reported' ? 'selected' : '' }}>Reported (Baru Dilaporkan)</option>
-                                <option value="order_part" {{ old('repair_status') == 'order_part' ? 'selected' : '' }}>Order Part (Butuh Suku Cadang)</option>
-                                <option value="on_progress" {{ old('repair_status') == 'on_progress' ? 'selected' : '' }}>On Progress (Langsung Dikerjakan)</option>
+                                <option value="reported" {{ old('repair_status') == 'reported' ? 'selected' : '' }}>Reported</option>
+                                <option value="order_part" {{ old('repair_status') == 'order_part' ? 'selected' : '' }}>Order Part</option>
+                                <option value="on_progress" {{ old('repair_status') == 'on_progress' ? 'selected' : '' }}>On Progress</option>
                             </select>
                             <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
                         </div>

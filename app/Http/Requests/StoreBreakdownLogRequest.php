@@ -27,6 +27,7 @@ class StoreBreakdownLogRequest extends FormRequest
             'issue_detail' => 'required|string|max:500|min:5',
             'repair_status' => 'required|in:reported,order_part,on_progress',
             'vendor_pic' => 'nullable|string|max:255|min:2',
+            'breakdown_date' => 'nullable|date_format:Y-m-d',
         ];
     }
 
@@ -45,6 +46,7 @@ class StoreBreakdownLogRequest extends FormRequest
             'repair_status.in' => 'Status laporan awal tidak valid',
             'vendor_pic.max' => 'Nama vendor/PIC maksimal 255 karakter',
             'vendor_pic.min' => 'Nama vendor/PIC minimal 2 karakter',
+            'breakdown_date.date_format' => 'Format tanggal breakdown tidak valid (Y-m-d)',
         ];
     }
 }

@@ -18,7 +18,12 @@
                     <textarea name="issue_detail" rows="3" class="w-full border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-sm font-medium p-4 focus:ring-4 focus:ring-blue-50 dark:focus:ring-blue-900/20 focus:border-[#003366] dark:focus:border-blue-400 transition-all text-slate-900 dark:text-slate-100" required>{{ old('issue_detail') ?? $breakdown->issue_detail }}</textarea>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Tgl Breakdown</label>
+                        <input type="date" name="breakdown_date" value="{{ old('breakdown_date') ?? ($breakdown->breakdown_date ? \Carbon\Carbon::parse($breakdown->breakdown_date)->format('Y-m-d') : '') }}" class="w-full border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-sm font-bold p-4 focus:ring-4 focus:ring-blue-50 dark:focus:ring-blue-900/20 focus:border-[#003366] dark:focus:border-blue-400 transition-all text-slate-900 dark:text-slate-100">
+                    </div>
+
                     <div>
                         <label class="block text-[11px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-2 ml-1">Penanggung Jawab (PIC)</label>
                         <input type="text" name="vendor_pic" value="{{ old('vendor_pic') ?? $breakdown->vendor_pic }}" class="w-full border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 rounded-xl text-sm font-bold p-4 focus:ring-4 focus:ring-blue-50 dark:focus:ring-blue-900/20 focus:border-[#003366] dark:focus:border-blue-400 transition-all uppercase text-slate-900 dark:text-slate-100" required>
