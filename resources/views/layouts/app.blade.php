@@ -93,15 +93,15 @@
             </header>
 
             <!-- MAIN CONTENT AREA -->
-            <div class="flex-1 overflow-y-auto custom-scrollbar bg-slate-50 dark:bg-slate-950 transition-colors duration-500">
-                <main class="w-full max-w-[1600px] mx-auto p-6 sm:p-8 lg:p-10 min-h-[calc(100vh-140px)]">
+            <div class="flex-1 overflow-y-auto custom-scrollbar bg-slate-50 dark:bg-slate-950 transition-colors duration-500 flex flex-col">
+                <main class="w-full max-w-[1600px] mx-auto p-6 sm:p-8 lg:p-10 flex-1">
                     {{ $slot }}
                 </main>
 
                 <x-flash-popup />
 
                 <!-- STANDARDIZED FOOTER -->
-                <footer class="w-full border-t border-slate-200 dark:border-slate-800 py-8 px-10 bg-white dark:bg-slate-900/50 transition-all duration-300 mt-auto">
+                <footer class="w-full border-t border-slate-200 dark:border-slate-800 py-8 px-10 bg-white dark:bg-slate-900/50 transition-all duration-300 mt-auto shrink-0">
                     <div class="max-w-[1600px] mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
                         <div class="flex items-center gap-4 group">
                             <img src="{{ asset('danantara.png') }}" alt="Danantara" class="h-5 object-contain opacity-80 group-hover:opacity-100 transition-all">

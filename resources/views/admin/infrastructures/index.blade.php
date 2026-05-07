@@ -370,5 +370,4 @@
         title="Hapus Aset?" 
         message="Anda yakin ingin menghapus data <strong class='text-red-600' x-text='assetCode'></strong>? Data ini akan dihapus secara permanen dari sistem."
     />
-    </div>
 </x-app-layout>
