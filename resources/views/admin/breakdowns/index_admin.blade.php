@@ -1,6 +1,6 @@
 <x-app-layout>
     <div class="max-w-[1600px] mx-auto w-full space-y-8 animate-fade-up" x-data="{ 
-        activeTab: '{{ request('page') ? 'list' : 'list' }}',
+        activeTab: '{{ request('tab', 'list') }}',
         showDeleteModal: false, 
         deleteUrl: '', 
         assetCode: '', 
@@ -66,11 +66,15 @@
                 </div>
             </div>
 
-            <!-- Server-side Filter Form -->
+            <!-- SEARCH & FILTER -->
             <form action="{{ route('admin.breakdowns.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 pt-8 border-t border-slate-100 dark:border-slate-800/50">
+                <input type="hidden" name="tab" x-bind:value="activeTab">
                 <div class="relative lg:col-span-2">
                     <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 text-xs"></i>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari kode alat, nama aset, atau detail..." 
+                    <input type="text" name="search" value="{{ request('search') }}" 
+                           x-on:input.debounce.800ms="$event.target.form.submit()"
+                           {{ request()->has('search') ? 'autofocus' : '' }}
+                           placeholder="Cari alat (nama, kode, tipe, kategori, entitas, detail)..." 
                            class="w-full pl-12 pr-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-red-500 transition-all">
                 </div>
                 

@@ -1,7 +1,7 @@
 <x-app-layout>
     <div class="max-w-[1600px] mx-auto w-full space-y-8 animate-fade-up"
          x-data="{
-                 activeTab: '{{ request('history_page') ? 'history' : 'active' }}',
+                 activeTab: '{{ request('tab', request('history_page') ? 'history' : 'active') }}',
                  showReportModal: false,
                  showUpdateModal: false,
                  selectedAsset: null,
@@ -88,14 +88,18 @@
         <!-- SEARCH & FILTER -->
         <div class="bg-white dark:bg-slate-900 p-4 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm">
             <form action="{{ route('admin.breakdowns.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <input type="hidden" name="tab" x-bind:value="activeTab">
                 <div class="relative lg:col-span-2">
                     <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"></i>
                     <input type="text" name="search" value="{{ request('search') }}"
-                           placeholder="Cari berdasarkan kode alat atau detail kerusakan..."
+                           x-on:input.debounce.800ms="$event.target.form.submit()"
+                           {{ request()->has('search') ? 'autofocus' : '' }}
+                           onfocus="var temp_value=this.value; this.value=''; this.value=temp_value"
+                           placeholder="Cari alat (nama, kode, tipe, kategori, entitas, detail)..."
                            class="w-full pl-12 pr-6 py-4 bg-slate-50 dark:bg-slate-800 border-none rounded-2xl text-sm font-bold text-slate-700 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-[#0055a4] transition-all">
                 </div>
 
-                <button type="submit" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2">
+                <button type="button" class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-6 py-4 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2">
                     <i class="fas fa-filter"></i> Filter
                 </button>
 
@@ -121,8 +125,8 @@
             <!-- TAB: UNIT RUSAK (ACTIVE BREAKDOWNS) -->
             <div x-show="activeTab === 'active'" x-transition class="space-y-4">
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    @forelse($infrastructures->where('status', 'breakdown') as $item)
-                        @php $activeLog = $activeBreakdowns[$item->id] ?? null; @endphp
+                    @forelse($recentBreakdowns as $activeLog)
+                        @php $item = $activeLog->infrastructure; @endphp
                         <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] border border-red-100 dark:border-red-900/30 overflow-hidden shadow-sm hover:shadow-xl transition-all border-l-8 border-l-red-500 relative">
                             <div class="p-8">
                                 <div class="flex justify-between items-start mb-6">
@@ -237,7 +241,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
-                            @forelse($infrastructures->where('status', 'available') as $index => $item)
+                            @forelse($infrastructures as $index => $item)
                                 <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
                                     <td class="px-8 py-6 text-center text-slate-400 font-bold text-xs">{{ $index + 1 }}</td>
                                     <td class="px-8 py-6">
@@ -267,6 +271,9 @@
                             @endforelse
                         </tbody>
                     </table>
+                </div>
+                <div class="mt-6">
+                    {{ $infrastructures->links() }}
                 </div>
             </div>
 

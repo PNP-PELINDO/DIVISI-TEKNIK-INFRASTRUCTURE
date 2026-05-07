@@ -39,7 +39,8 @@ class BreakdownLogController extends Controller
                       ->orWhereHas('infrastructure', function($sq) use ($search) {
                           $sq->where('code_name', 'like', "%{$search}%")
                              ->orWhere('type', 'like', "%{$search}%")
-                             ->orWhere('category', 'like', "%{$search}%");
+                             ->orWhere('category', 'like', "%{$search}%")
+                             ->orWhereHas('entity', fn($esq) => $esq->where('name', 'like', "%{$search}%"));
                       });
                 });
             }
@@ -78,7 +79,9 @@ class BreakdownLogController extends Controller
             ];
             $stats['readiness_rate'] = $stats['total'] > 0 ? round(($stats['available'] / $stats['total']) * 100, 1) : 0;
 
-            $infraQuery = Infrastructure::with('entity')->where('entity_id', $user->entity_id);
+            $infraQuery = Infrastructure::with('entity')
+                ->where('entity_id', $user->entity_id)
+                ->where('status', 'available');
 
             if ($filterInfraId) {
                 $infraQuery->where('id', $filterInfraId);
@@ -88,7 +91,8 @@ class BreakdownLogController extends Controller
                 $infraQuery->where(function($q) use ($search) {
                     $q->where('code_name', 'like', "%{$search}%")
                       ->orWhere('type', 'like', "%{$search}%")
-                      ->orWhere('category', 'like', "%{$search}%");
+                      ->orWhere('category', 'like', "%{$search}%")
+                      ->orWhereHas('entity', fn($esq) => $esq->where('name', 'like', "%{$search}%"));
                 });
             }
 
@@ -113,13 +117,28 @@ class BreakdownLogController extends Controller
                 ->where('entity_id', $user->entity_id)
                 ->get();
 
-            $recentBreakdowns = BreakdownLog::with(['infrastructure' => fn($q) => $q->withTrashed()->with('entity')])
+            $recentQuery = BreakdownLog::with(['infrastructure' => fn($q) => $q->withTrashed()->with('entity')])
                 ->where('repair_status', '!=', 'resolved')
-                ->whereHas('infrastructure', function($q) use ($user) {
+                ->whereHas('infrastructure', function($q) use ($user, $search) {
                     $q->where('entity_id', $user->entity_id);
-                })
-                ->latest()
-                ->get();
+                    if ($search) {
+                        $q->where(function($sq) use ($search) {
+                            $sq->where('code_name', 'like', "%{$search}%")
+                               ->orWhere('type', 'like', "%{$search}%")
+                               ->orWhere('category', 'like', "%{$search}%");
+                        });
+                    }
+                });
+
+            if ($search) {
+                $recentQuery->orWhere(function($q) use ($search, $user) {
+                    $q->where('repair_status', '!=', 'resolved')
+                      ->whereHas('infrastructure', fn($sq) => $sq->where('entity_id', $user->entity_id))
+                      ->where('issue_detail', 'like', "%{$search}%");
+                });
+            }
+
+            $recentBreakdowns = $recentQuery->latest()->get();
 
             // TAMBAHAN: Ambil SEMUA LOG (History) untuk Operator agar bisa melihat riwayat
             $historyQuery = BreakdownLog::with(['infrastructure' => fn($q) => $q->withTrashed(), 'createdBy', 'updatedBy', 'statusHistories'])
@@ -128,7 +147,9 @@ class BreakdownLogController extends Controller
                     if ($search) {
                         $q->where(function($sq) use ($search) {
                             $sq->where('code_name', 'like', "%{$search}%")
-                               ->orWhere('type', 'like', "%{$search}%");
+                               ->orWhere('type', 'like', "%{$search}%")
+                               ->orWhere('category', 'like', "%{$search}%")
+                               ->orWhereHas('entity', fn($esq) => $esq->where('name', 'like', "%{$search}%"));
                         });
                     }
                 });
