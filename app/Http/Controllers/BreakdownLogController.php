@@ -63,7 +63,28 @@ class BreakdownLogController extends Controller
 
             $allEntities = Entity::orderBy('name')->get();
 
-            return view('admin.breakdowns.index_admin', compact('logs', 'activeBreakdowns', 'allEntities'));
+            $infraQuery = Infrastructure::with('entity');
+
+            if ($search) {
+                $infraQuery->where(function($q) use ($search) {
+                    $q->where('code_name', 'like', "%{$search}%")
+                      ->orWhere('type', 'like', "%{$search}%")
+                      ->orWhere('category', 'like', "%{$search}%")
+                      ->orWhereHas('entity', fn($esq) => $esq->where('name', 'like', "%{$search}%"));
+                });
+            }
+
+            if ($filterEntity && $filterEntity !== 'all') {
+                $infraQuery->where('entity_id', $filterEntity);
+            }
+
+            if ($filterStatus && $filterStatus !== 'all') {
+                $infraQuery->where('status', $filterStatus === 'resolved' ? 'available' : 'breakdown');
+            }
+
+            $allInfrastructures = $infraQuery->latest()->get();
+
+            return view('admin.breakdowns.index_admin', compact('logs', 'activeBreakdowns', 'allEntities', 'allInfrastructures'));
         }
 
         // JIKA YANG LOGIN ADALAH OPERATOR (TAMPILAN EXCEL KESIAPAN ALAT)

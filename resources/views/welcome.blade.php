@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Portal Infrastruktur | Pelindo Regional Group</title>
+    <title>Dashboard Infrastructure Availability (DIA) | PT Pelindo Regional 2 Teluk Bayur</title>
     <link rel="icon" href="{{ asset('logo_pelindo.png') }}">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -209,10 +209,10 @@
 
         <div class="text-center py-4 md:py-8 ">
             <h1 class="text-3xl md:text-5xl font-black text-[#003366] dark:text-white uppercase tracking-tight leading-tight">
-                Dasbor Kesiapan <br>
-                <span class="text-[#0055a4] dark:text-sky-400">Infrastruktur</span>
+                Dashboard Infrastructure <br>
+                <span class="text-[#0055a4] dark:text-sky-400">Availability (DIA)</span>
             </h1>
-            <p class="mt-3 md:mt-4 text-xs md:text-sm font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase">Pelindo Regional Group</p>
+            <p class="mt-3 md:mt-4 text-xs md:text-sm font-bold text-slate-500 dark:text-slate-400 tracking-widest uppercase">PT Pelindo Regional 2 Teluk Bayur</p>
             
             <div class="inline-flex items-center gap-2 md:gap-3 mt-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 px-4 md:px-6 py-2 md:py-3 rounded-full shadow-sm text-[10px] md:text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest">
                 <span class="relative flex h-2.5 w-2.5 md:h-3 md:w-3">
@@ -480,7 +480,7 @@
 
     <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 md:py-8 mt-10 md:mt-12 text-center">
         <p class="text-[9px] md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] md:tracking-[0.3em] px-4">
-            &copy; {{ date('Y') }} Danantara Indonesia x Pelindo. All Rights Reserved.
+            &copy; {{ date('Y') }} Dashboard Infrastructure Availability (DIA) pada PT Pelindo Regional 2 Teluk Bayur. All Rights Reserved.
         </p>
     </footer>
 

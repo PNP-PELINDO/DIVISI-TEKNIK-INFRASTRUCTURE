@@ -55,7 +55,7 @@
             </div>
         </div>
         <div class="footer">
-            <p>&copy; {{ date('Y') }} DIVISI TEKNIK - Pelindo Infrastructure Reporting System</p>
+            <p>&copy; {{ date('Y') }} DIVISI TEKNIK - Dashboard Infrastructure Availability (DIA)</p>
         </div>
     </div>
 </body>

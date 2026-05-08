@@ -37,6 +37,8 @@
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
+            [x-cloak] { display: none !important; }
+
             body { font-family: 'Inter', sans-serif; }
             .sidebar-transition { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
             .sidebar-hidden { margin-left: -18rem; }

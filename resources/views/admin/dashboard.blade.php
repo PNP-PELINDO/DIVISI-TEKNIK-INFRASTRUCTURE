@@ -702,7 +702,7 @@
 
                 <!-- Modal Footer -->
                 <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between shrink-0">
-                    <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Pelindo Infrastructure Reporting System</p>
+                    <p class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">Dashboard Infrastructure Availability (DIA)</p>
                     <a :href="'/admin/infrastructures/' + infraData?.id" class="bg-pelindo-blue dark:bg-pelindo-blue hover:bg-pelindo-navy dark:hover:bg-pelindo-navy text-white px-5 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-md transition-colors flex items-center gap-2">
                         <i class="fas fa-tools"></i> Kelola Perbaikan (Update Status)
                     </a>

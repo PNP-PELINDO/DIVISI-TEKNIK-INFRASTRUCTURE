@@ -160,7 +160,7 @@
                                     class="text-2xl font-black text-[#003366] dark:text-white uppercase tracking-tight mb-2">
                                     Akhiri Sesi?</h3>
                                 <p class="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed mb-8">
-                                    Apakah Anda yakin ingin keluar dari sistem Management Infrastructure Pelindo?
+                                    Apakah Anda yakin ingin keluar dari sistem Dashboard Infrastructure Availability (DIA)?
                                 </p>
                                 <div class="flex gap-4">
                                     <button @click="showLogoutModal = false"
@@ -181,7 +181,7 @@
 
         <!-- Version Footer -->
         <div class="px-6 py-4 text-center opacity-40">
-            <p class="text-[8px] font-black text-white uppercase tracking-[0.3em]">Infrastructure Management v2.0</p>
+            <p class="text-[8px] font-black text-white uppercase tracking-[0.3em]">Dashboard Infrastructure Availability (DIA) v1.0</p>
         </div>
     </div>
 </aside>
