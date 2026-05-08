@@ -272,7 +272,7 @@
                                             <div class="flex items-center gap-4">
                                                 <div class="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shrink-0 shadow-sm">
                                                     @if($item->image)
-                                                        <img src="{{ asset('storage/'.$item->image) }}" class="w-full h-full object-cover">
+                                                        <img src="{{ str_starts_with($item->image, 'http') ? $item->image : asset('storage/' . ltrim($item->image, '/')) }}" class="w-full h-full object-cover">
                                                     @else
                                                         <div class="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-600">
                                                             <i class="fas text-xs {{ $item->category === 'equipment' ? 'fa-truck' : ($item->category === 'facility' ? 'fa-building' : ($item->category === 'utility' ? 'fa-bolt' : 'fa-image')) }}"></i>
@@ -312,7 +312,7 @@
                                                             'entity' => optional($item->entity)->name,
                                                             'status' => $item->status,
                                                             'quantity' => $item->quantity,
-                                                            'image' => $item->image ? asset('storage/'.$item->image) : null,
+                                                            'image' => $item->image ? (str_starts_with($item->image, 'http') ? $item->image : asset('storage/' . ltrim($item->image, '/'))) : null,
                                                             'created_by' => optional($item->createdBy)->name ?? 'System',
                                                             'updated_by' => optional($item->updatedBy)->name ?? 'System',
                                                             'created_at' => $item->created_at->format('d M Y H:i'),

@@ -130,8 +130,14 @@
                                     <td class="px-8 py-6 text-center text-slate-400 font-bold text-xs">{{ $index + 1 }}</td>
                                     <td class="px-8 py-6">
                                         <div class="flex items-center gap-4">
-                                            <div class="w-10 h-10 bg-slate-50 dark:bg-slate-800 rounded-xl flex items-center justify-center text-[#003366] dark:text-blue-400 text-sm border border-slate-100 dark:border-slate-700">
-                                                <i class="fas fa-cube"></i>
+                                            <div class="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shrink-0 shadow-sm">
+                                                @if($log->infrastructure && $log->infrastructure->image)
+                                                    <img src="{{ str_starts_with($log->infrastructure->image, 'http') ? $log->infrastructure->image : asset('storage/' . ltrim($log->infrastructure->image, '/')) }}" class="w-full h-full object-cover">
+                                                @else
+                                                    <div class="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-600">
+                                                        <i class="fas text-xs {{ $log->infrastructure && $log->infrastructure->category === 'equipment' ? 'fa-truck' : ($log->infrastructure && $log->infrastructure->category === 'facility' ? 'fa-building' : ($log->infrastructure && $log->infrastructure->category === 'utility' ? 'fa-bolt' : 'fa-image')) }}"></i>
+                                                    </div>
+                                                @endif
                                             </div>
                                             <div>
                                                 <p class="font-black text-[#003366] dark:text-blue-400 text-sm uppercase leading-none">{{ $log->infrastructure->code_name ?? 'UNIT TERHAPUS' }}</p>

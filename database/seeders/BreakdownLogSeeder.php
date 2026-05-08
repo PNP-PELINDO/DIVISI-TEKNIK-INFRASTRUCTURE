@@ -66,8 +66,6 @@ class BreakdownLogSeeder extends Seeder
             'Tim Teknisi Internal', 'PT Bima Solusi Elektrik', 'PT Pelindo Daya Sejahtera'
         ];
 
-        $logs = [];
-
         foreach ($infrastructures as $infra) {
             // Berapa kali alat ini pernah rusak? (0-5 kali histori)
             $historyCount = rand(0, 5);
@@ -94,7 +92,7 @@ class BreakdownLogSeeder extends Seeder
                 $pr_po_date = $statusIndex >= 1 ? (clone $work_order_date)->addDays(rand(2, 5)) : null;
                 $start_work_date = $statusIndex >= 2 ? (clone $pr_po_date)->addDays(rand(1, 7)) : null;
                 
-                $logs[] = [
+                $log = BreakdownLog::create([
                     'infrastructure_id' => $infra->id,
                     'issue_detail' => $faker->randomElement($issues[$infra->category]),
                     'repair_status' => $status,
@@ -111,7 +109,39 @@ class BreakdownLogSeeder extends Seeder
                     'updated_by' => $updaterId,
                     'created_at' => $createdDate,
                     'updated_at' => Carbon::now()
-                ];
+                ]);
+
+                // Audit Trail (Status History)
+                \App\Models\StatusHistory::create([
+                    'breakdown_log_id' => $log->id,
+                    'old_status' => null,
+                    'new_status' => 'reported',
+                    'note' => 'Laporan kerusakan awal oleh sistem/operator.',
+                    'user_id' => $creatorId,
+                    'created_at' => $createdDate,
+                ]);
+
+                if ($statusIndex >= 1) {
+                    \App\Models\StatusHistory::create([
+                        'breakdown_log_id' => $log->id,
+                        'old_status' => 'reported',
+                        'new_status' => 'order_part',
+                        'note' => 'Menunggu pemesanan sparepart.',
+                        'user_id' => $updaterId,
+                        'created_at' => $pr_po_date,
+                    ]);
+                }
+
+                if ($statusIndex >= 2) {
+                    \App\Models\StatusHistory::create([
+                        'breakdown_log_id' => $log->id,
+                        'old_status' => 'order_part',
+                        'new_status' => 'on_progress',
+                        'note' => 'Pekerjaan perbaikan dimulai.',
+                        'user_id' => $updaterId,
+                        'created_at' => $start_work_date,
+                    ]);
+                }
             }
             
             // Generate historical data (already resolved)
@@ -127,7 +157,7 @@ class BreakdownLogSeeder extends Seeder
                 $com_test_date = (clone $start_work_date)->addDays(rand(2, 7));
                 $resolved_date = (clone $com_test_date)->addDays(1);
                 
-                $logs[] = [
+                $log = BreakdownLog::create([
                     'infrastructure_id' => $infra->id,
                     'issue_detail' => $faker->randomElement($issues[$infra->category]),
                     'repair_status' => 'resolved',
@@ -144,12 +174,45 @@ class BreakdownLogSeeder extends Seeder
                     'updated_by' => $updaterId,
                     'created_at' => $createdDate,
                     'updated_at' => $resolved_date
-                ];
-            }
-        }
+                ]);
 
-        foreach (array_chunk($logs, 50) as $chunk) {
-            BreakdownLog::insert($chunk);
+                // Audit Trail for resolved
+                \App\Models\StatusHistory::create([
+                    'breakdown_log_id' => $log->id,
+                    'old_status' => null,
+                    'new_status' => 'reported',
+                    'note' => 'Laporan kerusakan awal.',
+                    'user_id' => $creatorId,
+                    'created_at' => $createdDate,
+                ]);
+
+                \App\Models\StatusHistory::create([
+                    'breakdown_log_id' => $log->id,
+                    'old_status' => 'reported',
+                    'new_status' => 'order_part',
+                    'note' => 'Sparepart dipesan.',
+                    'user_id' => $updaterId,
+                    'created_at' => $pr_po_date,
+                ]);
+
+                \App\Models\StatusHistory::create([
+                    'breakdown_log_id' => $log->id,
+                    'old_status' => 'order_part',
+                    'new_status' => 'on_progress',
+                    'note' => 'Proses perbaikan.',
+                    'user_id' => $updaterId,
+                    'created_at' => $start_work_date,
+                ]);
+
+                \App\Models\StatusHistory::create([
+                    'breakdown_log_id' => $log->id,
+                    'old_status' => 'on_progress',
+                    'new_status' => 'resolved',
+                    'note' => 'Perbaikan selesai, unit kembali ready.',
+                    'user_id' => $updaterId,
+                    'created_at' => $resolved_date,
+                ]);
+            }
         }
     }
 }

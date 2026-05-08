@@ -131,8 +131,14 @@
                             <div class="p-8">
                                 <div class="flex justify-between items-start mb-6">
                                     <div class="flex items-center gap-4">
-                                        <div class="w-16 h-16 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-2xl flex items-center justify-center text-2xl border border-red-100 dark:border-red-800 shadow-inner shrink-0">
-                                            <i class="fas fa-tools"></i>
+                                        <div class="w-16 h-16 bg-white dark:bg-slate-800 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 shrink-0 shadow-sm">
+                                            @if($item->image)
+                                                <img src="{{ str_starts_with($item->image, 'http') ? $item->image : asset('storage/' . ltrim($item->image, '/')) }}" class="w-full h-full object-cover">
+                                            @else
+                                                <div class="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-600 text-2xl">
+                                                    <i class="fas {{ $item->category === 'equipment' ? 'fa-truck' : ($item->category === 'facility' ? 'fa-building' : ($item->category === 'utility' ? 'fa-bolt' : 'fa-image')) }}"></i>
+                                                </div>
+                                            @endif
                                         </div>
                                         <div>
                                             <h3 class="text-xl font-black text-[#003366] dark:text-white uppercase leading-tight">{{ $item->code_name }}</h3>
@@ -245,9 +251,20 @@
                                 <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
                                     <td class="px-8 py-6 text-center text-slate-400 font-bold text-xs">{{ $index + 1 }}</td>
                                     <td class="px-8 py-6">
-                                        <div class="flex flex-col">
-                                            <span class="font-black text-[#003366] dark:text-blue-400 text-sm uppercase group-hover:text-blue-600 transition-colors">{{ $item->code_name }}</span>
-                                            <span class="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-1">{{ $item->name }}</span>
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shrink-0 shadow-sm">
+                                                @if($item->image)
+                                                    <img src="{{ str_starts_with($item->image, 'http') ? $item->image : asset('storage/' . ltrim($item->image, '/')) }}" class="w-full h-full object-cover">
+                                                @else
+                                                    <div class="w-full h-full flex items-center justify-center text-slate-300 dark:text-slate-600">
+                                                        <i class="fas text-xs {{ $item->category === 'equipment' ? 'fa-truck' : ($item->category === 'facility' ? 'fa-building' : ($item->category === 'utility' ? 'fa-bolt' : 'fa-image')) }}"></i>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            <div class="flex flex-col">
+                                                <span class="font-black text-[#003366] dark:text-blue-400 text-sm uppercase group-hover:text-blue-600 transition-colors">{{ $item->code_name }}</span>
+                                                <span class="text-[9px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-1">{{ $item->name }}</span>
+                                            </div>
                                         </div>
                                     </td>
                                     <td class="px-8 py-6">
